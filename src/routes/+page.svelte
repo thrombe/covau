@@ -17,8 +17,8 @@
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
 
-<button on:click={f} >button</button>
-<button on:click={f2} >button</button>
+<button on:click={f} >ts</button>
+<button on:click={f2} >js</button>
 
 <section>
 	<h1>
