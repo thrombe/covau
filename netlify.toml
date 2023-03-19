@@ -1,0 +1,8 @@
+[build]
+# base = "/"
+# command = "npm run build"
+publish = "build"
+
+
+# [functions]
+# directory = "lol/functions"
