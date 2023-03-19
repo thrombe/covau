@@ -3,6 +3,11 @@
 command = "npm run build"
 publish = "build"
 
+[dev]
+targetPort = 5173
+command = "npm run dev"
+framework = "#custom"
+publish = "src"
 
 [functions]
 directory = "functions"
