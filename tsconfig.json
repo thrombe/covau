@@ -4,9 +4,11 @@
 		"allowJs": true,
 		"checkJs": true,
 		"esModuleInterop": true,
+		// "isolatedModules": true,
 		"forceConsistentCasingInFileNames": true,
 		"resolveJsonModule": true,
 		"skipLibCheck": true,
+		// "target": "es2015",
 		"sourceMap": true,
 		"strict": true
 	}

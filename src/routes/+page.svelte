@@ -1,10 +1,24 @@
-<script>
+<script lang="ts">
+
+	let f = async () => {
+		let r = await fetch("/.netlify/functions/hello");
+		let e = r.text();
+		console.log(r, e);
+	};
+	let f2 = async () => {
+		let r = await fetch("/.netlify/functions/hello2");
+		let e = r.text();
+		console.log(r, e);
+	};
 </script>
 
 <svelte:head>
 	<title>Home</title>
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
+
+<button on:click={f} >button</button>
+<button on:click={f2} >button</button>
 
 <section>
 	<h1>
