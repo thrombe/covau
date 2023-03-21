@@ -2,6 +2,10 @@
 	"name": "covau",
 	"version": "0.0.1",
 	"scripts": {
+		"netlify-dev": "cd functions && netlify dev",
+		"netlify-serve": "cd functions && netlify serve",
+		"netlify-deploy": "npm run build && cd functions && netlify deploy",
+		"netlify-deploy-prod": "npm run build && cd functions && netlify deploy --prod",
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
@@ -29,6 +33,6 @@
 	"type": "module",
 	"dependencies": {
 		"@netlify/functions": "^1.4.0",
-		"youtubei": "^1.1.2"
+		"youtubei.js": "^4.0.1"
 	}
 }

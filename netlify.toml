@@ -1,15 +1,16 @@
 [build]
-# base = "/"
 command = "npm run build"
 publish = "build"
+# functions = "functions/src"
 
 [dev]
 targetPort = 5173
 command = "npm run dev"
 framework = "#custom"
-publish = "src"
+publish = "build"
 port = 8888
 
-[functions]
-directory = "functions"
+# [functions]
+# directory = "functions/src"
 # node_bundler = "esbuild"
+

@@ -1,0 +1,10 @@
+{
+	"scripts": {
+		"dev": "cd ..; npm run dev",
+		"build": "cd ..; npm run build"
+	},
+	"dependencies": {
+		"@netlify/functions": "^1.4.0",
+		"youtubei.js": "^4.0.1"
+	}
+}

@@ -17,6 +17,7 @@
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
 
+<a style={"background-color: #282828;"} href="/play">play</a>
 <button on:click={f} >ts</button>
 <button on:click={f2} >js</button>
 
