@@ -37,6 +37,18 @@
   - [Tutorials - Netlify Functions](https://functions.netlify.com/tutorials/)
   - [File-based configuration | Netlify Docs](https://docs.netlify.com/configure-builds/file-based-configuration/#deploy-contexts)
 
+- firebase
+  - [Firebase  |  Google Developers](https://developers.google.com/learn/topics/firebase)
+  - [Firebase Pricing](https://firebase.google.com/pricing/)
+  - [Firebase Documentation](https://firebase.google.com/docs)
+  - [Firestore  |  Firebase](https://firebase.google.com/docs/firestore)
+  - [Firebase web codelab](https://firebase.google.com/codelabs/firebase-web#0)
+  - [Installation & Setup in JavaScript  |  Firebase Realtime Database](https://firebase.google.com/docs/database/web/start#web-version-9)
+  - [Cloud Firestore Web Codelab  |  Firebase](https://firebase.google.com/codelabs/firestore-web#0)
+  - [API Reference  |  Firebase JavaScript API reference](https://firebase.google.com/docs/reference/js)
+  - [Firebase Realtime Database](https://firebase.google.com/docs/database)
+  - [How to Build a Real-time Chat App with ReactJS and Firebase](https://www.freecodecamp.org/news/building-a-real-time-chat-app-with-reactjs-and-firebase/)
+
 - group synced music player
   - go to a site and play a song somehow
   - anyone can play songs, pause, each can control the volume level for them (ofc)
@@ -49,17 +61,8 @@
       - [Single-page apps • Docs • SvelteKit](https://kit.svelte.dev/docs/single-page-apps)
       - [Single Page Applications Rust yew](https://www.sheshbabu.com/posts/rust-wasm-yew-single-page-application/)
     - firebase for syncing
-      - [Firebase  |  Google Developers](https://developers.google.com/learn/topics/firebase)
-      - [Firebase Pricing](https://firebase.google.com/pricing/)
-      - [Firebase Documentation](https://firebase.google.com/docs)
-      - [Send notifications using Cloud Messaging and Cloud Functions](https://firebase.google.com/codelabs/firebase-cloud-functions#0)
-      - resources or something
-        - [Firebase Realtime Database](https://firebase.google.com/docs/database)
     - but [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) won't allow this
       - cors proxies
-      - [firebase cloud functions](https://firebase.google.com/docs/functions)
-        - is it possible to get yt audio uris using scraping?
-      - aws lambda
       - a server thing running on someone's pc that responds to requests on firebase or some db
     - maybe have a seperate server
       - webserver?
