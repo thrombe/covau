@@ -2,6 +2,7 @@
 command = "npm run build"
 publish = "../build"
 # functions = "src"
+edge_functions = "src/edge"
 
 [dev]
 targetPort = 5173
@@ -15,7 +16,18 @@ port = 8888
 directory = "src"
 # node_bundler = "esbuild"
 
-[[redirects]]
-from = "/functions/*"
-to = "/.netlify/functions/:splat"
-status = 200
+[[edge_functions]]
+# directory = "src/edge"
+path = "/fetch"
+function = "ollo"
+
+# [[redirects]]
+# from = "/functions/*"
+# to = "/.netlify/functions/:splat"
+# status = 200
+
+# [[redirects]]
+# from = "http://fetch/*"
+# from = "https://fetch/*"
+# to = "/.netlify/functions/fetch/:splat"
+# status = 200

@@ -5,6 +5,8 @@
 	},
 	"dependencies": {
 		"@netlify/functions": "^1.4.0",
+		"node-fetch": "^3.3.1",
+		"node-fetch-commonjs": "^3.2.4",
 		"youtubei.js": "^4.0.1"
 	}
 }

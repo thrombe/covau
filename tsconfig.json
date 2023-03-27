@@ -4,11 +4,15 @@
 		"allowJs": true,
 		"checkJs": true,
 		"esModuleInterop": true,
-		// "isolatedModules": true,
+		"isolatedModules": true,
 		"forceConsistentCasingInFileNames": true,
 		"resolveJsonModule": true,
 		"skipLibCheck": true,
+    "target": "ESNext",
 		// "target": "es2015",
+    "module": "ESNext",
+    "useDefineForClassFields": true,
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
 		"sourceMap": true,
 		"strict": true
 	}
