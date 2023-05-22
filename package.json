@@ -33,6 +33,7 @@
 	"type": "module",
 	"dependencies": {
 		"@netlify/functions": "^1.4.0",
+		"@types/youtube": "^0.0.47",
 		"dashjs": "^4.6.0",
 		"youtubei.js": "^4.0.1"
 	}
