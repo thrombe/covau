@@ -34,7 +34,7 @@ function copyHeader(headerName, to, from) {
 }
 
 exports.handler = async (event, context) => {
-  console.log(event);
+  // console.log(event);
 
   let resp = {
     body: "lol this be me fr",
@@ -49,51 +49,53 @@ exports.handler = async (event, context) => {
   };
   // return resp;
 
-  console.log(event.queryStringParameters.__url);
-  let request;
-  if ("__url" in event.queryStringParameters) {
-      request = {
-          method: event.httpMethod,
-          url: event.queryStringParameters.__url,
-          headers: new Headers(event.headers),
-          body: event.body,
-          encoded: true,
-      };
-      let h = new Headers();
-      h.set("range", request.headers.get("range"));
-      h.set("user-agent", request.headers.get("user-agent"));
-      h.set("origin", request.headers.get("origin"));
-      request.headers = h;
-  } else if (event.body) {
+  // console.log(event.queryStringParameters.__url);
+  // let request;
+  // if ("__url" in event.queryStringParameters) {
+  //     request = {
+  //         method: event.httpMethod,
+  //         url: event.queryStringParameters.__url,
+  //         headers: new Headers(event.__headers),
+  //         body: event.body,
+  //         encoded: true,
+  //     };
+  //   console.log(request)
+  //     let h = new Headers();
+  //     h.set("range", request.headers.get("range"));
+  //     h.set("user-agent", request.headers.get("user-agent"));
+  //     h.set("origin", request.headers.get("origin"));
+  //     request.headers = h;
+  // } else if (event.body) {
       let data = JSON.parse(event.body);
-      request = {
+      let request = {
           method: data.method,
           url: data.url,
           headers: new Headers(JSON.parse(data.headers)),
           body: data.body,
           encoded: false,
       };
-  } else {return {statusCode: 200}}
+  // } else {return {statusCode: 200}}
+  // console.log(request)
   
-  let event_headers = new Headers(event.headers);
+  // let event_headers = new Headers(event.headers);
 
-  if (request.method === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': request.headers.get('origin') || '*',
-        'Access-Control-Allow-Methods': '*',
-        'Access-Control-Allow-Headers':
-          'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-goog-visitor-id, x-origin, x-youtube-client-version, Accept-Language, Range, Referer',
-        'Access-Control-Max-Age': '86400',
-        'Access-Control-Allow-Credentials': true,
-      },
-      body: "",
-    };
-  }
+  // if (request.method === 'OPTIONS') {
+  //   return {
+  //     statusCode: 200,
+  //     headers: {
+  //       'Access-Control-Allow-Origin': request.headers.get('origin') || '*',
+  //       'Access-Control-Allow-Methods': '*',
+  //       'Access-Control-Allow-Headers':
+  //         'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-goog-visitor-id, x-origin, x-youtube-client-version, Accept-Language, Range, Referer',
+  //       'Access-Control-Max-Age': '86400',
+  //       'Access-Control-Allow-Credentials': true,
+  //     },
+  //     body: "yaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaah",
+  //   };
+  // }
 
-  copyHeader('range', event_headers, request.headers);
-  !event_headers.has('user-agent') && copyHeader('user-agent', event_headers, request.headers);
+  // copyHeader('range', event_headers, request.headers);
+  // !event_headers.has('user-agent') && copyHeader('user-agent', event_headers, request.headers);
 
   console.log("\nsending request\n", {
     url: new URL(request.url),
@@ -106,7 +108,7 @@ exports.handler = async (event, context) => {
     headers: request.headers,
     body: request.body,
   });
-  console.log("\n\ngot response\n", fetchRes);
+  // console.log("\n\ngot response\n", fetchRes);
   // return fetchRes;
   // fetchRes.setEncoding("binary");
   let body = await fetchRes.buffer();
@@ -115,31 +117,32 @@ exports.handler = async (event, context) => {
   if ((fetchRes.headers.get("content-type") || "UTF-8").includes("UTF-8")) {
     body = body.toString();
   } else {
-    body = String.fromCharCode.apply(null, body);
+    body = body.toString();
+    // body = String.fromCharCode.apply(null, body);
   }
 
-  let headers = new Headers();
-  // copy content headers
-  copyHeader('content-length', headers, fetchRes.headers);
-  copyHeader('content-type', headers, fetchRes.headers);
-  copyHeader('content-disposition', headers, fetchRes.headers);
-  copyHeader('accept-ranges', headers, fetchRes.headers);
-  copyHeader('content-range', headers, fetchRes.headers);
-  copyHeader('sec-fetch-mode', headers, fetchRes.headers);
-  // copyHeader('connection', headers, fetchRes.headers);
-  // add cors headers
-  headers.set(
-    'Access-Control-Allow-Origin',
-    request.headers.get('origin') || '*',
-  );
-  headers.set('Access-Control-Allow-Headers', '*');
-  headers.set('Access-Control-Allow-Methods', '*');
-  headers.set('Access-Control-Allow-Credentials', true);
-  let m = new Map([...headers.entries()]);
-  m.set('access-control-allow-credentials', true);
-  m.set('access-control-allow-origin', "*");
-  let h = Object.fromEntries(m);
-  console.log("\n\nheaders sent\n", h);
+  // let headers = new Headers();
+  // // copy content headers
+  // copyHeader('content-length', headers, fetchRes.headers);
+  // copyHeader('content-type', headers, fetchRes.headers);
+  // copyHeader('content-disposition', headers, fetchRes.headers);
+  // copyHeader('accept-ranges', headers, fetchRes.headers);
+  // copyHeader('content-range', headers, fetchRes.headers);
+  // copyHeader('sec-fetch-mode', headers, fetchRes.headers);
+  // // copyHeader('connection', headers, fetchRes.headers);
+  // // add cors headers
+  // headers.set(
+  //   'Access-Control-Allow-Origin',
+  //   request.headers.get('origin') || '*',
+  // );
+  // headers.set('Access-Control-Allow-Headers', '*');
+  // headers.set('Access-Control-Allow-Methods', '*');
+  // headers.set('Access-Control-Allow-Credentials', true);
+  // let m = new Map([...headers.entries()]);
+  // m.set('access-control-allow-credentials', true);
+  // m.set('access-control-allow-origin', "*");
+  // let h = Object.fromEntries(m);
+  // console.log("\n\nheaders sent\n", h);
   
   let res = {
     // isBase64Encoded: request.encoded,
@@ -149,7 +152,7 @@ exports.handler = async (event, context) => {
     // body: "play\ning\n\njoke",
     statusCode: fetchRes.status,
     // headers: headers,
-    headers: h,
+    // headers: h,
     // multiValueHeaders: ,
   };
   console.log("\n\nsending response\n", res);

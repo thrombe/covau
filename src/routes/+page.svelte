@@ -18,6 +18,7 @@
 </svelte:head>
 
 <a style={"background-color: #282828;"} href="/play">play</a>
+<a style={"background-color: #282828;"} href="/play_iframe">play iframe</a>
 <button on:click={f} >ts</button>
 <button on:click={f2} >js</button>
 

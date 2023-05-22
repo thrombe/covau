@@ -8,7 +8,7 @@
 
   let src_url = "";
   let progress = 0;
-  let yt_id = "";
+  let yt_id = "AjesoBGztF8";
 
   let on_audio_load = async () => {
     console.log("audio loaded");

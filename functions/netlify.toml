@@ -5,7 +5,7 @@ publish = "../build"
 edge_functions = "src/edge"
 
 [dev]
-targetPort = 5173
+targetPort = 5178
 command = "npm run dev"
 framework = "#custom"
 # publish = "../src"

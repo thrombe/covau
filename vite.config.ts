@@ -6,5 +6,8 @@ export default defineConfig({
 		minify: false,
 		// minifySyntax: false,
 	},
+    server: {
+        port: 5178
+    },
 	plugins: [sveltekit()]
 });
