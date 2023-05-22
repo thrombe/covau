@@ -23,7 +23,7 @@ exports.handler = async (event, context) => {
         body: request.body,
     });
 
-    let body = await fetchRes.buffer().toString();
+    let body = (await fetchRes.buffer()).toString();
 
     let res = {
         body: body,

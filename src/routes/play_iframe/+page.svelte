@@ -32,20 +32,25 @@
 
 				headers.delete('user-agent');
 
+				const request = new Request(
+					url,
+					input instanceof Request ? input : undefined
+				);
 				let req = {
 					url: url,
 					headers: headers_copy,
 					body: init?.body,
-					method: init?.method
+					method: request.method
 				};
 				let res = await fetch('/.netlify/functions/fetch', {
-					method: 'post',
+					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify(req)
 				});
 				return res;
 			}
 		});
+		console.log(await yt.getBasicInfo('vJnCiySv1Nw'))
 	};
 	f();
 
@@ -99,6 +104,7 @@
 </script>
 
 <input bind:value={yt_id} />
+<button on:click={f}>f</button>
 <button on:click={yo}>yo</button>
 <button on:click={do_somethin}>bo</button>
 
