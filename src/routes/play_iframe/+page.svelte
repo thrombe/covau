@@ -6,7 +6,7 @@
 	let progress = 0;
 	let yt_id = 'AjesoBGztF8';
 
-	fetch('/.netlify/functions/ollo').then((e) => console.log(e));
+	// fetch('/.netlify/functions/ollo').then((e) => console.log(e));
 
 	let yt: Innertube;
 	let f = async () => {
@@ -61,9 +61,6 @@
 	const do_somethin = () => {
 		console.log(video);
 
-		// - [Play iFrame embedded YouTube Video on click](https://codepen.io/martinwolf/pen/DrPWXw)
-		// - [Control yt Video Player with js](https://tutorialzine.com/2015/08/how-to-control-youtubes-video-player-with-javascript)
-		// - [Control yt Video Player with js](https://demo.tutorialzine.com/2015/08/how-to-control-youtubes-video-player-with-javascript/)
 		// this YT thing comes from the youtube iframe api script
 		// - [youtube.d.ts File for the youtube-iframe-api](https://stackoverflow.com/questions/42352944/youtube-d-ts-file-for-the-youtube-iframe-api-to-use-in-angular-2-needed)
 		player = new YT.Player('video', {

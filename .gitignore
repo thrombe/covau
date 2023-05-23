@@ -13,3 +13,4 @@ vite.config.ts.timestamp-*
 .netlify
 
 olb_functions
+cache
