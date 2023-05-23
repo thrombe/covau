@@ -1,174 +1,112 @@
 <script lang="ts">
-	import { onMount } from "svelte";
-  import { Innertube, UniversalCache } from "youtubei.js/web";
-  import { MediaPlayer } from "dashjs";
-	import type { Format } from "youtubei.js/dist/src/parser/misc";
+    import { initializeApp } from 'firebase/app';
+    import { doc, getFirestore, onSnapshot, updateDoc } from 'firebase/firestore';
+    import { onDestroy } from 'svelte';
+    import { writable } from 'svelte/store';
+    import { firebase_config } from '../../firebase-config';
 
-
-
-  let src_url = "";
-  let progress = 0;
-  let yt_id = "AjesoBGztF8";
-
-  let on_audio_load = async () => {
-    console.log("audio loaded");
-  };
-  let seeked = async () => {
-    console.log("audio loaded");
-  };
-	let get_audio_uri = async () => {
-    let r = await fetch("/.netlify/functions/get_audio_uri",
-        {
-            method: "post",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({"yt_id": yt_id}),
+    let url = new URL(window.location.toString());
+    let group: string;
+    if (!url.searchParams.get('id')) {
+        group = 'random-one';
+        // window.location = url.toString();
+        url.searchParams.set('id', group);
+        window.history.pushState({}, '', url.toString());
+    } else {
+        let not_null = url.searchParams.get('id');
+        if (!not_null) {
+            throw 'never';
         }
-    );
-		let e = await r.json();
-		console.log(r, e);
-    // src_url = e.uri;
-    src_url = to_dash(e.uri).toString();
-	};
-
-  let yt: any;
-  let f = async () => {
-    yt = await Innertube.create({
-      cache: new UniversalCache(false),
-      generate_session_locally: true,
-       fetch: async (input, init) => {
-            // console.log(input);
-            // url
-            const url = typeof input === 'string'
-              ? new URL(input)
-              : input instanceof URL
-                ? input
-                : new URL(input.url);
-            // console.log(url);
-            let url_copy = url.toString();
-
-            // transform the url for use with our proxy
-            url.searchParams.set('__host', url.host);
-            url.host = 'localhost:8080';
-            // url.host = '/functions/fetch';
-            // url.host = 'fetch';
-            url.protocol = 'http';
-
-            const headers = init?.headers
-              ? new Headers(init.headers)
-              : input instanceof Request
-                ? input.headers
-                : new Headers();
-            let headers_copy = JSON.stringify([...headers]);
-
-            // now serialize the headers
-            url.searchParams.set('__headers', JSON.stringify([...headers]));
-
-            // @ts-ignore
-            input.duplex = 'half';
-
-            // copy over the request
-            const request = new Request(
-              // url,
-              to_dash(url_copy),
-              input instanceof Request ? input : undefined,
-            );
-
-            headers.delete('user-agent');
-
-            let headers_and_stuff = init ? {
-              ...init,
-              headers
-            } : {
-              headers
-            };
-            console.log(await request.arrayBuffer());
-            let body = await request.body?.getReader().read();
-            let req = {
-              url: url_copy,
-              headers: headers_copy,
-              body: init?.body,
-              method: request.method,
-            }
-            console.log(req, headers_and_stuff);
-            // fetch the url
-            let _res = fetch(request, headers_and_stuff);
-            return _res;
-
-            let res = await fetch("/fetch",
-                {
-                    method: "post",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify(req),
-                }
-            );
-            console.log("T-T");
-            console.log(res);
-            
-            return res;
-          },
-    });
-    let k = await yt.getInfo(yt_id);
-    // let uri = k.streaming_data?.adaptive_formats[k.streaming_data?.adaptive_formats.length - 1].decipher(yt.session.player);
-    // console.log(k.streaming_data?.adaptive_formats,  uri);
-    console.log(k);
-  };
-
-  let to_dash = (url: any) => {
-    let u = new URL("http://localhost:8888/fetch");
-    // let u = new URL("https://covau.netlify.app/fetch");
-    u.searchParams.set("__url", url.toString());
-    console.log(url.toString());
-    console.log(u.toString());
-    return u;
-    // return "http://localhost:8888/fetch?__url=" + url.toString();
-  };
-  let filter_formats = (format: Format): boolean => {
-    console.log(format);
-    return !format.mime_type.includes("audio") ;
-    if (format.mime_type.includes("audio")) {
-      return false;
+        group = not_null;
     }
-    return true;
-  };
 
-  let player: any;
-  onMount(async () => {
-      await f();
-      let info = await yt.getInfo(yt_id);
+    let app = initializeApp(firebase_config);
+    let db = getFirestore(app);
 
-      let video_element = document.querySelector('video') as HTMLVideoElement;
-      video_element.setAttribute('controls', 'true');
-      video_element.poster = info.basic_info.thumbnail![0].url;
+    let queue = new Array();
+    let playing_index: number;
+    let update = writable(1);
 
-      // let dash = await info.toDash(to_dash, filter_formats);
-     let r = await fetch("/.netlify/functions/get_dash",
-          {
-              method: "post",
-              headers: {"Content-Type": "application/json"},
-              body: JSON.stringify({"yt_id": yt_id}),
-          }
-      );
-  		let e = await r.json();
-      let dash = e.dash;
-      let uri = 'data:application/dash+xml;charset=utf-8;base64,' + btoa(dash);
+    let snapshot_unsub = onSnapshot(doc(db, 'groups', group), async (doc) => {
+        let data = doc.data();
+        if (!data) {
+            return;
+        }
+        console.log(data);
+        queue = data.queue;
+        playing_index = data.playing_index;
+        $update += 1;
+    });
+    onDestroy(async () => {
+        snapshot_unsub();
+    });
 
-      player = MediaPlayer().create();
-      player.initialize(video_element, uri, true);
-  });
+    let video: any;
+    let player: YT.Player;
+    const on_yt_load = () => {
+        // this YT thing comes from the youtube iframe api script
+        // - [youtube.d.ts File for the youtube-iframe-api](https://stackoverflow.com/questions/42352944/youtube-d-ts-file-for-the-youtube-iframe-api-to-use-in-angular-2-needed)
+        new YT.Player('video', {
+            width: 0,
+            height: 0,
+            playerVars: {
+                color: 'white',
+                controls: 0,
+                // autoplay: 1,
+                showinfo: 0,
+                disablekb: 1,
+                modestbranding: 1,
+                enablejsapi: 1
+            },
+            events: {
+                onReady: (eve: any) => {
+                    player = eve.target;
+                }
+            }
+        });
+    };
 
+    $: if (playing_index || queue || $update) {
+        console.log('updateeeeeeeeeeeeeeeeeeeeeeee');
+        if (player) {
+            console.log('ttttttttttttttttttttttttttttt');
+            player.loadVideoById(queue[playing_index]);
+            player.playVideo();
+        }
+    }
 
-  let dash_play = async () => {
-      let info = await yt.getInfo(yt_id);
-      let dash = await info.toDash(to_dash, filter_formats);
-      let uri = 'data:application/dash+xml;charset=utf-8;base64,' + btoa(dash);
-    player.attachSource(uri);
-    player.play();
-  };
+    (window as any).onYouTubeIframeAPIReady = on_yt_load;
+
+    let id_input_val: string;
+    const play = async () => {
+        if (!id_input_val) {
+            id_input_val = queue[playing_index];
+        }
+        await updateDoc(doc(db, 'groups', group), {
+            queue: [id_input_val]
+        });
+        player.playVideo();
+    };
 </script>
 
+<svelte:head>
+    <script src="https://www.youtube.com/iframe_api"></script>
+</svelte:head>
 
-<input bind:value={yt_id} />
-<button on:click={dash_play} >dash play</button>
-<button on:click={get_audio_uri} >play</button>
-<audio src={src_url} on:load={on_audio_load} bind:duration={progress} on:seeked={seeked} controls />
-<video />
+<input bind:value={id_input_val} />
+<button on:click={play}>play</button>
+{#each queue as id (id)}
+    <span>{id}</span>
+{/each}
+
+{#if typeof playing_index !== 'undefined'}
+    <div class="video" bind:this={video} id="video" />
+{/if}
+
+<style>
+    .video {
+        position: fixed;
+        right: 0px;
+        bottom: 0px;
+    }
+</style>
