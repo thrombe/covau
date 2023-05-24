@@ -107,6 +107,11 @@ export class Player {
                     } else if (eve.data == YT.PlayerState.PAUSED) {
                         await this.pause();
                         prev_player_state = eve.data;
+                    } else if (eve.data == YT.PlayerState.UNSTARTED) {
+                        if (prev_player_state != YT.PlayerState.UNSTARTED) {
+                            await this.play();
+                        }
+                        prev_player_state = eve.data;
                     }
                 }
             }
@@ -357,3 +362,5 @@ async function get_local_time_error(db: Firestore) {
     await deleteDoc(added_doc);
     return time_offset;
 }
+
+
