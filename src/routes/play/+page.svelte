@@ -3,9 +3,13 @@
     import {
         addDoc,
         arrayUnion,
+        collection,
+        deleteDoc,
         doc,
+        getDoc,
         getFirestore,
         onSnapshot,
+        serverTimestamp,
         setDoc,
         updateDoc
     } from 'firebase/firestore';
@@ -40,6 +44,25 @@
     let paused: boolean;
 
     let update = writable(1);
+    let time_offset = 0;
+    (async () => {
+        let sync_start = Date.now();
+        let added_doc = await addDoc(collection(db, 'timesync'), {
+            ts: serverTimestamp(),
+        });
+        let d = await getDoc(added_doc);
+        let sync_end = Date.now();
+        let now = (sync_start + sync_end)/2;
+        let data = d.data();
+        if (!data) {
+            throw "yaaaaaaah. no data . .^"
+        }
+        console.log(data.ts.toMillis());
+        let server_now = data.ts.toMillis();
+        time_offset = now - server_now;
+        console.log(time_offset, sync_end - sync_start);
+        await deleteDoc(added_doc);
+    })();
 
     let snapshot_unsub = onSnapshot(doc(db, 'groups', group), async (d) => {
         let data = d.data();
@@ -76,6 +99,7 @@
     let video: any;
     let player: YT.Player;
     const on_yt_load = () => {
+        console.log("creating player!!!!");
         // this YT thing comes from the youtube iframe api script
         // - [youtube.d.ts File for the youtube-iframe-api](https://stackoverflow.com/questions/42352944/youtube-d-ts-file-for-the-youtube-iframe-api-to-use-in-angular-2-needed)
         new YT.Player('video', {
@@ -94,7 +118,14 @@
                 onReady: (eve: any) => {
                     player = eve.target;
                 },
-                onStateChange: (eve) => {}
+                onStateChange: (eve) => {
+                    console.log(eve);
+                    if (eve.data == YT.PlayerState.PLAYING) {
+                        // this might happen because of buffering cuz slow interweb | maybe cuz of ads (heven't checked)
+                    } else if (eve.data == YT.PlayerState.ENDED) {
+                        // play next vid
+                    }
+                }
             }
         });
     };
@@ -113,14 +144,14 @@
             player.loadVideoById(current_vid);
         }
         if (!started_at) {
-            started_at = Date.now();
+            started_at = Date.now() - time_offset;
         }
         if (paused) {
             console.log('pausing!!!!!!');
             player.pauseVideo();
         } else {
             player.playVideo();
-            player.seekTo((Date.now() - started_at) / 1000, true);
+            player.seekTo((Date.now() - time_offset - started_at) / 1000, true);
         }
     };
     const play_next = async () => {
