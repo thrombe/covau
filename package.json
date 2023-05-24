@@ -34,6 +34,7 @@
 	"dependencies": {
 		"@netlify/functions": "^1.4.0",
 		"@types/youtube": "^0.0.47",
+		"async-mutex": "^0.4.0",
 		"dashjs": "^4.6.0",
 		"firebase": "^9.22.0",
 		"youtubei.js": "^4.0.1"

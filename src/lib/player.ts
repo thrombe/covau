@@ -2,6 +2,7 @@
 
 import { addDoc, collection, deleteDoc, doc, DocumentReference, Firestore, getDoc, getFirestore, onSnapshot, serverTimestamp, setDoc, type Unsubscribe } from 'firebase/firestore';
 import { type FirebaseApp } from 'firebase/app';
+import { Mutex, type MutexInterface } from 'async-mutex';
 
 type PlayerSyncedData = {
     state: 'Initialised';
@@ -36,6 +37,8 @@ export class Player {
 
     data_ref: DocumentReference;
     synced_data: PlayerSyncedData;
+    unlock: null | MutexInterface.Releaser;
+    mutex: Mutex;
 
     // player position in range 0..1
     player_pos: number;
@@ -53,6 +56,8 @@ export class Player {
             state: 'Initialised',
             queue: [],
         };
+        this.mutex = new Mutex();
+        this.unlock = null;
         this.tick = 0;
         this.player_pos = 0;
         this.current_yt_id = '';
@@ -117,6 +122,16 @@ export class Player {
             // console.log(data);
             this.synced_data = data as PlayerSyncedData;
             this.tick += 1;
+
+            // only resolve if the request was local
+            if (d.metadata.hasPendingWrites) {
+                if (this.unlock) {
+                    let unlock = this.unlock;
+                    this.unlock = null;
+                    unlock();
+                }
+            }
+
             this.sync_yt_player();
         });
     }
@@ -239,8 +254,17 @@ export class Player {
     }
 
     private async update_state(data: PlayerSyncedData) {
+        // TODO: T-T this mutex stuff is not enough.
+        //  - mutex should be locked before each time stuff from this.synced_data is fetched to be overwritten
+        //  - otherwise writes from 2 places can overwite each other's work
+        this.unlock = await this.mutex.acquire();
+        
         // TODO: it is a inefficient to send the entire queue for every state change :/
         await setDoc(this.data_ref, data);
+
+        // does this resolve when the unlock returned by this is called?
+        // or does it allow someone else to grab the lock in between
+        await this.mutex.waitForUnlock();
     }
 
     server_now() {
