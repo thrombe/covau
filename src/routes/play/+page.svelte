@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Player } from '$lib/player';
     import { initializeApp } from 'firebase/app';
+    import { getFirestore } from 'firebase/firestore';
     import { onDestroy } from 'svelte';
     import { writable, type Writable } from 'svelte/store';
     import { firebase_config } from '../../firebase-config';
@@ -21,6 +22,7 @@
     }
 
     let app = initializeApp(firebase_config);
+    let db = getFirestore(app);
     let player: Writable<Player>;
 
     onDestroy(async () => {
@@ -31,7 +33,7 @@
 
     let tick = writable(0);
     const on_yt_load = async () => {
-        let p = await Player.new(app, group, 'video');
+        let p = await Player.new(db, group, 'video');
         player = writable(p);
         $player.on_update = () => {
             $tick += $player.synced_data.tick;

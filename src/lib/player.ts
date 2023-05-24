@@ -1,8 +1,10 @@
 
 
-import { addDoc, collection, deleteDoc, doc, DocumentReference, DocumentSnapshot, Firestore, FirestoreError, getDoc, getFirestore, onSnapshot, serverTimestamp, setDoc, type Unsubscribe } from 'firebase/firestore';
-import { type FirebaseApp } from 'firebase/app';
-import { Mutex, type MutexInterface } from 'async-mutex';
+import {
+    addDoc, collection, deleteDoc, doc, DocumentReference, DocumentSnapshot, Firestore,
+    getDoc, onSnapshot, serverTimestamp, setDoc, type Unsubscribe
+} from 'firebase/firestore';
+import { Mutex } from 'async-mutex';
 
 type PlayerSyncedData = {
     state: 'Initialised';
@@ -29,7 +31,6 @@ type PlayerSyncedData = {
 };
 
 export class Player {
-    app: FirebaseApp;
     db: Firestore;
 
     snapshot_unsub: Unsubscribe | null;
@@ -48,8 +49,7 @@ export class Player {
     current_yt_id: string;
     on_update: () => void;
 
-    private constructor(app: FirebaseApp, db: Firestore, video_element_id: string, data_ref: DocumentReference) {
-        this.app = app;
+    private constructor(db: Firestore, video_element_id: string, data_ref: DocumentReference) {
         this.db = db;
         this.data_ref = data_ref;
 
@@ -64,7 +64,7 @@ export class Player {
         this.mutex = new Mutex();
         this.player_pos = 0;
         this.current_yt_id = '';
-        this.on_update = () => {};
+        this.on_update = () => { };
 
         console.log("creating player!!!!");
         let initialised: (v: void) => void;
@@ -128,10 +128,9 @@ export class Player {
         }, 1000)
     }
 
-    static async new(firebase_app: FirebaseApp, group: string, video_element_id: string) {
-        let db = getFirestore(firebase_app);
+    static async new(db: Firestore, group: string, video_element_id: string) {
         let data_ref = doc(db, 'groups', group);
-        let player = new Player(firebase_app, db, video_element_id, data_ref);
+        let player = new Player(db, video_element_id, data_ref);
 
         await player.recalculate_time_error();
 
