@@ -1,6 +1,6 @@
 
 
-import { addDoc, collection, deleteDoc, doc, DocumentReference, Firestore, getDoc, getFirestore, onSnapshot, serverTimestamp, setDoc, type Unsubscribe } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, DocumentReference, DocumentSnapshot, Firestore, FirestoreError, getDoc, getFirestore, onSnapshot, serverTimestamp, setDoc, type Unsubscribe } from 'firebase/firestore';
 import { type FirebaseApp } from 'firebase/app';
 import { Mutex, type MutexInterface } from 'async-mutex';
 
@@ -141,7 +141,7 @@ export class Player {
     }
 
     private start_listener() {
-        this.snapshot_unsub = onSnapshot(this.data_ref, async (d) => {
+        const on_next = async (d: DocumentSnapshot) => {
             let data = d.data();
             if (!data) {
                 await setDoc(this.data_ref, this.synced_data);
@@ -150,8 +150,13 @@ export class Player {
             console.log(data);
 
             if (d.metadata.hasPendingWrites) {
+                // TODO: this is simpler but lazier way to handle errors in updating stuff in firebase
+                //   a nicer alternative can be to cache this.synced_data in each function before trying sync
+                //   and catch errors on this.update_state. and restore stuff | retry updating depending on
+                //   what operation it is. (queueing new items should retry)
+                //   also need to handle cases like multiple people clicking the same thing (next_song)
+                return;
                 // lock should already be held in local writes
-                // ?: assuming that local writes happen before the promise for online writes is resolved
                 this.synced_data = data as PlayerSyncedData;
             } else {
                 await this.mutex.runExclusive(() => {
@@ -164,7 +169,8 @@ export class Player {
 
             await this.sync_yt_player();
             this.on_update();
-        });
+        };
+        this.snapshot_unsub = onSnapshot(this.data_ref, { includeMetadataChanges: true }, on_next);
     }
 
     private async sync_yt_player() {

@@ -70,10 +70,11 @@
 <button on:click={() => $player.play_next()}>next</button>
 <button on:click={() => $player.toggle_pause()}>toggle pause</button>
 <button on:click={() => $player.recalculate_time_error()}>resync</button>
+<button on:click={() => on_yt_load()}>reload player</button>
 
 <span>{now_time.toString().slice(8, 10)}</span>
 {#if player}
-    {#key $player.synced_data.tick}
+    {#key $tick}
         <span>{$player.player_pos}</span>
         {#each queue as id, i (i)}
             <span
