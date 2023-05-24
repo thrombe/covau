@@ -6,18 +6,22 @@ import { Mutex, type MutexInterface } from 'async-mutex';
 
 type PlayerSyncedData = {
     state: 'Initialised';
+    tick: number;
     queue: Array<string>;
 } | {
     state: 'Finished'; // T-T: who sets finished?? all clients should finish the video around the same time
+    tick: number;
     queue: Array<string>;
     playing_index: number;
 } | {
     state: 'Playing';
+    tick: number;
     queue: Array<string>;
     playing_index: number;
     started_at: number;
 } | {
     state: 'Paused';
+    tick: number;
     queue: Array<string>;
     playing_index: number;
     started_at: number;
@@ -33,11 +37,9 @@ export class Player {
 
     player: YT.Player;
     local_time_error: number;
-    tick: number;
 
     data_ref: DocumentReference;
     synced_data: PlayerSyncedData;
-    unlock: null | MutexInterface.Releaser;
     mutex: Mutex;
 
     // player position in range 0..1
@@ -55,10 +57,9 @@ export class Player {
         this.synced_data = {
             state: 'Initialised',
             queue: [],
+            tick: 0,
         };
         this.mutex = new Mutex();
-        this.unlock = null;
-        this.tick = 0;
         this.player_pos = 0;
         this.current_yt_id = '';
 
@@ -83,6 +84,10 @@ export class Player {
                 },
                 onStateChange: (eve) => {
                     console.log(eve);
+
+                    // undo whatever change made by user by clicking the thing :P
+                    // this.sync_yt_player();
+
                     if (eve.data == YT.PlayerState.PLAYING) {
                         // this might happen because of buffering cuz slow interweb | maybe cuz of ads (heven't checked)
                     } else if (eve.data == YT.PlayerState.ENDED) {
@@ -93,6 +98,9 @@ export class Player {
         });
 
         this.player_pos_interval = setInterval(() => {
+            if (!this.player.getCurrentTime || !this.player.getDuration) {
+                return;
+            }
             let curr_time = this.player.getCurrentTime();
             let duration = this.player.getDuration();
             let current_pos = curr_time / duration;
@@ -119,17 +127,19 @@ export class Player {
                 await setDoc(this.data_ref, this.synced_data);
                 return;
             }
-            // console.log(data);
-            this.synced_data = data as PlayerSyncedData;
-            this.tick += 1;
+            console.log(data);
 
-            // only resolve if the request was local
             if (d.metadata.hasPendingWrites) {
-                if (this.unlock) {
-                    let unlock = this.unlock;
-                    this.unlock = null;
-                    unlock();
-                }
+                // lock should already be held in local writes
+                // ?: assuming that local writes happen before the promise for online writes is resolved
+                this.synced_data = data as PlayerSyncedData;
+            } else {
+                await this.mutex.runExclusive(() => {
+                    // T-T: how do i communicate back the error?
+                    if ((data as PlayerSyncedData).tick > this.synced_data.tick) {
+                        this.synced_data = data as PlayerSyncedData;
+                    }
+                });
             }
 
             this.sync_yt_player();
@@ -170,101 +180,125 @@ export class Player {
     }
 
     async pause() {
-        if (this.synced_data.state === 'Playing') {
-            let data: PlayerSyncedData = {
-                state: 'Paused',
-                queue: this.synced_data.queue,
-                started_at: this.synced_data.started_at,
-                playing_index: this.synced_data.playing_index,
-                paused_started_at: this.server_now(),
-            };
+        await this.mutex.runExclusive(async () => {
+            if (this.synced_data.state === 'Playing') {
+                let data: PlayerSyncedData = {
+                    state: 'Paused',
+                    queue: this.synced_data.queue,
+                    started_at: this.synced_data.started_at,
+                    playing_index: this.synced_data.playing_index,
+                    paused_started_at: this.server_now(),
+                    tick: this.synced_data.tick + 1,
+                };
 
-            await this.update_state(data);
-
-            // no need to set this here. it will be synced using the firebase stuff
-            // this.synced_data = data;
-        }
+                await this.update_state(data);
+            }
+        });
     }
 
     async play() {
-        let data: PlayerSyncedData;
-        switch (this.synced_data.state) {
-            case 'Initialised':
-                if (this.synced_data.queue.length > 0) {
+        await this.mutex.runExclusive(async () => {
+            let data: PlayerSyncedData;
+            switch (this.synced_data.state) {
+                case 'Initialised':
+                    if (this.synced_data.queue.length > 0) {
+                        data = {
+                            state: 'Playing',
+                            queue: this.synced_data.queue,
+                            playing_index: 0,
+                            started_at: this.server_now(),
+                            tick: this.synced_data.tick + 1,
+                        };
+                        await this.update_state(data);
+                    }
+                    break;
+                case 'Finished':
+                    // TODO: maybe restart the vid??
+                    break;
+                case 'Playing':
+                    // nothing to be done here
+                    break;
+                case 'Paused':
+                    let paused_for = this.server_now() - this.synced_data.paused_started_at;
                     data = {
                         state: 'Playing',
                         queue: this.synced_data.queue,
-                        playing_index: 0,
-                        started_at: this.server_now(),
+                        started_at: this.synced_data.started_at + paused_for,
+                        playing_index: this.synced_data.playing_index,
+                        tick: this.synced_data.tick + 1,
                     };
                     await this.update_state(data);
-                }
-                break;
-            case 'Finished':
-                // TODO: maybe restart the vid??
-                break;
-            case 'Playing':
-                // nothing to be done here
-                break;
-            case 'Paused':
-                let paused_for = this.synced_data.paused_started_at - this.server_now();
-                data = {
-                    state: 'Playing',
-                    queue: this.synced_data.queue,
-                    started_at: this.synced_data.started_at + paused_for,
-                    playing_index: this.synced_data.playing_index,
-                };
-                await this.update_state(data);
-                break;
-            default:
-                throw 'unhandled state!!';
-        }
+                    break;
+                default:
+                    throw 'unhandled state!!';
+            }
+        });
     }
 
     async play_next() {
-        let index: number;
-        switch (this.synced_data.state) {
-            case 'Initialised':
-                index = -1;
-                break;
-            case 'Finished':
-            case 'Playing':
-            case 'Paused':
-                index = this.synced_data.playing_index;
-                break;
-            default:
-                throw 'unhandled state!!';
-        }
-        index += 1;
-        if (this.synced_data.queue.length > index) {
-            let data: PlayerSyncedData = {
-                state: 'Playing',
-                queue: this.synced_data.queue,
-                playing_index: index,
-                started_at: this.server_now(),
-            };
-            await this.update_state(data);
-        }
+        console.log(this);
+        await this.mutex.runExclusive(async () => {
+            let index: number;
+            switch (this.synced_data.state) {
+                case 'Initialised':
+                    index = -1;
+                    break;
+                case 'Finished':
+                case 'Playing':
+                case 'Paused':
+                    index = this.synced_data.playing_index;
+                    break;
+                default:
+                    throw 'unhandled state!!';
+            }
+            index += 1;
+            if (this.synced_data.queue.length > index) {
+                let data: PlayerSyncedData = {
+                    state: 'Playing',
+                    queue: this.synced_data.queue,
+                    playing_index: index,
+                    started_at: this.server_now(),
+                    tick: this.synced_data.tick + 1,
+                };
+                await this.update_state(data);
+            }
+        });
+    }
+
+    async play_index(index: number) {
+        await this.mutex.runExclusive(async () => {
+            if (this.synced_data.queue.length > index) {
+                let data: PlayerSyncedData = {
+                    state: 'Playing',
+                    queue: this.synced_data.queue,
+                    playing_index: index,
+                    started_at: this.server_now(),
+                    tick: this.synced_data.tick + 1,
+                };
+                await this.update_state(data);
+            }
+        });
     }
 
     async queue(id: string) {
-        let data = this.synced_data;
-        data.queue = [...data.queue, id];
-        await this.update_state(data);
+        await this.mutex.runExclusive(async () => {
+            let data = this.synced_data;
+            data.queue = [...data.queue, id];
+            await this.update_state(data);
+        });
+    }
+
+    async toggle_pause() {
+        if (this.synced_data.state === 'Playing') {
+            await this.pause();
+        } else if (this.synced_data.state === 'Paused') {
+            await this.play();
+        }
     }
 
     private async update_state(data: PlayerSyncedData) {
-        // TODO: T-T this mutex stuff is not enough.
-        //  - mutex should be locked before each time stuff from this.synced_data is fetched to be overwritten
-        //  - otherwise writes from 2 places can overwite each other's work
-        this.unlock = await this.mutex.acquire();
-        
         // TODO: it is a inefficient to send the entire queue for every state change :/
         await setDoc(this.data_ref, data);
-
-        // does this resolve when the unlock returned by this is called?
-        // or does it allow someone else to grab the lock in between
-        await this.mutex.waitForUnlock();
     }
 
     server_now() {
