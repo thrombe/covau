@@ -69,12 +69,13 @@ export class Player {
         this.player_initialised = new Promise(r => { initialised = r; });
         // this YT thing comes from the youtube iframe api script
         // - [youtube.d.ts File for the youtube-iframe-api](https://stackoverflow.com/questions/42352944/youtube-d-ts-file-for-the-youtube-iframe-api-to-use-in-angular-2-needed)
+        let prev_player_state = YT.PlayerState.UNSTARTED;
         this.player = new YT.Player(video_element_id, {
             width: 0,
             height: 0,
             playerVars: {
                 color: 'white',
-                // controls: 0,
+                controls: 0,
                 // autoplay: 1,
                 showinfo: 0,
                 disablekb: 1,
@@ -86,16 +87,24 @@ export class Player {
                     this.player = eve.target;
                     initialised();
                 },
-                onStateChange: (eve) => {
-                    console.log(eve);
-
-                    // undo whatever change made by user by clicking the thing :P
-                    // this.sync_yt_player();
+                onStateChange: async (eve) => {
+                    // console.log(eve);
 
                     if (eve.data == YT.PlayerState.PLAYING) {
-                        // this might happen because of buffering cuz slow interweb | maybe cuz of ads (heven't checked)
+                        // this might also happen because of buffering cuz | maybe cuz of ads
+                        if (this.synced_data.state === 'Paused') {
+                            await this.play();
+                        } else if (prev_player_state == YT.PlayerState.UNSTARTED) {
+                            await this.sync_yt_player();
+                        }
+                        // await this.sync_yt_player();
+                        prev_player_state = eve.data;
                     } else if (eve.data == YT.PlayerState.ENDED) {
-                        // play next vid
+                        await this.play_next();
+                        prev_player_state = eve.data;
+                    } else if (eve.data == YT.PlayerState.PAUSED) {
+                        await this.pause();
+                        prev_player_state = eve.data;
                     }
                 }
             }
@@ -117,8 +126,8 @@ export class Player {
         let data_ref = doc(db, 'groups', group);
         let player = new Player(firebase_app, db, video_element_id, data_ref);
 
-        player.local_time_error = await get_local_time_error(player.db);
-        
+        await player.recalculate_time_error();
+
         player.start_listener();
 
         return player;
@@ -166,8 +175,11 @@ export class Player {
                     this.current_yt_id = new_yt_id;
                     this.player.loadVideoById(this.current_yt_id);
                 }
-                this.player.playVideo();
-                this.player.seekTo((this.server_now() - this.synced_data.started_at) / 1000, true);
+                if (this.player.getPlayerState() != YT.PlayerState.PLAYING) {
+                    this.player.playVideo();
+                }
+                let seek_time = (this.server_now() - this.synced_data.started_at) / 1000;
+                this.player.seekTo(seek_time, true);
                 break;
             case 'Paused':
                 this.player.pauseVideo();
@@ -220,9 +232,11 @@ export class Player {
                     break;
                 case 'Finished':
                     // TODO: maybe restart the vid??
+                    await this.sync_yt_player();
                     break;
                 case 'Playing':
                     // nothing to be done here
+                    await this.sync_yt_player();
                     break;
                 case 'Paused':
                     let paused_for = this.server_now() - this.synced_data.paused_started_at;
@@ -307,6 +321,14 @@ export class Player {
         await setDoc(this.data_ref, data);
     }
 
+    // TODO: call this method every few seconds untill either or
+    //   - the set and fetch time delay gets lower than some threshold
+    //   - the time delays are very constant
+    async recalculate_time_error() {
+        this.local_time_error = await get_local_time_error(this.db);
+        await this.sync_yt_player();
+    }
+
     server_now() {
         return Date.now() - this.local_time_error;
     }
@@ -332,3 +354,5 @@ async function get_local_time_error(db: Firestore) {
     await deleteDoc(added_doc);
     return time_offset;
 }
+
+
