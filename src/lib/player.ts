@@ -35,6 +35,7 @@ export class Player {
     snapshot_unsub: Unsubscribe | null;
     player_pos_interval: NodeJS.Timer;
 
+    player_initialised: Promise<void>;
     player: YT.Player;
     local_time_error: number;
 
@@ -64,6 +65,8 @@ export class Player {
         this.current_yt_id = '';
 
         console.log("creating player!!!!");
+        let initialised: (v: void) => void;
+        this.player_initialised = new Promise(r => { initialised = r; });
         // this YT thing comes from the youtube iframe api script
         // - [youtube.d.ts File for the youtube-iframe-api](https://stackoverflow.com/questions/42352944/youtube-d-ts-file-for-the-youtube-iframe-api-to-use-in-angular-2-needed)
         this.player = new YT.Player(video_element_id, {
@@ -81,6 +84,7 @@ export class Player {
             events: {
                 onReady: (eve: any) => {
                     this.player = eve.target;
+                    initialised();
                 },
                 onStateChange: (eve) => {
                     console.log(eve);
@@ -142,11 +146,13 @@ export class Player {
                 });
             }
 
-            this.sync_yt_player();
+            await this.sync_yt_player();
         });
     }
 
-    private sync_yt_player() {
+    private async sync_yt_player() {
+        await this.player_initialised;
+
         switch (this.synced_data.state) {
             case 'Initialised':
                 // this should only be run when a new group is created. so nothing to be done here
@@ -326,5 +332,3 @@ async function get_local_time_error(db: Firestore) {
     await deleteDoc(added_doc);
     return time_offset;
 }
-
-
