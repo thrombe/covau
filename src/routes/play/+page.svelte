@@ -29,9 +29,13 @@
         }
     });
 
+    let tick = writable(0);
     const on_yt_load = async () => {
         let p = await Player.new(app, group, 'video');
         player = writable(p);
+        $player.on_update = () => {
+            $tick += $player.synced_data.tick;
+        };
     };
 
     (window as any).onYouTubeIframeAPIReady = on_yt_load;
@@ -40,8 +44,10 @@
 
     let video: any;
     let queue = new Array<string>();
-    $: if (player && $player && $player.synced_data) {
+    $: if ($tick) {
+        console.log($player.synced_data)
         queue = $player.synced_data.queue;
+        console.log(queue)
     }
 
     let now_time = 0;

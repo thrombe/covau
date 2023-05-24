@@ -46,6 +46,7 @@ export class Player {
     // player position in range 0..1
     player_pos: number;
     current_yt_id: string;
+    on_update: () => void;
 
     private constructor(app: FirebaseApp, db: Firestore, video_element_id: string, data_ref: DocumentReference) {
         this.app = app;
@@ -63,6 +64,7 @@ export class Player {
         this.mutex = new Mutex();
         this.player_pos = 0;
         this.current_yt_id = '';
+        this.on_update = () => {};
 
         console.log("creating player!!!!");
         let initialised: (v: void) => void;
@@ -156,6 +158,7 @@ export class Player {
             }
 
             await this.sync_yt_player();
+            this.on_update();
         });
     }
 
@@ -354,5 +357,3 @@ async function get_local_time_error(db: Firestore) {
     await deleteDoc(added_doc);
     return time_offset;
 }
-
-
