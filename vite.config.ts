@@ -1,13 +1,14 @@
-import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
+import { svelte } from '@sveltejs/vite-plugin-svelte';
+import sveltePreprocess from 'svelte-preprocess';
 
 export default defineConfig({
-	build: {
-		minify: false,
-		// minifySyntax: false,
+	server: {
+		port: 5178
 	},
-    server: {
-        port: 5178
-    },
-	plugins: [sveltekit()]
+	plugins: [
+		svelte({
+			/* plugin options */
+		})
+	]
 });
