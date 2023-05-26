@@ -104,7 +104,10 @@ export class Player {
                         await this.play_next();
                         prev_player_state = eve.data;
                     } else if (eve.data == YT.PlayerState.PAUSED) {
-                        await this.pause();
+                        // NOTE: pause events are received when changing videos. which becomes a pain
+                        //  so either don't let the user pause vid directly or let this pause be just for this
+                        //  specific client
+                        // await this.pause();
                         prev_player_state = eve.data;
                     } else if (eve.data == YT.PlayerState.UNSTARTED) {
                         if (prev_player_state != YT.PlayerState.UNSTARTED) {
