@@ -89,13 +89,36 @@
     {/key}
 {/if}
 
-<div class="video" bind:this={video} id="video" />
+<div class="video-parent">
+    <div class="video" bind:this={video} id="video" />
+    <div class="video-sibling" />
+</div>
 
 <style>
     .video {
+        display: block;
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+
+    .video-sibling {
+        display: block;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        background-color: #00ff0000;
+        z-index: 2;
+    }
+
+    .video-parent {
         position: fixed;
         right: 0px;
         bottom: 0px;
+
+        width: 300px;
+        height: 150px;
     }
 </style>
-
