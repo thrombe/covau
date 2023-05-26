@@ -4,10 +4,14 @@ import Home from './routes/Home.svelte'
 import Loading from './routes/Loading.svelte'
 import NotFound from './routes/NotFound.svelte'
 
-// Export the route definition object
 export default {
-    // Exact path
     '/': Home,
+
+    '/play/:group?': wrap({
+        asyncComponent: () => import('./routes/Play.svelte'),
+        loadingComponent: Loading,
+        loadingParams: {},
+    }),
 
     // Using named parameters, with last being optional
     // This is dynamically imported, so the code is loaded on-demand from the server
