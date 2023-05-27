@@ -13,6 +13,12 @@ export default {
         loadingParams: {},
     }),
 
+    '/vibe/:group?': wrap({
+        asyncComponent: () => import('./routes/Vibe.svelte'),
+        loadingComponent: Loading,
+        loadingParams: {},
+    }),
+
     // Using named parameters, with last being optional
     // This is dynamically imported, so the code is loaded on-demand from the server
     '/hello/:first/:last?': wrap({
