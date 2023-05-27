@@ -43,6 +43,7 @@ export class Player {
     synced_data: PlayerSyncedData;
     mutex: Mutex;
 
+    // TODO: also track buffered pos
     // player position in range 0..1
     player_pos: number;
     current_yt_id: string;
@@ -97,6 +98,8 @@ export class Player {
                             await this.play();
                         } else if (prev_player_state == YT.PlayerState.UNSTARTED) {
                             await this.sync_yt_player();
+                        } else if (prev_player_state == YT.PlayerState.BUFFERING) {
+                            await this.sync_yt_player();
                         }
                         // await this.sync_yt_player();
                         prev_player_state = eve.data;
@@ -108,11 +111,14 @@ export class Player {
                         //  so either don't let the user pause vid directly or let this pause be just for this
                         //  specific client
                         // await this.pause();
+                        await this.sync_yt_player();
                         prev_player_state = eve.data;
                     } else if (eve.data == YT.PlayerState.UNSTARTED) {
                         if (prev_player_state != YT.PlayerState.UNSTARTED) {
                             await this.play();
                         }
+                        prev_player_state = eve.data;
+                    } else if (eve.data == YT.PlayerState.BUFFERING) {
                         prev_player_state = eve.data;
                     }
                 }
@@ -193,8 +199,13 @@ export class Player {
                 if (this.player.getPlayerState() != YT.PlayerState.PLAYING) {
                     this.player.playVideo();
                 }
+                let pos = this.player.getCurrentTime();
                 let seek_time = (this.server_now() - this.synced_data.started_at) / 1000;
-                this.player.seekTo(seek_time, true);
+
+                // only try to seek if it is desynced
+                if (Math.abs(seek_time - pos) > 0.5) {
+                    this.player.seekTo(seek_time, true);
+                }
                 break;
             case 'Paused':
                 this.player.pauseVideo();
@@ -333,6 +344,8 @@ export class Player {
 
     private async update_state(data: PlayerSyncedData) {
         // TODO: it is a inefficient to send the entire queue for every state change :/
+        // - [TypeScript: Utility Types](https://www.typescriptlang.org/docs/handbook/utility-types.html)
+        // maybe use Omit and stuff
         await setDoc(this.data_ref, data);
     }
 
