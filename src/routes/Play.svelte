@@ -6,19 +6,22 @@
     import { writable, type Writable } from 'svelte/store';
     import { firebase_config } from '../firebase_config';
 
-    let url = new URL(window.location.toString());
+    export let params: { group?: string };
+
     let group: string;
-    if (!url.searchParams.get('id')) {
+    if (!params.group) {
         group = 'random-one';
-        // window.location = url.toString();
-        url.searchParams.set('id', group);
-        window.history.pushState({}, '', url.toString());
+        params.group = group;
+        window.history.pushState({}, '', '#/play/' + group);
     } else {
-        let not_null = url.searchParams.get('id');
-        if (!not_null) {
-            throw 'never';
-        }
-        group = not_null;
+        group = params.group;
+    }
+
+    $: if (group != params.group) {
+        let url_without_hash =  window.location.toString().replace(window.location.hash, '');
+        let new_url = url_without_hash + '#/play/' + params.group;
+        window.location.replace(new_url);
+        window.location.reload();
     }
 
     let app = initializeApp(firebase_config);
