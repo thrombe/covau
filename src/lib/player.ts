@@ -305,6 +305,35 @@ export class Player {
         });
     }
 
+    async play_prev() {
+        await this.mutex.runExclusive(async () => {
+            let index: number;
+            switch (this.synced_data.state) {
+                case 'Initialised':
+                    index = 1;
+                    break;
+                case 'Finished':
+                case 'Playing':
+                case 'Paused':
+                    index = this.synced_data.playing_index;
+                    break;
+                default:
+                    throw 'unhandled state!!';
+            }
+            index -= 1;
+            if (this.synced_data.queue.length > index) {
+                let data: PlayerSyncedData = {
+                    state: 'Playing',
+                    queue: this.synced_data.queue,
+                    playing_index: index,
+                    started_at: this.server_now(),
+                    tick: this.synced_data.tick + 1,
+                };
+                await this.update_state(data);
+            }
+        });
+    }
+
     async play_index(index: number) {
         await this.mutex.runExclusive(async () => {
             if (this.synced_data.queue.length > index) {
@@ -369,6 +398,52 @@ export class Player {
             await this.pause();
         } else if (this.synced_data.state === 'Paused') {
             await this.play();
+        }
+    }
+
+    has_next() {
+        // MAYBE: maybe i should copy synced_data as it might be changed somewhere else
+        let d = this.synced_data;
+        switch (d.state) {
+            case 'Initialised':
+                if (d.queue.length > 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+                // break;
+            case 'Playing':
+            case 'Paused':
+            case 'Finished':
+                if (d.queue.length > d.playing_index) {
+                    return true;
+                } else {
+                    return false;
+                }
+                // break;
+            default:
+                throw 'case not handled';
+        }
+    }
+
+    has_prev() {
+        // MAYBE: maybe i should copy synced_data as it might be changed somewhere else
+        let d = this.synced_data;
+        switch (d.state) {
+            case 'Initialised':
+                return false;
+                // break;
+            case 'Playing':
+            case 'Paused':
+            case 'Finished':
+                if (d.playing_index > 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+                // break;
+            default:
+                throw 'case not handled';
         }
     }
 
