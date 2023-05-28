@@ -19,7 +19,7 @@
         let url_without_hash =  window.location.toString().replace(window.location.hash, '');
         let new_url = url_without_hash + '#/vibe/' + params.group;
         window.location.replace(new_url);
-        window.location.reload();
+        // window.location.reload();
     }
 
     let player: Player;
@@ -57,7 +57,9 @@
     </all-contents>
 
     <play-bar>
-        <PlayBar />
+        <PlayBar
+            {player}
+        />
     </play-bar>
 </all>
 
