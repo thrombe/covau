@@ -119,6 +119,7 @@ export class Player {
         });
     }
 
+    // TODO: more consistent format for duration | position
     async get_player_pos() {
         await this.seek_promise;
 
