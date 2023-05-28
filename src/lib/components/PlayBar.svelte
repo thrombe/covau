@@ -8,9 +8,18 @@
 
 
     let video_pos = 0;
+    let has_prev = false;
+    let has_next = false;
+    let is_playing = false;
+    let audio_duration = 0;
     let interval = setInterval(async () => {
         if (player) {
             video_pos = await player.get_player_pos();
+            has_prev = player.has_prev();
+            has_next = player.has_next();
+            is_playing = player.is_playing();
+            let dur = player.get_duration();
+            audio_duration = dur ? dur : 0;
         }
     }, 1000);
 
@@ -57,9 +66,10 @@
             <button
                 on:click={async () => {
                     await player.toggle_pause();
+                    is_playing = player.is_playing();
                 }}
             >
-                toggle
+                {is_playing? 'Pause' : 'Play'}
             </button>
             <button
                 on:click={async () => {

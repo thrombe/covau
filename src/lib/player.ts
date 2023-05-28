@@ -133,6 +133,15 @@ export class Player {
         return current_pos;
     }
 
+    get_duration() {
+        let dur = this.player.getDuration();
+        if (typeof dur === 'undefined' || dur === 0) {
+            return null;
+        } else {
+            return dur;
+        }
+    }
+
     static async new(db: Firestore, group: string, video_element_id: string) {
         let data_ref = doc(db, 'groups', group);
         let player = new Player(db, video_element_id, data_ref);
@@ -412,6 +421,10 @@ export class Player {
         }
     }
 
+    is_playing() {
+        return this.synced_data.state === 'Playing' && this.player.getPlayerState() !== YT.PlayerState.UNSTARTED;
+    }
+    
     has_next() {
         // MAYBE: maybe i should copy synced_data as it might be changed somewhere else
         let d = this.synced_data;
