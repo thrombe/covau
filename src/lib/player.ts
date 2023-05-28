@@ -471,6 +471,37 @@ export class Player {
         }
     }
 
+    async get_volume() {
+        await this.player_initialised;
+        let vol = this.player.getVolume() / 100;
+        return vol;
+    }
+
+    async set_volume(t: number) {
+        await this.player_initialised;
+        if (t > 1) {
+            t = 1;
+        } else if (t < 0) {
+            t = 0;
+        }
+        this.player.setVolume(100*t);
+    }
+
+    async is_muted() {
+        await this.player_initialised;
+        return this.player.isMuted();
+    }
+
+    async mute() {
+        await this.player_initialised;
+        this.player.mute();
+    }
+
+    async unmute() {
+        await this.player_initialised;
+        this.player.unMute();
+    }
+
     private async update_state(data: PlayerSyncedData) {
         // TODO: it is a inefficient to send the entire queue for every state change :/
         // - [TypeScript: Utility Types](https://www.typescriptlang.org/docs/handbook/utility-types.html)
