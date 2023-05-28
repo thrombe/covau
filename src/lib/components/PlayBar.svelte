@@ -12,6 +12,7 @@
     let has_next = false;
     let is_playing = false;
     let audio_duration = 0;
+    let is_muted = false;
     let interval = setInterval(async () => {
         if (player) {
             video_pos = await player.get_player_pos();
@@ -20,8 +21,9 @@
             is_playing = player.is_playing();
             let dur = player.get_duration();
             audio_duration = dur ? dur : 0;
+            is_muted = await player.is_muted();
         }
-    }, 1000);
+    }, 300);
 
     onDestroy(async () => {
         clearInterval(interval);
@@ -30,15 +32,39 @@
     const on_seek = async (e: Event) => {
         await player.seek_perc(video_pos);
     };
+
+    let volume = 1;
+    const on_volume_change = async () => {
+        player.set_volume(volume);
+    };
 </script>
 
 <bar>
     <volume-control>
         <volume-icon>
             <!-- this is also the mute button -->
+            <button
+                on:click={async () => {
+                    if (await player.is_muted()) {
+                        await player.unmute();
+                    } else {
+                        await player.mute();
+                    }
+                }}
+            >
+                {is_muted ? 'unmute' : 'mute'}
+            </button>
         </volume-icon>
 
         <volume-slider>
+            <input
+                type="range"
+                min={0}
+                max={1}
+                step={'any'}
+                bind:value={volume}
+                on:input={on_volume_change}
+            />
         </volume-slider>
     </volume-control>
 
@@ -160,5 +186,11 @@
     volume-control {
         width: var(--volume-control-width);
         background-color: #336633;
+
+        display: flex;
+        flex-direction: row;
+
+        justify-content: center;
+        align-items: center;
     }
 </style>
