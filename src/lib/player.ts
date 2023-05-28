@@ -351,8 +351,9 @@ export class Player {
 
     async queue(id: string) {
         await this.mutex.runExclusive(async () => {
-            let data = this.synced_data;
+            let data: PlayerSyncedData = {...this.synced_data};
             data.queue = [...data.queue, id];
+            data.tick += 1;
             await this.update_state(data);
         });
     }
