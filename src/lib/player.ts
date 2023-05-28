@@ -93,6 +93,7 @@ export class Player {
                         } else if (prev_player_state == YT.PlayerState.BUFFERING) {
                             await this.sync_yt_player();
                         }
+                        this.seek_wait();
                         // await this.sync_yt_player();
                         prev_player_state = eve.data;
                     } else if (eve.data == YT.PlayerState.ENDED) {
@@ -325,6 +326,42 @@ export class Player {
             data.queue = [...data.queue, id];
             await this.update_state(data);
         });
+    }
+
+    seek_promise: Promise<void> = Promise.resolve();
+    seek_wait: (v: void) => void = () => {};
+    async seek_perc(perc: number) {
+        if (this.synced_data.state == 'Initialised') {
+            await this.play();
+        }
+        await this.mutex.runExclusive(async () => {
+            let data: PlayerSyncedData;
+            if (this.synced_data.state == 'Initialised') {
+                // this should not happen if queue is not empty
+                return;
+            } else if (this.synced_data.state == 'Finished') {
+                data = {
+                    state: 'Playing',
+                    tick: this.synced_data.tick,
+                    started_at: this.server_now(),
+                    queue: this.synced_data.queue,
+                    playing_index: this.synced_data.playing_index,
+                };
+            } else {
+                data = {...this.synced_data};
+                data.started_at = this.server_now();
+            }
+            data.tick += 1;
+            data.started_at -= Math.floor(this.player.getDuration()*perc * 1000);
+            if (!data.started_at) {
+                return;
+            }
+            this.seek_promise = new Promise(r => {
+                this.seek_wait = r;
+            });
+            await this.update_state(data);
+        });
+        await this.seek_promise;
     }
 
     async toggle_pause() {
