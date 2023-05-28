@@ -32,7 +32,6 @@ type PlayerSyncedData = {
 export class Player {
     db: Firestore;
 
-    player_pos_interval: number;
     snapshot_unsub: Unsubscribe | null = null;
 
     player_initialised: Promise<void>;
@@ -117,16 +116,20 @@ export class Player {
                 }
             }
         });
+    }
 
-        this.player_pos_interval = setInterval(() => {
-            if (!this.player.getCurrentTime || !this.player.getDuration) {
-                return;
-            }
-            let curr_time = this.player.getCurrentTime();
-            let duration = this.player.getDuration();
-            let current_pos = curr_time / duration;
-            this.player_pos = current_pos;
-        }, 1000)
+    async get_player_pos() {
+        await this.seek_promise;
+
+        let curr_time = this.player.getCurrentTime();
+        let duration = this.player.getDuration();
+        let current_pos = curr_time / duration;
+
+        if (typeof curr_time === 'undefined' || typeof duration === 'undefined' || duration == 0) {
+            return 0;
+        }
+        // this.player_pos = current_pos;
+        return current_pos;
     }
 
     static async new(db: Firestore, group: string, video_element_id: string) {
@@ -147,7 +150,6 @@ export class Player {
                 await setDoc(this.data_ref, this.synced_data);
                 return;
             }
-            console.log(data);
 
             if (d.metadata.hasPendingWrites) {
                 // TODO: this is simpler but lazier way to handle errors in updating stuff in firebase
@@ -212,7 +214,6 @@ export class Player {
         if (this.snapshot_unsub) {
             this.snapshot_unsub();
         }
-        clearInterval(this.player_pos_interval);
         this.player.destroy();
     }
 
@@ -275,7 +276,6 @@ export class Player {
     }
 
     async play_next() {
-        console.log(this);
         await this.mutex.runExclusive(async () => {
             let index: number;
             switch (this.synced_data.state) {
