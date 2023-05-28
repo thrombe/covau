@@ -204,6 +204,12 @@ export class Player {
                 }
                 break;
             case 'Paused':
+                if (!this.current_yt_id) {
+                    this.current_yt_id = this.synced_data.queue[this.synced_data.playing_index];
+                }
+                if (!this.player.getVideoUrl().includes(this.current_yt_id)) {
+                    this.player.loadVideoById(this.current_yt_id);
+                }
                 this.player.pauseVideo();
                 break;
             default:
@@ -395,6 +401,10 @@ export class Player {
     }
 
     async toggle_pause() {
+        if (this.player.getPlayerState() == YT.PlayerState.UNSTARTED) {
+            await this.sync_yt_player();
+            return;
+        }
         if (this.synced_data.state === 'Playing') {
             await this.pause();
         } else if (this.synced_data.state === 'Paused') {
