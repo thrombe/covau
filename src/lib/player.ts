@@ -32,39 +32,32 @@ type PlayerSyncedData = {
 export class Player {
     db: Firestore;
 
-    snapshot_unsub: Unsubscribe | null;
     player_pos_interval: number;
+    snapshot_unsub: Unsubscribe | null = null;
 
     player_initialised: Promise<void>;
     player: YT.Player;
-    local_time_error: number;
+    local_time_error: number = 0;
 
     data_ref: DocumentReference;
     synced_data: PlayerSyncedData;
-    mutex: Mutex;
+    mutex: Mutex = new Mutex();
 
-    // TODO: also track buffered pos
+    // TODO: also track buffered pos using this.player.getVideoLoadedFraction maybe??
     // player position in range 0..1
-    player_pos: number;
-    current_yt_id: string;
-    on_update: () => void;
+    // player_pos: number = 0;
+    current_yt_id: string = '';
+    on_update: () => void = () => {};
 
     private constructor(db: Firestore, video_element_id: string, data_ref: DocumentReference) {
         this.db = db;
         this.data_ref = data_ref;
 
-        this.snapshot_unsub = null;
-
-        this.local_time_error = 0;
         this.synced_data = {
             state: 'Initialised',
             queue: [],
             tick: 0,
         };
-        this.mutex = new Mutex();
-        this.player_pos = 0;
-        this.current_yt_id = '';
-        this.on_update = () => { };
 
         console.log("creating player!!!!");
         let initialised: (v: void) => void;
@@ -382,6 +375,3 @@ async function get_local_time_error(db: Firestore) {
     await deleteDoc(added_doc);
     return time_offset;
 }
-
-
-
