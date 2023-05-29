@@ -19,6 +19,7 @@
     type T = $$Generic;
 
     let width: number;
+    let height: number;
     let columns = 1;
 
     $: margin = item_height * 2;
@@ -91,7 +92,7 @@
             event.preventDefault();
         }
     };
-    $: if (width && root && items) {
+    $: if (height && width && root && items) {
         on_update();
     }
     let _selected_item: HTMLElement;
@@ -137,14 +138,17 @@
     };
 </script>
 
-<cl on:scroll={on_update} bind:this={root} bind:clientWidth={width}>
+<cl on:scroll={on_update} bind:this={root} bind:clientWidth={width} bind:clientHeight={height}>
     <pad style="height: {top_padding}px; width: 100%;" />
     <gd style="--item-width: {item_width}px; --gap: {gap}px;" bind:this={grid}>
         {#each visible as item, i (item.id)}
             {#if selected == i + start * columns || (i + start * columns == items.length - 1 && selected >= items.length)}
-                <sel bind:this={_selected_item} on:keydown={() => {}} on:click={() => {
-                    _on_item_click(i);
-                }}>
+                <sel bind:this={_selected_item}
+                    on:keydown={() => {}}
+                    on:click={() => {
+                        _on_item_click(i);
+                    }}
+                >
                     <slot
                         {item_width}
                         {item_height}
