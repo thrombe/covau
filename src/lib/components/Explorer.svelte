@@ -16,11 +16,10 @@
     export let item_width: number;
     export let item_height: number;
     export let search_query: string;
+    export let gap: number;
+    export let end_is_visible = true;
     export let on_item_click: () => Promise<void>;
-    export let on_keydown: (
-        e: KeyboardEvent,
-        scroll_selected_into_view: () => Promise<void>
-    ) => Promise<void>;
+    export let try_scroll_selected_item_in_view: () => Promise<void>;
 
     type T = $$Generic;
     interface $$Slots {
@@ -35,8 +34,7 @@
         };
         infobox: {};
     }
-
-    let search_objects = async () => {
+    export const search_objects = async () => {
         let s = await fac.with_query(search_query);
         if (!s) {
             return;
@@ -45,36 +43,12 @@
         await next_page();
         await tick();
         selected_item_index = 0;
-        await try_scroll_into_view();
+        await try_scroll_selected_item_in_view();
         end_reached();
     };
     search_objects();
 
     let items = new Array<Unique<RObject<T>, number>>();
-
-    let end_is_visible = true;
-    let search_input: HTMLElement;
-    const _on_keydown = async (
-        event: KeyboardEvent,
-        scroll_selected_into_view: () => Promise<void>
-    ) => {
-        if (event.key == 'i') {
-            show_item_info = !show_item_info;
-        } else if (event.key == '?') {
-            selected_item_index = 0;
-            await tick();
-            await scroll_selected_into_view();
-            search_input.focus();
-            event.preventDefault();
-        } else if (event.key == '/') {
-            search_query = '';
-            search_input.focus();
-            event.preventDefault();
-            await search_objects();
-        } else {
-            await on_keydown(event, scroll_selected_into_view);
-        }
-    };
 
     const end_reached = async () => {
         while (true) {
@@ -91,11 +65,6 @@
             return { id: e.get_key(), data: e } as Unique<RObject<T>, number>;
         });
     };
-    const on_enter = async (event: KeyboardEvent) => {
-        if (event.key == 'Enter') {
-            search_input.blur();
-        }
-    };
 
     let info_width = 0;
     let info_margin = 0;
@@ -107,46 +76,19 @@
         info_width = 0;
         info_margin = 0;
     }
-
-    let try_scroll_into_view: () => Promise<void>;
 </script>
-
-<cl class="inputs">
-    <input
-        bind:value={search_query}
-        on:input={search_objects}
-        bind:this={search_input}
-        on:keydown={on_enter}
-    />
-    <button on:click={search_objects}>refresh</button>
-    <button
-        on:click={() => {
-            console.log($searcher, items)
-        }}
-    >
-        {end_is_visible}
-    </button>
-    <button
-        on:click={() => {
-            show_item_info = !show_item_info;
-        }}
-    >
-        show item info
-    </button>
-</cl>
 
 <cl class="main" style="--info-width: {info_width}px; --info-margin: {info_margin}px;">
     <scrollable>
         <VirtualScrollable
             bind:items
-            gap={15}
+            {gap}
             {item_width}
             {item_height}
             {on_item_click}
             {end_reached}
-            bind:try_scroll_into_view
+            bind:try_scroll_into_view={try_scroll_selected_item_in_view}
             bind:selected={selected_item_index}
-            on_keydown={_on_keydown}
             bind:end_is_visible
             bind:selected_item
             let:item_width
@@ -173,22 +115,9 @@
 </cl>
 
 <style>
-    * {
-        --input-height: 33px;
-        --gap: 20px;
-        --top-margin: 15px;
-    }
-
-    .inputs {
-        height: var(--input-height);
-    }
-
     .main {
-        margin-left: var(--gap);
-        margin-right: var(--gap);
-        margin-top: var(--top-margin);
-        width: calc(100% - var(--gap) * 2);
-        height: calc(100% - var(--input-height) - var(--top-margin));
+        width: 100%;
+        height: 100%;
 
         flex-direction: column;
     }

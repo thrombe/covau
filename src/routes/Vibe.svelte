@@ -29,7 +29,15 @@
     let on_player_tick = async () => {};
 
     let group_name_input: string;
+    let item_width: number = window.innerWidth / 3;
+    let item_height: number = 70;
+
+    let queue_element: HTMLElement;
 </script>
+
+<svelte:window on:resize={async (e) => {
+    item_width = Number(getComputedStyle(queue_element).getPropertyValue('width').replace('px', ''));
+}} />
 
 <all>
     <all-contents>
@@ -38,12 +46,16 @@
             </top-menubar>
 
             <browse>
-                <SongBrowser />
+                <SongBrowser
+                    bind:item_height
+                    bind:item_width
+                    gap={0}
+                />
             </browse>
         </search-area>
 
         <queue-area>
-            <queue>
+            <queue bind:this={queue_element}>
                 <queue-name>
                     <InputBar
                         bind:placeholder={group}

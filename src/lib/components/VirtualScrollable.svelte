@@ -211,9 +211,5 @@
         overflow: visible;
         width: calc(100% - var(--gap) * 0);
     }
-
-    sel,
-    clk {
-    }
 </style>
 
