@@ -11,6 +11,7 @@
 
 <script lang="ts">
     import { type Unique } from "../virtual";
+    import AudioListItem from "./AudioListItem.svelte";
     import Explorer from "./Explorer.svelte";
     import InputBar from "./InputBar.svelte";
 
@@ -44,6 +45,13 @@
             await search_objects();
         }
     };
+
+    const get_artist_name = (t: MusicResponsiveListItem) => {
+        if (!t.artists || t.artists.length <= 0) {
+            return '';
+        }
+        return t.artists[0].name;
+    }
 </script>
 
 <browse>
@@ -76,23 +84,30 @@
             bind:search_objects
             bind:try_scroll_selected_item_in_view
             {gap}
-            on_item_click={async () => {}}
+            on_item_click={async (t) => {
+                console.log(t)
+            }}
 
             let:item
             let:selected
             let:item_width
             let:item_height
         >
-            <temp style="width: {item_width}px; height: {item_height}px;">{item.title}</temp>
+            <item style="width: {item_width}px; height: {item_height}px;">
+                <AudioListItem
+                    title={item.title ? item.title : ''}
+                    title_sub={get_artist_name(item)}
+                    img_src={item.thumbnails.length > 0 ? item.thumbnails[0].url : ''}
+                />
+            </item>
         </Explorer>
     </browse-area>
 </browse>
 
 <style>
-    temp {
+    item {
         display: block;
         background-color: #774477;
-        overflow: hidden;
     }
     
     browse {

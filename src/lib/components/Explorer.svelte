@@ -18,7 +18,7 @@
     export let search_query: string;
     export let gap: number;
     export let end_is_visible = true;
-    export let on_item_click: () => Promise<void>;
+    export let on_item_click: (t: Unique<RObject<T>, unknown>) => Promise<void>;
     export let try_scroll_selected_item_in_view: () => Promise<void>;
 
     type T = $$Generic;

@@ -12,7 +12,7 @@
     export let selected_item: Unique<T, unknown> | null = null;
     export let end_reached = async () => {};
     export let on_keydown = async (_: KeyboardEvent, _a: () => Promise<void>) => {};
-    export let on_item_click = async () => {};
+    export let on_item_click = async (t: Unique<T, unknown>) => {};
     export let end_is_visible = true;
     export let keyboard_control = true;
 
@@ -98,7 +98,7 @@
     export const try_scroll_into_view = async () => {
         await tick();
         if (!(selected === undefined) && items) {
-            console.log(items[selected]);
+            // console.log(items[selected]);
         }
         if (_selected_item) {
             _selected_item.scrollIntoView({ block: 'nearest' });
@@ -133,7 +133,7 @@
     const _on_item_click = async (i: number) => {
         selected = i + start * columns;
         await tick();
-        await on_item_click();
+        await on_item_click(items[selected]);
     };
 </script>
 
@@ -142,7 +142,9 @@
     <gd style="--item-width: {item_width}px; --gap: {gap}px;" bind:this={grid}>
         {#each visible as item, i (item.id)}
             {#if selected == i + start * columns || (i + start * columns == items.length - 1 && selected >= items.length)}
-                <sel bind:this={_selected_item}>
+                <sel bind:this={_selected_item} on:keydown={() => {}} on:click={() => {
+                    _on_item_click(i);
+                }}>
                     <slot
                         {item_width}
                         {item_height}

@@ -39,7 +39,7 @@
     item_width = Number(getComputedStyle(queue_element).getPropertyValue('width').replace('px', ''));
 }} />
 
-<all>
+<all style='--list-item-icon-width: {item_height}px;'>
     <all-contents>
         <search-area>
             <top-menubar>
@@ -102,6 +102,8 @@
         --browse-tab-bar-height: 25px;
         --queue-area-width: min(475px, max(330px, 33vw));
         --video-height: calc(var(--queue-area-width) * 1080 / 1920);
+
+        font-family: monospace;
     }
 
 
