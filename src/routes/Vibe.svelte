@@ -109,6 +109,8 @@
 
     :global(html, body) {
         margin: 0px;
+        width: 100%;
+        overflow: hidden;
     }
 
     all {
