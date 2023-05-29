@@ -82,19 +82,16 @@ export class Player {
                     initialised();
                 },
                 onStateChange: async (eve) => {
-                    // console.log(eve);
+                    console.log(eve);
 
                     if (eve.data == YT.PlayerState.PLAYING) {
                         // this might also happen because of buffering cuz | maybe cuz of ads
-                        if (this.synced_data.state === 'Paused') {
-                            await this.play();
-                        } else if (prev_player_state == YT.PlayerState.UNSTARTED) {
+                        if (prev_player_state == YT.PlayerState.UNSTARTED) {
                             await this.sync_yt_player();
                         } else if (prev_player_state == YT.PlayerState.BUFFERING) {
                             await this.sync_yt_player();
                         }
-                        this.seek_wait();
-                        // await this.sync_yt_player();
+
                         prev_player_state = eve.data;
                     } else if (eve.data == YT.PlayerState.ENDED) {
                         await this.play_next();
@@ -103,13 +100,9 @@ export class Player {
                         // NOTE: pause events are received when changing videos. which becomes a pain
                         //  so either don't let the user pause vid directly or let this pause be just for this
                         //  specific client
-                        // await this.pause();
                         await this.sync_yt_player();
                         prev_player_state = eve.data;
                     } else if (eve.data == YT.PlayerState.UNSTARTED) {
-                        if (prev_player_state != YT.PlayerState.UNSTARTED) {
-                            await this.play();
-                        }
                         prev_player_state = eve.data;
                     } else if (eve.data == YT.PlayerState.BUFFERING) {
                         prev_player_state = eve.data;
@@ -161,6 +154,7 @@ export class Player {
                 await setDoc(this.data_ref, this.synced_data);
                 return;
             }
+            console.log(data);
 
             if (d.metadata.hasPendingWrites) {
                 // TODO: this is simpler but lazier way to handle errors in updating stuff in firebase
@@ -198,15 +192,18 @@ export class Player {
                 break;
             case 'Playing':
                 let new_yt_id = this.synced_data.queue[this.synced_data.playing_index];
-                if (this.current_yt_id !== new_yt_id) {
+                if (this.current_yt_id != new_yt_id) {
                     this.current_yt_id = new_yt_id;
                     this.player.loadVideoById(this.current_yt_id);
                 }
                 if (this.player.getPlayerState() != YT.PlayerState.PLAYING) {
                     this.player.playVideo();
                 }
+
                 let pos = this.player.getCurrentTime();
                 let seek_time = (this.server_now() - this.synced_data.started_at) / 1000;
+
+                this.seek_wait();
 
                 // only try to seek if it is desynced
                 if (Math.abs(seek_time - pos) > 0.5) {
@@ -402,21 +399,24 @@ export class Player {
             if (!data.started_at) {
                 return;
             }
+
+            // BUG: multiple things can modify seek_promise
             this.seek_promise = new Promise(r => {
                 this.seek_wait = r;
             });
+
             await this.update_state(data);
         });
         await this.seek_promise;
     }
 
     async toggle_pause() {
-        if (this.player.getPlayerState() == YT.PlayerState.UNSTARTED) {
-            await this.sync_yt_player();
-            return;
-        }
         if (this.synced_data.state === 'Playing') {
-            await this.pause();
+            if (this.player.getPlayerState() == YT.PlayerState.UNSTARTED) {
+                await this.sync_yt_player();
+            } else {
+                await this.pause();
+            }
         } else if (this.synced_data.state === 'Paused') {
             await this.play();
         }
