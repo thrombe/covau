@@ -7,32 +7,30 @@ export type { MusicResponsiveListItem };
 export {};
 
 
-// this should onlybe used for the type parameter in the types below
-export interface ForceDb<_> {
-    force: null;
-}
-
 export type RObject<T> =
     T extends MusicResponsiveListItem
     ? ReturnType<typeof SongTube.obj_type>
 
-    : never;
+    // OOF:
+    : ReturnType<typeof SongTube.obj_type>;
 
 
 export type RSearcher<T> =
     T extends MusicResponsiveListItem
     ? Awaited<ReturnType<typeof SongTube.new>>
 
-    : never;
+    // OOF:
+    : Awaited<ReturnType<typeof SongTube.new>>;
 
 
 export type RFactory<T> = 
     T extends MusicResponsiveListItem
     ? ReturnType<typeof SongTube.factory>
 
-    : never;
+    // OOF:
+    : ReturnType<typeof SongTube.factory>;
 
 
-export type Keyed  = { get_key(): unknown };
+export type Keyed = { get_key(): unknown };
 
 

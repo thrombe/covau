@@ -11,10 +11,10 @@
         if (e.key === 'Enter') {
             e.preventDefault();
             await on_enter(e);
-            input_element.blur();
+            input_element?.blur();
         } else if (e.key == 'Escape') {
             e.preventDefault();
-            input_element.blur();
+            input_element?.blur();
         } else {
             await on_keydown(e);
         }
