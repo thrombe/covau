@@ -1,8 +1,20 @@
 <script lang="ts">
+    import InputBar from "./InputBar.svelte";
+
+    let search_query: string = '';
+    let search_input_element: HTMLElement | null;
 </script>
 
 <browse>
     <search-bar>
+        <InputBar
+            placeholder={'Search'}
+            bind:value={search_query}
+            bind:input_element={search_input_element}
+            on_enter={async (e) => {
+                e.preventDefault();
+            }}
+        />
     </search-bar>
 
     <browse-tab-bar>
