@@ -1,4 +1,5 @@
 <script lang="ts">
+    import InputBar from "../lib/components/InputBar.svelte";
     import PlayBar from "../lib/components/PlayBar.svelte";
     import SongBrowser from "../lib/components/SongBrowser.svelte";
     import Video from "../lib/components/Video.svelte";
@@ -6,24 +7,28 @@
 
     export let params: { group?: string };
 
+    const hash_prefix = '#/vibe/';
+
     let group: string;
     if (!params.group) {
         group = 'random-one';
         params.group = group;
-        window.history.pushState({}, '', '#/vibe/' + group);
+        window.history.pushState({}, '', hash_prefix + group);
     } else {
         group = params.group;
     }
 
     $: if (group != params.group) {
         let url_without_hash =  window.location.toString().replace(window.location.hash, '');
-        let new_url = url_without_hash + '#/vibe/' + params.group;
+        let new_url = url_without_hash + hash_prefix + params.group;
         window.location.replace(new_url);
         // window.location.reload();
     }
 
     let player: Player;
     let on_player_tick = async () => {};
+
+    let group_name_input: string;
 </script>
 
 <all>
@@ -40,6 +45,20 @@
         <queue-area>
             <queue>
                 <queue-name>
+                    <InputBar
+                        bind:placeholder={group}
+                        bind:value={group_name_input}
+                        on_enter={async (e) => {
+                            if (!group_name_input) {
+                                return;
+                            }
+                            group = group_name_input;
+                            let url_without_hash =  window.location.toString().replace(window.location.hash, '');
+                            let new_url = url_without_hash + hash_prefix + group;
+                            window.location.replace(new_url);
+                            window.location.reload();
+                        }}
+                    />
                 </queue-name>
 
                 <queue-content>
@@ -58,7 +77,7 @@
 
     <play-bar>
         <PlayBar
-            {player}
+            bind:player
         />
     </play-bar>
 </all>

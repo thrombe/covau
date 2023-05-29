@@ -193,11 +193,13 @@
     audio-slider {
         display: flex;
         flex-direction: row;
+
+        align-items: center;
+        height: 50%;
     }
 
     audio-slider input {
         width: 100%;
-        height: 50%;
     }
 
     volume-control {
