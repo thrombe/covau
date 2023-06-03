@@ -4,6 +4,9 @@
     import SongBrowser from "../lib/components/SongBrowser.svelte";
     import Video from "../lib/components/Video.svelte";
     import { Player } from "../lib/player";
+    import Queue from '../lib/components/Queue.svelte';
+    import type { Unique } from '../lib/virtual';
+    import { tube } from '../lib/searcher/Tube.svelte';
 
     export let params: { group?: string };
 
@@ -26,18 +29,54 @@
     }
 
     let player: Player;
-    let on_player_tick = async () => {};
+    let on_player_tick = async () => {
+        queue_items = player.synced_data.queue.map((e) => {
+            return { data: e, id: e };
+        });
+        if (player.synced_data.state != 'Initialised') {
+            queue_selected_item_index = player.synced_data.playing_index;
+        }
+    };
 
-    let group_name_input: string;
-    let item_width: number = window.innerWidth / 3;
+    let group_name_input: string = '';
     let item_height: number = 70;
+    let item_width: number = window.innerWidth / 3;
+    const on_window_resize = () => {
+        item_width = Number(
+            getComputedStyle(queue_element).getPropertyValue('width').replace('px', '')
+        );
+    };
+    $: if (queue_element) {
+        on_window_resize();
+    }
 
     let queue_element: HTMLElement;
+    let queue_items: Array<Unique<string, string>> = [];
+    let queue_selected_item_index: number;
+    let on_queue_item_add = async (id_or_url: string) => {
+        if (id_or_url.startsWith('https://')) {
+            let url = await tube.resolveURL(id_or_url);
+            if (!url.payload.videoId && url.payload.url) {
+                url = await tube.resolveURL(id_or_url);
+            }
+            if (!url.payload.videoId) {
+                return;
+            }
+            await player.queue(id_or_url);
+        } else {
+            try {
+                // TODO: this should be cached
+                let r = await tube.getBasicInfo(id_or_url);
+            } catch {
+                return;
+            }
+
+            await player.queue(id_or_url);
+        }
+    };
 </script>
 
-<svelte:window on:resize={async (e) => {
-    item_width = Number(getComputedStyle(queue_element).getPropertyValue('width').replace('px', ''));
-}} />
+<svelte:window on:resize={on_window_resize} />
 
 <all style='--list-item-icon-width: {item_height}px;'>
     <all-contents>
@@ -74,6 +113,16 @@
                 </queue-name>
 
                 <queue-content>
+                    {#if player}
+                        <Queue
+                            bind:items={queue_items}
+                            gap={0}
+                            bind:item_width
+                            bind:item_height
+                            bind:selected_item_index={queue_selected_item_index}
+                            bind:on_item_add={on_queue_item_add}
+                        />
+                    {/if}
                 </queue-content>
             </queue>
 
