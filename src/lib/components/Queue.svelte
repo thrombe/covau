@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { tube } from '../searcher/Tube.svelte';
+    import type Innertube from 'youtubei.js/agnostic';
     import type { Unique } from '../virtual';
     import AudioListItem from './AudioListItem.svelte';
     import InputBar from './InputBar.svelte';
@@ -12,6 +12,7 @@
     export let item_height: number;
     export let selected_item_index: number;
     export let on_item_add: (id_or_url: string) => Promise<void>;
+    export let tube: Innertube;
 
     let end_is_visible = false;
     const end_reached = async () => {};

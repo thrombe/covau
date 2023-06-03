@@ -1,5 +1,5 @@
 
-import { MusicResponsiveListItem, SongTube } from './tube';
+import { MusicResponsiveListItem, SongTube } from './song_tube';
 
 type ReturnType<Type> = Type extends (...args: never[]) => infer R ? R : never;
 

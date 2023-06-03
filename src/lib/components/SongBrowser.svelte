@@ -2,12 +2,12 @@
     import { tick } from "svelte";
     import { writable } from "svelte/store";
     import type { RObject } from "../searcher/searcher";
-    import { type MusicResponsiveListItem, SongTube } from "../searcher/tube";
-    import { tube } from "../searcher/Tube.svelte";
+    import { type MusicResponsiveListItem, SongTube } from "../searcher/song_tube";
 
 
-    let fac = writable(SongTube.factory(tube));
-    let searcher = writable(SongTube.new('', tube));
+    let fac = writable(SongTube.factory(undefined as unknown as Innertube));
+    // OOF: cannot search anything if query is '' anyway
+    let searcher = writable(SongTube.new('', undefined as unknown as Innertube));
 </script>
 
 <script lang="ts">
@@ -15,10 +15,15 @@
     import AudioListItem from "./AudioListItem.svelte";
     import Explorer from "./Explorer.svelte";
     import InputBar from "./InputBar.svelte";
+    import type Innertube from "youtubei.js/agnostic";
 
     export let item_width: number;
     export let item_height: number;
     export let gap: number;
+    export let tube: Innertube;
+
+    $fac = SongTube.factory(tube);
+    $searcher = SongTube.new('', tube);
 
     let search_query: string = '';
     let search_input_element: HTMLElement | null;

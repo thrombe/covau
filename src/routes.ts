@@ -14,7 +14,7 @@ export default {
     }),
 
     '/vibe/:group?': wrap({
-        asyncComponent: () => import('./routes/Vibe.svelte'),
+        asyncComponent: () => import('./routes/VibeWrap.svelte'),
         loadingComponent: Loading,
         loadingParams: {},
     }),

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type Innertube from 'youtubei.js/agnostic';
     import InputBar from '../lib/components/InputBar.svelte';
     import PlayBar from '../lib/components/PlayBar.svelte';
     import Queue from '../lib/components/Queue.svelte';
@@ -6,9 +7,9 @@
     import Video from '../lib/components/Video.svelte';
     import { Player } from '../lib/player';
     import type { Unique } from '../lib/virtual';
-    import { tube } from '../lib/searcher/Tube.svelte';
 
     export let params: { group?: string };
+    export let tube: Innertube;
 
     const hash_prefix = '#/vibe/';
 
@@ -84,7 +85,7 @@
             <top-menubar />
 
             <browse>
-                <SongBrowser bind:item_height bind:item_width gap={0} />
+                <SongBrowser bind:item_height bind:item_width gap={0} bind:tube />
             </browse>
         </search-area>
 
@@ -118,6 +119,7 @@
                             bind:item_height
                             bind:selected_item_index={queue_selected_item_index}
                             bind:on_item_add={on_queue_item_add}
+                            bind:tube
                         />
                     {/if}
                 </queue-content>
