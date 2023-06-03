@@ -148,6 +148,7 @@
                     on:click={() => {
                         _on_item_click(i);
                     }}
+                    style="width: {item_width}px; height: {item_height}px;"
                 >
                     <slot
                         {item_width}
@@ -164,6 +165,7 @@
                         _on_item_click(i);
                     }}
                     on:keydown={() => {}}
+                    style="width: {item_width}px; height: {item_height}px;"
                 >
                     <slot
                         {item_width}

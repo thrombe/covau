@@ -90,10 +90,8 @@
 
             let:item
             let:selected
-            let:item_width
-            let:item_height
         >
-            <item style="width: {item_width}px; height: {item_height}px;">
+            <item>
                 <AudioListItem
                     title={item.title ? item.title : ''}
                     title_sub={get_artist_name(item)}
@@ -106,6 +104,9 @@
 
 <style>
     item {
+        width: 100%;
+        height: 100%;
+
         display: block;
         background-color: #774477;
     }
