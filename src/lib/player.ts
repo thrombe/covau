@@ -334,7 +334,7 @@ export class Player {
                     throw 'unhandled state!!';
             }
             index -= 1;
-            if (this.synced_data.queue.length > index) {
+            if (this.synced_data.queue.length > index && index >= 0) {
                 let data: PlayerSyncedData = {
                     state: 'Playing',
                     queue: this.synced_data.queue,
