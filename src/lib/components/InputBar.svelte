@@ -36,6 +36,7 @@
         background-color: #ffffff00;
         border: 0px;
         text-align: center;
+        padding: 0px;
     }
     input:focus {
         border: none;
