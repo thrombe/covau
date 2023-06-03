@@ -15,68 +15,26 @@ export class SongTube extends Unpaged<MusicResponsiveListItem> {
         this.tube = tube;
     }
 
-    private static async new_innertube_instance() {
-        let yt = await Innertube.create({
-            cache: new UniversalCache(false),
-            generate_session_locally: true,
-            fetch: async (input, init) => {
-                let url: string;
-                if (typeof input === 'string') {
-                    url = input;
-                } else if (input instanceof URL) {
-                    url = input.toString();
-                } else {
-                    url = input.url;
-                }
-
-                let headers = init?.headers
-                    ? new Headers(init.headers)
-                    : input instanceof Request
-                        ? input.headers
-                        : new Headers();
-                let headers_copy = JSON.stringify([...headers]);
-
-                headers.delete('user-agent');
-
-                const request = new Request(
-                    url,
-                    input instanceof Request ? input : undefined
-                );
-                let req = {
-                    url: url,
-                    headers: headers_copy,
-                    body: init?.body,
-                    method: request.method
-                };
-                let res = await fetch('/.netlify/functions/fetch', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(req)
-                });
-                return res;
-            }
-        });
-        return yt;
-    }
-
-
-    static async new(q: string) {
+    static new(q: string, tube: Innertube) {
         const US = UniqueSearch<MusicResponsiveListItem, typeof SongTube>(SongTube);
         const SS = SavedSearch<MusicResponsiveListItem, typeof US>(US);
-        return new SS(q, await this.new_innertube_instance());
+        return new SS(q, tube);
     }
 
-    static factory() {
+    static factory(tube: Innertube) {
         type R = RSearcher<MusicResponsiveListItem>;
         class Fac {
-            include_adult: boolean = false;
+            tube: Innertube;
+            constructor(tube: Innertube) {
+                this.tube = tube;
+            }
             async with_query(q: string) {
-                let t = await SongTube.new(q);
+                let t = SongTube.new(q, this.tube);
                 return t as R | null;
             }
         }
         const SS = SlowSearch<R, typeof Fac>(Fac);
-        return new SS();
+        return new SS(tube);
     }
 
     static obj_type() {

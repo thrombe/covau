@@ -17,10 +17,10 @@ export type RObject<T> =
 
 export type RSearcher<T> =
     T extends MusicResponsiveListItem
-    ? Awaited<ReturnType<typeof SongTube.new>>
+    ? ReturnType<typeof SongTube.new>
 
     // OOF:
-    : Awaited<ReturnType<typeof SongTube.new>>;
+    : ReturnType<typeof SongTube.new>;
 
 
 export type RFactory<T> = 

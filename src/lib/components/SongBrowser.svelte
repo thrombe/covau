@@ -3,10 +3,11 @@
     import { writable } from "svelte/store";
     import type { RObject } from "../searcher/searcher";
     import { type MusicResponsiveListItem, SongTube } from "../searcher/tube";
+    import { tube } from "../searcher/Tube.svelte";
 
 
-    let fac = writable(SongTube.factory());
-    let searcher = writable(await SongTube.new(''));
+    let fac = writable(SongTube.factory(tube));
+    let searcher = writable(SongTube.new('', tube));
 </script>
 
 <script lang="ts">
