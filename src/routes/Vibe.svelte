@@ -1,10 +1,10 @@
 <script lang="ts">
-    import InputBar from "../lib/components/InputBar.svelte";
-    import PlayBar from "../lib/components/PlayBar.svelte";
-    import SongBrowser from "../lib/components/SongBrowser.svelte";
-    import Video from "../lib/components/Video.svelte";
-    import { Player } from "../lib/player";
+    import InputBar from '../lib/components/InputBar.svelte';
+    import PlayBar from '../lib/components/PlayBar.svelte';
     import Queue from '../lib/components/Queue.svelte';
+    import SongBrowser from '../lib/components/SongBrowser.svelte';
+    import Video from '../lib/components/Video.svelte';
+    import { Player } from '../lib/player';
     import type { Unique } from '../lib/virtual';
     import { tube } from '../lib/searcher/Tube.svelte';
 
@@ -22,7 +22,7 @@
     }
 
     $: if (group != params.group) {
-        let url_without_hash =  window.location.toString().replace(window.location.hash, '');
+        let url_without_hash = window.location.toString().replace(window.location.hash, '');
         let new_url = url_without_hash + hash_prefix + params.group;
         window.location.replace(new_url);
         // window.location.reload();
@@ -78,18 +78,13 @@
 
 <svelte:window on:resize={on_window_resize} />
 
-<all style='--list-item-icon-width: {item_height}px;'>
+<all style="--list-item-icon-width: {item_height}px;">
     <all-contents>
         <search-area>
-            <top-menubar>
-            </top-menubar>
+            <top-menubar />
 
             <browse>
-                <SongBrowser
-                    bind:item_height
-                    bind:item_width
-                    gap={0}
-                />
+                <SongBrowser bind:item_height bind:item_width gap={0} />
             </browse>
         </search-area>
 
@@ -104,7 +99,9 @@
                                 return;
                             }
                             group = group_name_input;
-                            let url_without_hash =  window.location.toString().replace(window.location.hash, '');
+                            let url_without_hash = window.location
+                                .toString()
+                                .replace(window.location.hash, '');
                             let new_url = url_without_hash + hash_prefix + group;
                             window.location.replace(new_url);
                             window.location.reload();
@@ -127,19 +124,13 @@
             </queue>
 
             <video-box>
-                <Video
-                    bind:group
-                    bind:player
-                    bind:on_tick={on_player_tick}
-                />
+                <Video bind:group bind:player bind:on_tick={on_player_tick} />
             </video-box>
         </queue-area>
     </all-contents>
 
     <play-bar>
-        <PlayBar
-            bind:player
-        />
+        <PlayBar bind:player />
     </play-bar>
 </all>
 
@@ -154,7 +145,6 @@
 
         font-family: monospace;
     }
-
 
     :global(html, body) {
         margin: 0px;
@@ -187,7 +177,7 @@
     }
 
     browse {
-        height: calc(100%  - var(--top-menubar-height));
+        height: calc(100% - var(--top-menubar-height));
     }
 
     queue-area {
