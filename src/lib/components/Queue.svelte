@@ -20,6 +20,7 @@
     };
     export let swap_items = async (i: number, j: number) => {};
     export let insert_item = async (index: number, id: string) => {};
+    export let delete_item = async (index: number, id: string) => {};
 
     let end_is_visible = false;
     const end_reached = async () => {};
@@ -133,6 +134,11 @@
                         ? item.basic_info.thumbnail[item.basic_info.thumbnail.length - 1].url
                         : ''}
                 />
+                <button
+                    on:click={async () => {
+                        await delete_item(index, items[index].data);
+                    }}
+                >pop</button>
             {/if}
         </item>
     </VirtualScrollable>
@@ -148,6 +154,7 @@
         width: 100%;
         height: 100%;
         display: block;
+        position: relative;
     }
     item.is-active {
         background-color: #558855;
@@ -160,5 +167,15 @@
     }
     item.is-selected {
         background-color: #888855;
+    }
+    item:hover button {
+        display: block;
+    }
+    item button {
+        display: none;
+
+        position: absolute;
+        right: 0px;
+        top: 0px;
     }
 </style>

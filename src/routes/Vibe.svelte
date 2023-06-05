@@ -36,7 +36,7 @@
             return { data: e, id: e };
         });
         if (player.synced_data.state != 'Initialised') {
-            queue_selected_item_index = player.synced_data.playing_index;
+            // queue_selected_item_index = player.synced_data.playing_index;
             playing_index = player.synced_data.playing_index;
         }
     };
@@ -85,6 +85,13 @@
             // TODO: show popup saying that this id is already in the queue
         } else {
             await player.queue_item_insert(index, id);
+        }
+    };
+    let on_queue_item_delete = async (index: number, id: string) => {
+        if (player.synced_data.queue[index] === id) {
+            await player.queue_item_delete(index);
+        } else {
+            // TODO: notify user
         }
     };
 
@@ -138,6 +145,7 @@
                             bind:dragend={queue_dragend}
                             insert_item={on_queue_item_insert}
                             swap_items={on_queue_item_swap}
+                            delete_item={on_queue_item_delete}
                         />
                     {/if}
                 </queue-content>

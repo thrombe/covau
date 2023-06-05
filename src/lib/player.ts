@@ -416,6 +416,23 @@ export class Player {
         });
     }
 
+    async queue_item_delete(index: number) {
+        await this.mutex.runExclusive(async () => {
+            let data: PlayerSyncedData = {...this.synced_data};
+            data.queue = [...data.queue];
+
+            if (data.state !== 'Initialised') {
+                if (data.playing_index == data.queue.length - 1) {
+                    data.playing_index -= 1;
+                }
+            }
+            data.queue.splice(index, 1);
+
+            data.tick += 1;
+            await this.update_state(data);
+        });
+    }
+
     seek_promise: Promise<void> = Promise.resolve();
     seek_wait: (v: void) => void = () => {};
     async seek_perc(perc: number) {
