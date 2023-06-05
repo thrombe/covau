@@ -30,12 +30,14 @@
     }
 
     let player: Player;
+    let playing_index: number | null = null;
     let on_player_tick = async () => {
         queue_items = player.synced_data.queue.map((e) => {
             return { data: e, id: e };
         });
         if (player.synced_data.state != 'Initialised') {
             queue_selected_item_index = player.synced_data.playing_index;
+            playing_index = player.synced_data.playing_index;
         }
     };
 
@@ -53,7 +55,7 @@
 
     let queue_element: HTMLElement;
     let queue_items: Array<Unique<string, string>> = [];
-    let queue_selected_item_index: number;
+    let queue_selected_item_index: number = -1; // -1 avoids selecting input bar in queue when nothing is in queue
     let on_queue_item_add = async (id_or_url: string) => {
         if (id_or_url.startsWith('https://')) {
             let url = await tube.resolveURL(id_or_url);
@@ -130,6 +132,7 @@
                             bind:item_width
                             bind:item_height
                             bind:selected_item_index={queue_selected_item_index}
+                            bind:playing={playing_index}
                             bind:on_item_add={on_queue_item_add}
                             bind:tube
                             bind:dragend={queue_dragend}

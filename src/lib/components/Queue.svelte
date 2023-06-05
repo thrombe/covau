@@ -11,6 +11,7 @@
     export let item_width: number;
     export let item_height: number;
     export let selected_item_index: number;
+    export let playing: number | null;
     export let on_item_add: (id_or_url: string) => Promise<void>;
     export let tube: Innertube;
     export let dragend = (e: DragEvent) => {
@@ -113,6 +114,8 @@
             on:dragenter={() => (hovering = index)}
             class:is-active={hovering === index && items.length != index}
             class:is-dragging={dragging_index === index}
+            class:is-playing={index === playing}
+            class:is-selected={index === selected_item_index}
         >
             {#if typeof item === 'string'}
                 <InputBar
@@ -151,5 +154,11 @@
     }
     item.is-dragging {
         background-color: #885555;
+    }
+    item.is-playing {
+        background-color: #885588;
+    }
+    item.is-selected {
+        background-color: #888855;
     }
 </style>
