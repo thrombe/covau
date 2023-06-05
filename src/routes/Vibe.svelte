@@ -56,26 +56,8 @@
     let queue_element: HTMLElement;
     let queue_items: Array<Unique<string, string>> = [];
     let queue_selected_item_index: number = -1; // -1 avoids selecting input bar in queue when nothing is in queue
-    let on_queue_item_add = async (id_or_url: string) => {
-        if (id_or_url.startsWith('https://')) {
-            let url = await tube.resolveURL(id_or_url);
-            if (!url.payload.videoId && url.payload.url) {
-                url = await tube.resolveURL(id_or_url);
-            }
-            if (!url.payload.videoId) {
-                return;
-            }
-            await player.queue(id_or_url);
-        } else {
-            try {
-                // TODO: this should be cached
-                let r = await tube.getBasicInfo(id_or_url);
-            } catch {
-                return;
-            }
-
-            await player.queue(id_or_url);
-        }
+    let on_queue_item_add = async (id: string) => {
+        await player.queue(id);
     };
     let on_queue_item_swap = async (i: number, j: number) => {
         await player.queue_item_swap(i, j);

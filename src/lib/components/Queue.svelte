@@ -12,7 +12,7 @@
     export let item_height: number;
     export let selected_item_index: number;
     export let playing: number | null;
-    export let on_item_add: (id_or_url: string) => Promise<void>;
+    export let on_item_add: (id: string) => Promise<void>;
     export let tube: Innertube;
     export let dragend = (e: DragEvent) => {
         hovering = null;
@@ -56,9 +56,33 @@
     $: if (items) {
         fetch_info(items);
     }
+    let get_verified_id = async (id_or_url: string): Promise<string | null> => {
+        if (id_or_url.startsWith('https://')) {
+            let url = await tube.resolveURL(id_or_url);
+            if (!url.payload.videoId && url.payload.url) {
+                url = await tube.resolveURL(id_or_url);
+            }
+            if (!url.payload.videoId) {
+                return null;
+            }
+            return url.payload.videoId;
+        } else {
+            try {
+                let r = await tube.getBasicInfo(id_or_url);
+                searched_item_map.set(id_or_url, r);
+            } catch {
+                return null;
+            }
+
+            return id_or_url;
+        }
+    };
 
     const on_enter = async (e: KeyboardEvent) => {
-        await on_item_add(new_queue_item);
+        let id = await get_verified_id(new_queue_item);
+        if (id) {
+            await on_item_add(id);
+        }
         new_queue_item = '';
     };
 
@@ -78,6 +102,13 @@
             let new_id = event.dataTransfer.getData('covau/dragndropnew');
 
             await insert_item(target, new_id);
+        } else if (event.dataTransfer?.getData('text/plain')) {
+            let maybe_url = event.dataTransfer.getData('text/plain');
+
+            let id = await get_verified_id(maybe_url);
+            if (id) {
+                await insert_item(target, id);
+            }
         }
     };
 
@@ -87,6 +118,15 @@
         dragging_index = i;
         event.dataTransfer!.setData('covau/dragndrop', i.toString());
         event.dataTransfer!.setData('text/plain', 'https://youtu.be/' + items[i].data);
+    };
+
+    const dragenter = (e: DragEvent, index: number) => {
+        if (items.length > index) {
+            hovering = index;
+        } else {
+            // if it is input bar - select the thing above it
+            hovering = index - 1;
+        }
     };
 </script>
 
@@ -112,7 +152,7 @@
             on:drop|preventDefault={(event) => drop(event, index)}
             on:dragend={dragend}
             ondragover="return false"
-            on:dragenter={() => (hovering = index)}
+            on:dragenter={dragenter}
             class:is-active={hovering === index && items.length != index}
             class:is-dragging={dragging_index === index}
             class:is-playing={index === playing}
