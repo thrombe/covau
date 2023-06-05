@@ -61,8 +61,8 @@
     let on_queue_item_add = async (id: string) => {
         await player.queue(id);
     };
-    let on_queue_item_swap = async (i: number, j: number) => {
-        await player.queue_item_swap(i, j);
+    let on_queue_item_move = async (from: number, to: number) => {
+        await player.queue_item_move(from, to);
     };
     let on_queue_item_insert = async (index: number, id: string) => {
         if (player.synced_data.queue.filter(t => t == id).length > 0) {
@@ -132,7 +132,7 @@
                             bind:dragend={queue_dragend}
                             bind:playing_video_info={queue_playing_vid_info}
                             insert_item={on_queue_item_insert}
-                            swap_items={on_queue_item_swap}
+                            move_item={on_queue_item_move}
                             delete_item={on_queue_item_delete}
                             play_item={on_queue_item_play}
                         />

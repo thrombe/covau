@@ -19,7 +19,7 @@
         hovering = null;
         dragging_index = null;
     };
-    export let swap_items = async (i: number, j: number) => {};
+    export let move_item = async (from: number, to: number) => {};
     export let insert_item = async (index: number, id: string) => {};
     export let delete_item = async (index: number, id: string) => {};
     export let play_item = async (index: number) => {};
@@ -117,7 +117,7 @@
         if (event.dataTransfer?.getData('covau/dragndrop')) {
             let start_index = parseInt(event.dataTransfer.getData('covau/dragndrop'));
 
-            await swap_items(start_index, target);
+            await move_item(start_index, target);
         } else if (event.dataTransfer?.getData('covau/dragndropnew')) {
             let new_id = event.dataTransfer.getData('covau/dragndropnew');
 
@@ -252,6 +252,7 @@
         width: var(--list-item-icon-width);
         margin: 0px;
         padding: 0px;
-        background-color: #88555555;
+        border: 0px;
+        background-color: #88555588;
     }
 </style>

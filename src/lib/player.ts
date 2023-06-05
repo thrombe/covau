@@ -371,8 +371,8 @@ export class Player {
         });
     }
 
-    async queue_item_swap(i: number, j: number) {
-        if (i == j) {
+    async queue_item_move(from: number, to: number) {
+        if (from == to) {
             return;
         }
         await this.mutex.runExclusive(async () => {
@@ -380,18 +380,21 @@ export class Player {
             data.queue = [...data.queue];
 
             if (data.state !== 'Initialised') {
-                if (i == data.playing_index) {
-                    data.playing_index = j;
-                } else if (j == data.playing_index) {
-                    data.playing_index = i;
+                if (from == data.playing_index) {
+                    data.playing_index = to;
+                } else if (
+                    data.playing_index >= Math.min(from, to) &&
+                    data.playing_index <= Math.max(from, to)
+                ) {
+                    data.playing_index += 1 * Math.sign(from - to);
                 }
             }
-            if (i < j) {
-                data.queue.splice(j + 1, 0, data.queue[i]);
-                data.queue.splice(i, 1);
+            if (from < to) {
+                data.queue.splice(to + 1, 0, data.queue[from]);
+                data.queue.splice(from, 1);
             } else {
-                data.queue.splice(j, 0, data.queue[i]);
-                data.queue.splice(i + 1, 1);
+                data.queue.splice(to, 0, data.queue[from]);
+                data.queue.splice(from + 1, 1);
             }
 
             data.tick += 1;
