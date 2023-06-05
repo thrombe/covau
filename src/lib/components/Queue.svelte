@@ -110,6 +110,7 @@
     let hovering: number | null = null;
     let dragging_index: number | null = null;
     const drop = async (event: DragEvent, target: number) => {
+        dragend(event);
         event.dataTransfer!.dropEffect = 'move';
 
         if (event.dataTransfer?.getData('covau/dragndrop')) {
@@ -170,7 +171,7 @@
             on:drop|preventDefault={(event) => drop(event, index)}
             on:dragend={dragend}
             ondragover="return false"
-            on:dragenter={dragenter}
+            on:dragenter={e => dragenter(e, index)}
             class:is-active={hovering === index && items.length != index}
             class:is-dragging={dragging_index === index}
             class:is-playing={index === playing}
