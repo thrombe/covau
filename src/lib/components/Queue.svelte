@@ -22,6 +22,7 @@
     export let swap_items = async (i: number, j: number) => {};
     export let insert_item = async (index: number, id: string) => {};
     export let delete_item = async (index: number, id: string) => {};
+    export let play_item = async (index: number) => {};
 
     $: if (playing) {
         update_playing_vid_info();
@@ -198,6 +199,12 @@
                         await delete_item(index, items[index].data);
                     }}>pop</button
                 >
+                <button
+                    class:play-button={true}
+                    on:click={async () => {
+                        await play_item(index);
+                    }}>play</button
+                >
             {/if}
         </item>
     </VirtualScrollable>
@@ -236,5 +243,15 @@
         position: absolute;
         right: 0px;
         top: 0px;
+    }
+    item button.play-button {
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        height: var(--list-item-icon-width);
+        width: var(--list-item-icon-width);
+        margin: 0px;
+        padding: 0px;
+        background-color: #88555555;
     }
 </style>

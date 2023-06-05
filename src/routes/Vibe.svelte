@@ -78,6 +78,9 @@
             // TODO: notify user
         }
     };
+    let on_queue_item_play = async (index: number) => {
+        await player.play_index(index);
+    };
 
     let queue_dragend: (e: DragEvent) => void;
 </script>
@@ -131,6 +134,7 @@
                             insert_item={on_queue_item_insert}
                             swap_items={on_queue_item_swap}
                             delete_item={on_queue_item_delete}
+                            play_item={on_queue_item_play}
                         />
                     {/if}
                 </queue-content>
