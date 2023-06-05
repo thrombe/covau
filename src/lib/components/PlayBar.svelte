@@ -146,26 +146,8 @@
 
         display: flex;
         flex-direction: row;
-    }
 
-    audio-icon {
-        width: var(--play-bar-height);
-        background-color: #994444;
-    }
-
-    audio-info-contents {
-        width: calc(100% - var(--play-bar-height));
-        display: flex;
-        flex-direction: column;
-    }
-
-    audio-title {
-        height: 60%;
-        background-color: #665544;
-    }
-    audio-title-sub {
-        height: 40%;
-        background-color: #445555;
+        --list-item-icon-width: var(--play-bar-height);
     }
 
     audio-controls {

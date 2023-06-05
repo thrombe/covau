@@ -215,17 +215,17 @@
         display: block;
         position: relative;
     }
-    item.is-active {
-        background-color: #558855;
-    }
     item.is-dragging {
         background-color: #885555;
+    }
+    item.is-selected {
+        background-color: #888855;
     }
     item.is-playing {
         background-color: #885588;
     }
-    item.is-selected {
-        background-color: #888855;
+    item.is-active {
+        background-color: #558855;
     }
     item:hover button {
         display: block;
