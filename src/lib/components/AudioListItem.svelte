@@ -2,6 +2,8 @@
     export let title: string;
     export let title_sub: string;
     export let img_src: string;
+
+    // TODO: somehow setup retrying and see if images load more reliably
 </script>
 
 <boxx>
@@ -63,6 +65,7 @@
         text-overflow: '.. ';
         white-space: nowrap;
         overflow: hidden;
+        user-select: none;
     }
 
     item-title-sub {

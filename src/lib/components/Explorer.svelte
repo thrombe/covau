@@ -61,7 +61,7 @@
     };
     const next_page = async () => {
         let r = await $searcher.next_page();
-        items = r.map(e => {
+        items = r.map((e: RObject<T>) => {
             return { id: e.get_key(), data: e } as Unique<RObject<T>, number>;
         });
     };
