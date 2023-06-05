@@ -13,6 +13,12 @@
     export let selected_item_index: number;
     export let on_item_add: (id_or_url: string) => Promise<void>;
     export let tube: Innertube;
+    export let dragend = (e: DragEvent) => {
+        hovering = null;
+        dragging_index = null;
+    };
+    export let swap_items = async (i: number, j: number) => {};
+    export let insert_item = async (index: number, id: string) => {};
 
     let end_is_visible = false;
     const end_reached = async () => {};
@@ -41,6 +47,10 @@
         });
         searched_items.push({ data: 'add-new', id: 'add-new' });
     };
+    // TODO:
+    // make these fetches paged or something
+    // like - a queue with many items should not make all users fetch absolutely every vid
+    // but this is not a prolem usually
     $: if (items) {
         fetch_info(items);
     }
@@ -52,6 +62,30 @@
 
     let new_queue_item = '';
     let new_item_input: HTMLElement;
+
+    let hovering: number | null = null;
+    let dragging_index: number | null = null;
+    const drop = async (event: DragEvent, target: number) => {
+        event.dataTransfer!.dropEffect = 'move';
+
+        if (event.dataTransfer?.getData('covau/dragndrop')) {
+            let start_index = parseInt(event.dataTransfer.getData('covau/dragndrop'));
+
+            await swap_items(start_index, target);
+        } else if (event.dataTransfer?.getData('covau/dragndropnew')) {
+            let new_id = event.dataTransfer.getData('covau/dragndropnew');
+
+            await insert_item(target, new_id);
+        }
+    };
+
+    const dragstart = (event: DragEvent, i: number) => {
+        event.dataTransfer!.effectAllowed = 'move';
+        event.dataTransfer!.dropEffect = 'move';
+        dragging_index = i;
+        event.dataTransfer!.setData('covau/dragndrop', i.toString());
+        event.dataTransfer!.setData('text/plain', 'https://youtu.be/' + items[i].data);
+    };
 </script>
 
 <queue>
@@ -68,8 +102,18 @@
         bind:selected_item
         let:item
         let:selected
+        let:index
     >
-        <item>
+        <item
+            draggable={index != items.length}
+            on:dragstart={(event) => dragstart(event, index)}
+            on:drop|preventDefault={(event) => drop(event, index)}
+            on:dragend={dragend}
+            ondragover="return false"
+            on:dragenter={() => (hovering = index)}
+            class:is-active={hovering === index && items.length != index}
+            class:is-dragging={dragging_index === index}
+        >
             {#if typeof item === 'string'}
                 <InputBar
                     placeholder="Add new item"
@@ -101,5 +145,11 @@
         width: 100%;
         height: 100%;
         display: block;
+    }
+    item.is-active {
+        background-color: #558855;
+    }
+    item.is-dragging {
+        background-color: #885555;
     }
 </style>

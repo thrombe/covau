@@ -75,6 +75,18 @@
             await player.queue(id_or_url);
         }
     };
+    let on_queue_item_swap = async (i: number, j: number) => {
+        await player.queue_item_swap(i, j);
+    };
+    let on_queue_item_insert = async (index: number, id: string) => {
+        if (player.synced_data.queue.filter(t => t == id).length > 0) {
+            // TODO: show popup saying that this id is already in the queue
+        } else {
+            await player.queue_item_insert(index, id);
+        }
+    };
+
+    let queue_dragend: (e: DragEvent) => void;
 </script>
 
 <svelte:window on:resize={on_window_resize} />
@@ -85,7 +97,7 @@
             <top-menubar />
 
             <browse>
-                <SongBrowser bind:item_height bind:item_width gap={0} bind:tube />
+                <SongBrowser bind:item_height bind:item_width gap={0} bind:tube {queue_dragend} />
             </browse>
         </search-area>
 
@@ -120,6 +132,9 @@
                             bind:selected_item_index={queue_selected_item_index}
                             bind:on_item_add={on_queue_item_add}
                             bind:tube
+                            bind:dragend={queue_dragend}
+                            insert_item={on_queue_item_insert}
+                            swap_items={on_queue_item_swap}
                         />
                     {/if}
                 </queue-content>

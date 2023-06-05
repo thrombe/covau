@@ -21,6 +21,7 @@
     export let item_height: number;
     export let gap: number;
     export let tube: Innertube;
+    export let queue_dragend: (e: DragEvent) => void = () => {};
 
     $fac = SongTube.factory(tube);
     $searcher = SongTube.new('', tube);
@@ -58,6 +59,14 @@
         }
         return t.artists[0].name;
     }
+
+    let dragstart = (event: DragEvent, t: MusicResponsiveListItem) => {
+        if (t.id) {
+            event.dataTransfer!.effectAllowed = 'move';
+            event.dataTransfer!.dropEffect = 'move';
+            event.dataTransfer!.setData('covau/dragndropnew', t.id);
+        }
+    };
 </script>
 
 <browse>
@@ -97,7 +106,11 @@
             let:item
             let:selected
         >
-            <item>
+            <item
+                draggable={true}
+                on:dragstart={(event) => dragstart(event, item)}
+                on:dragend={queue_dragend}
+            >
                 <AudioListItem
                     title={item.title ? item.title : ''}
                     title_sub={get_artist_name(item)}

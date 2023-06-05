@@ -371,6 +371,51 @@ export class Player {
         });
     }
 
+    async queue_item_swap(i: number, j: number) {
+        if (i == j) {
+            return;
+        }
+        await this.mutex.runExclusive(async () => {
+            let data: PlayerSyncedData = {...this.synced_data};
+            data.queue = [...data.queue];
+
+            if (data.state !== 'Initialised') {
+                if (i == data.playing_index) {
+                    data.playing_index = j;
+                } else if (j == data.playing_index) {
+                    data.playing_index = i;
+                }
+            }
+            if (i < j) {
+                data.queue.splice(j + 1, 0, data.queue[i]);
+                data.queue.splice(i, 1);
+            } else {
+                data.queue.splice(j, 0, data.queue[i]);
+                data.queue.splice(i + 1, 1);
+            }
+
+            data.tick += 1;
+            await this.update_state(data);
+        });
+    }
+
+    async queue_item_insert(index: number, id: string) {
+        await this.mutex.runExclusive(async () => {
+            let data: PlayerSyncedData = {...this.synced_data};
+            data.queue = [...data.queue];
+
+            if (data.state !== 'Initialised') {
+                if (data.playing_index >= index) {
+                    data.playing_index += 1;
+                }
+            }
+            data.queue.splice(index, 0, id);
+
+            data.tick += 1;
+            await this.update_state(data);
+        });
+    }
+
     seek_promise: Promise<void> = Promise.resolve();
     seek_wait: (v: void) => void = () => {};
     async seek_perc(perc: number) {
