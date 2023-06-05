@@ -1,9 +1,8 @@
 <script lang="ts" context="module">
-    import { tick } from "svelte";
-    import { writable } from "svelte/store";
-    import type { RObject } from "../searcher/searcher";
-    import { type MusicResponsiveListItem, SongTube } from "../searcher/song_tube";
-
+    import { tick } from 'svelte';
+    import { writable } from 'svelte/store';
+    import type { RObject } from '../searcher/searcher';
+    import { type MusicResponsiveListItem, SongTube } from '../searcher/song_tube';
 
     let fac = writable(SongTube.factory(undefined as unknown as Innertube));
     // OOF: cannot search anything if query is '' anyway
@@ -11,11 +10,11 @@
 </script>
 
 <script lang="ts">
-    import { type Unique } from "../virtual";
-    import AudioListItem from "./AudioListItem.svelte";
-    import Explorer from "./Explorer.svelte";
-    import InputBar from "./InputBar.svelte";
-    import type Innertube from "youtubei.js/agnostic";
+    import { type Unique } from '../virtual';
+    import AudioListItem from './AudioListItem.svelte';
+    import Explorer from './Explorer.svelte';
+    import InputBar from './InputBar.svelte';
+    import type Innertube from 'youtubei.js/agnostic';
 
     export let item_width: number;
     export let item_height: number;
@@ -29,16 +28,13 @@
     let search_query: string = '';
     let search_input_element: HTMLElement | null;
 
-
     let t: MusicResponsiveListItem;
     let selected_item: Unique<RObject<MusicResponsiveListItem>, string>;
     let selected_item_index = 0;
     let search_objects: () => Promise<void>;
     let try_scroll_selected_item_in_view: () => Promise<void>;
 
-    const _on_keydown = async (
-        event: KeyboardEvent,
-    ) => {
+    const _on_keydown = async (event: KeyboardEvent) => {
         if (event.key == '?') {
             selected_item_index = 0;
             await tick();
@@ -58,7 +54,7 @@
             return '';
         }
         return t.artists[0].name;
-    }
+    };
 
     let dragstart = (event: DragEvent, t: MusicResponsiveListItem) => {
         if (t.id) {
@@ -83,8 +79,7 @@
         />
     </search-bar>
 
-    <browse-tab-bar>
-    </browse-tab-bar>
+    <browse-tab-bar />
 
     <browse-area>
         <Explorer
@@ -100,9 +95,8 @@
             bind:try_scroll_selected_item_in_view
             {gap}
             on_item_click={async (t) => {
-                console.log(t)
+                console.log(t);
             }}
-
             let:item
             let:selected
         >
@@ -129,7 +123,7 @@
         display: block;
         background-color: #774477;
     }
-    
+
     browse {
         width: 100%;
         height: 100%;
@@ -151,5 +145,4 @@
         height: calc(100% - var(--browse-tab-bar-height) - var(--name-bar-height));
         background-color: #aa4444;
     }
-
 </style>
