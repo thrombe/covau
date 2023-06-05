@@ -1,10 +1,10 @@
 <script lang="ts">
-    import { onDestroy } from "svelte";
-    import { Player } from "../player";
-
-
+    import { onDestroy } from 'svelte';
+    import { Player } from '../player';
+    import AudioListItem from './AudioListItem.svelte';
 
     export let player: Player;
+    export let audio_info: { title: string; title_sub: string; img_src: string } | null;
 
 
     let video_pos = 0;
@@ -39,17 +39,66 @@
     };
 
     const fmt_time = (t: number) => {
-        let hours = ('000' + Math.floor(t/3600)).slice(-2);
-        let mins = ('000' + Math.floor(t/60)).slice(-2);
-        let secs = ('000' + (Math.floor(t))).slice(-2)
-        return `${Math.floor(t/3600) ? hours + ':' : ''}${mins}:${secs}`;
-    }
+        let hours = ('000' + Math.floor(t / 3600)).slice(-2);
+        let mins = ('000' + Math.floor(t / 60)).slice(-2);
+        let secs = ('000' + Math.floor(t)).slice(-2);
+        return `${Math.floor(t / 3600) ? hours + ':' : ''}${mins}:${secs}`;
+    };
 
     $: fmt_duration = fmt_time(audio_duration);
-    $: fmt_video_pos = fmt_time(video_pos*audio_duration);
+    $: fmt_video_pos = fmt_time(video_pos * audio_duration);
 </script>
 
 <bar>
+    <audio-info>
+        <AudioListItem
+            title={audio_info ? audio_info.title : ''}
+            title_sub={audio_info ? audio_info.title_sub : ''}
+            img_src={audio_info ? audio_info.img_src : ''}
+        />
+    </audio-info>
+
+    <audio-controls>
+        <audio-slider>
+            {fmt_video_pos}
+            <input
+                type="range"
+                min={0}
+                max={1}
+                step={'any'}
+                bind:value={video_pos}
+                on:change={on_seek}
+                on:input={(e) => console.log(e)}
+            />
+            {fmt_duration}
+        </audio-slider>
+
+        <buttons>
+            <button
+                on:click={async () => {
+                    await player.play_prev();
+                }}
+            >
+                prev
+            </button>
+            <button
+                on:click={async () => {
+                    await player.toggle_pause();
+                    is_playing = player.is_playing();
+                }}
+            >
+                {is_playing ? 'Pause' : 'Play'}
+            </button>
+            <button
+                on:click={async () => {
+                    await player.play_next();
+                }}
+            >
+                next
+            </button>
+        </buttons>
+    </audio-controls>
+
     <volume-control>
         <volume-icon>
             <!-- this is also the mute button -->
@@ -77,65 +126,12 @@
             />
         </volume-slider>
     </volume-control>
-
-    <audio-controls>
-        <audio-slider>
-            {fmt_video_pos}
-            <input
-                type="range"
-                min={0}
-                max={1}
-                step={'any'}
-                bind:value={video_pos}
-                on:change={on_seek}
-                on:input={e => console.log(e)}
-            />
-            {fmt_duration}
-        </audio-slider>
-
-        <buttons>
-            <button
-                on:click={async () => {
-                    await player.play_prev();
-                }}
-            >
-                prev
-            </button>
-            <button
-                on:click={async () => {
-                    await player.toggle_pause();
-                    is_playing = player.is_playing();
-                }}
-            >
-                {is_playing? 'Pause' : 'Play'}
-            </button>
-            <button
-                on:click={async () => {
-                    await player.play_next();
-                }}
-            >
-                next
-            </button>
-        </buttons>
-    </audio-controls>
-
-    <audio-info>
-        <audio-info-contents>
-            <audio-title>
-            </audio-title>
-
-            <audio-title-sub>
-            </audio-title-sub>
-        </audio-info-contents>
-
-        <audio-icon>
-        </audio-icon>
-    </audio-info>
 </bar>
 
 <style>
     * {
         --volume-control-width: 23%;
+        --audio-info-width: 27%;
     }
 
     bar {
@@ -145,7 +141,7 @@
     }
 
     audio-info {
-        width: var(--queue-area-width);
+        width: var(--audio-info-width);
         background-color: #339933;
 
         display: flex;
@@ -173,7 +169,7 @@
     }
 
     audio-controls {
-        width: calc(100% - var(--queue-area-width) - var(--volume-control-width));
+        width: calc(100% - var(--audio-info-width) - var(--volume-control-width));
         background-color: #882288;
 
         display: flex;

@@ -7,6 +7,7 @@
     import Video from '../lib/components/Video.svelte';
     import { Player } from '../lib/player';
     import type { Unique } from '../lib/virtual';
+    import type { VideoInfo } from 'youtubei.js/dist/src/parser/youtube';
 
     export let params: { group?: string };
     export let tube: Innertube;
@@ -35,7 +36,7 @@
         queue_items = player.synced_data.queue.map((e) => {
             return { data: e, id: e };
         });
-        if (player.synced_data.state != 'Initialised') {
+        if (player.synced_data.state !== 'Initialised') {
             // queue_selected_item_index = player.synced_data.playing_index;
             playing_index = player.synced_data.playing_index;
         }
@@ -56,6 +57,7 @@
     let queue_element: HTMLElement;
     let queue_items: Array<Unique<string, string>> = [];
     let queue_selected_item_index: number = -1; // -1 avoids selecting input bar in queue when nothing is in queue
+    let queue_playing_vid_info: VideoInfo | null;
     let on_queue_item_add = async (id: string) => {
         await player.queue(id);
     };
@@ -125,6 +127,7 @@
                             bind:on_item_add={on_queue_item_add}
                             bind:tube
                             bind:dragend={queue_dragend}
+                            bind:playing_video_info={queue_playing_vid_info}
                             insert_item={on_queue_item_insert}
                             swap_items={on_queue_item_swap}
                             delete_item={on_queue_item_delete}
@@ -140,7 +143,15 @@
     </all-contents>
 
     <play-bar>
-        <PlayBar bind:player />
+        <PlayBar bind:player
+            audio_info={queue_playing_vid_info ? {
+                title: queue_playing_vid_info.basic_info.title ? queue_playing_vid_info.basic_info.title : '',
+                title_sub: queue_playing_vid_info.basic_info.author ? queue_playing_vid_info.basic_info.author : '',
+                img_src: queue_playing_vid_info.basic_info.thumbnail
+                        ? queue_playing_vid_info.basic_info.thumbnail[queue_playing_vid_info.basic_info.thumbnail.length - 1].url
+                        : ''
+            } : null}
+        />
     </play-bar>
 </all>
 

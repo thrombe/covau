@@ -12,6 +12,7 @@
     export let item_height: number;
     export let selected_item_index: number;
     export let playing: number | null;
+    export let playing_video_info: VideoInfo | null = null;
     export let on_item_add: (id: string) => Promise<void>;
     export let tube: Innertube;
     export let dragend = (e: DragEvent) => {
@@ -21,6 +22,21 @@
     export let swap_items = async (i: number, j: number) => {};
     export let insert_item = async (index: number, id: string) => {};
     export let delete_item = async (index: number, id: string) => {};
+
+    $: if (playing) {
+        update_playing_vid_info();
+    }
+
+    const update_playing_vid_info = () => {
+        if (
+            playing &&
+            (playing_video_info === null ||
+                playing_video_info.basic_info.id !== items[playing].data)
+        ) {
+            let vid = searched_item_map.get(items[playing].data);
+            playing_video_info = vid ? vid : null;
+        }
+    };
 
     let end_is_visible = false;
     const end_reached = async () => {};
@@ -48,6 +64,8 @@
             return { data: info, id: e.data };
         });
         searched_items.push({ data: 'add-new', id: 'add-new' });
+
+        update_playing_vid_info();
     };
     // TODO:
     // make these fetches paged or something
@@ -177,8 +195,8 @@
                 <button
                     on:click={async () => {
                         await delete_item(index, items[index].data);
-                    }}
-                >pop</button>
+                    }}>pop</button
+                >
             {/if}
         </item>
     </VirtualScrollable>
