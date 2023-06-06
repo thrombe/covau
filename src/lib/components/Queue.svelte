@@ -141,6 +141,9 @@
     };
 
     const dragenter = (e: DragEvent, index: number) => {
+        if (e.dataTransfer?.dropEffect !== 'link' && e.dataTransfer?.dropEffect !== 'move') {
+            return;
+        }
         if (items.length > index) {
             hovering = index;
         } else {
@@ -172,7 +175,7 @@
             on:drop|preventDefault={(event) => drop(event, index)}
             on:dragend={dragend}
             ondragover="return false"
-            on:dragenter={e => dragenter(e, index)}
+            on:dragenter={(e) => dragenter(e, index)}
             class:is-active={hovering === index && items.length != index}
             class:is-dragging={dragging_index === index}
             class:is-playing={index === playing}
