@@ -41,7 +41,6 @@
     const mousemove = (e: MouseEvent) => {};
     const dragstart = (e: DragEvent) => {
         e.dataTransfer?.setDragImage(img, 0, 0);
-        e.dataTransfer!.effectAllowed = 'none';
         e.dataTransfer!.dropEffect = 'none';
         dragging = true;
     };

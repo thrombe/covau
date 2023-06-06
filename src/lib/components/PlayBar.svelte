@@ -2,6 +2,7 @@
     import { onDestroy } from 'svelte';
     import { Player } from '../player';
     import AudioListItem from './AudioListItem.svelte';
+    import ProgressBar from './ProgressBar.svelte';
 
     export let player: Player;
     export let audio_info: { title: string; title_sub: string; img_src: string } | null;
@@ -13,6 +14,7 @@
     let is_playing = false;
     let audio_duration = 0;
     let is_muted = false;
+    let volume = 1;
     let interval = setInterval(async () => {
         if (player) {
             video_pos = await player.get_player_pos();
@@ -22,6 +24,7 @@
             let dur = player.get_duration();
             audio_duration = dur ? dur : 0;
             is_muted = await player.is_muted();
+            volume = await player.get_volume();
         }
     }, 300);
 
@@ -29,13 +32,13 @@
         clearInterval(interval);
     });
 
-    const on_seek = async (e: Event) => {
-        await player.seek_perc(video_pos);
+    const on_seek = async (p: number) => {
+        await player.seek_perc(p);
     };
 
-    let volume = 1;
-    const on_volume_change = async () => {
-        player.set_volume(volume);
+    const on_volume_change = async (v: number) => {
+        await player.set_volume(v);
+        volume = await player.get_volume();
     };
 
     const fmt_time = (t: number) => {
@@ -61,14 +64,10 @@
     <audio-controls>
         <audio-slider>
             {fmt_video_pos}
-            <input
-                type="range"
-                min={0}
-                max={1}
-                step={'any'}
-                bind:value={video_pos}
-                on:change={on_seek}
-                on:input={(e) => console.log(e)}
+            <ProgressBar
+                bind:progress={video_pos}
+                onchange={on_seek}
+                thumb_size={30}
             />
             {fmt_duration}
         </audio-slider>
@@ -116,13 +115,10 @@
         </volume-icon>
 
         <volume-slider>
-            <input
-                type="range"
-                min={0}
-                max={1}
-                step={'any'}
-                bind:value={volume}
-                on:input={on_volume_change}
+            <ProgressBar
+                bind:progress={volume}
+                onchange={on_volume_change}
+                thumb_size={20}
             />
         </volume-slider>
     </volume-control>
@@ -189,5 +185,13 @@
 
         justify-content: center;
         align-items: center;
+    }
+    volume-icon {
+        width: 60px;
+    }
+    volume-slider {
+        height: 100%;
+        width: calc(100% - 60px);
+        background-color: #885555;
     }
 </style>
