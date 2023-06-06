@@ -24,6 +24,12 @@ export async function new_innertube_instance() {
 
             headers.delete('user-agent');
 
+            if (input instanceof Request) {
+                // idk why the it shows an error
+                // - [Fetch Standard](https://fetch.spec.whatwg.org/#dom-requestinit-duplex)
+                (input as any).duplex = 'half';
+            }
+
             const request = new Request(
                 url,
                 input instanceof Request ? input : undefined
