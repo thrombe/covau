@@ -2,6 +2,7 @@
     import Observer from './Observer.svelte';
     import { tick } from 'svelte';
     import type { Unique } from '../virtual';
+    import Scrollbar from './Scrollbar.svelte';
 
     export let item_width: number;
     export let item_height: number;
@@ -138,17 +139,21 @@
     };
 </script>
 
+<sbp>
 <cl on:scroll={on_update} bind:this={root} bind:clientWidth={width} bind:clientHeight={height}>
     <pad style="height: {top_padding}px; width: 100%;" />
-    <gd style="--item-width: {item_width}px; --gap: {gap}px;" bind:this={grid}>
+    <gd
+        style="--item-width: {item_width}px; --item-height: {item_height}px; --gap: {gap}px; --columns: {columns};"
+        bind:this={grid}
+    >
         {#each visible as item, i (item.id)}
             {#if selected == i + start * columns || (i + start * columns == items.length - 1 && selected >= items.length)}
-                <sel bind:this={_selected_item}
+                <sel
+                    bind:this={_selected_item}
                     on:keydown={() => {}}
                     on:click={() => {
                         _on_item_click(i);
                     }}
-                    style="width: {item_width}px; height: {item_height}px;"
                 >
                     <slot
                         {item_width}
@@ -165,7 +170,6 @@
                         _on_item_click(i);
                     }}
                     on:keydown={() => {}}
-                    style="width: {item_width}px; height: {item_height}px;"
                 >
                     <slot
                         {item_width}
@@ -193,6 +197,11 @@
     {/if}
 </cl>
 
+    <sb>
+        <Scrollbar {root} total_height={items.length / columns * item_height} />
+    </sb>
+</sbp>
+
 <svelte:window on:keydown={_on_keydown} />
 
 <style>
@@ -202,14 +211,33 @@
         flex-wrap: wrap;
         align-content: flex-start;
 
-        overflow: auto;
+        overflow-y: scroll;
+        width: calc(100% - var(--scrollbar-width));
+
+        scrollbar-width: none;
+    }
+    ::-webkit-scrollbar {
+        display: none;
+    }
+
+    sbp {
+        display: flex;
+        flex-direction: row;
+
         width: 100%;
         height: 100%;
     }
+    sb {
+        height: 100%;
+        width: var(--scrollbar-width);
+        background-color: #555588;
+    }
 
     gd {
+        --list-item-width: calc(var(--item-width) - var(--scrollbar-width) / var(--columns));
+
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(var(--item-width), 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(var(--list-item-width), 1fr));
         align-content: start;
         justify-content: space-evenly;
         justify-items: center;
@@ -218,7 +246,12 @@
         padding: 0px;
 
         overflow: visible;
-        width: calc(100% - var(--gap) * 0);
+        width: 100%;
+    }
+
+    sel,
+    clk {
+        width: var(--list-item-width);
+        height: var(--item-height);
     }
 </style>
-

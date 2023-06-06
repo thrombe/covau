@@ -165,8 +165,9 @@
         --top-menubar-height: 36px;
         --name-bar-height: 50px;
         --browse-tab-bar-height: 25px;
-        --queue-area-width: min(475px, max(330px, 33vw));
+        --queue-area-width: min(475px, max(330px, 33.333vw));
         --video-height: calc(var(--queue-area-width) * 1080 / 1920);
+        --scrollbar-width: 13px;
 
         font-family: monospace;
     }
