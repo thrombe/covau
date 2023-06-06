@@ -1,8 +1,9 @@
 <script lang="ts" context="module">
-
     let init_iframe: (b: boolean) => void;
-    let has_iframe: Promise<boolean> = new Promise(r => { init_iframe=r } );
-    [...document.getElementsByTagName('script')].forEach(e => {
+    let has_iframe: Promise<boolean> = new Promise((r) => {
+        init_iframe = r;
+    });
+    [...document.getElementsByTagName('script')].forEach((e) => {
         if (e.src.includes('https://www.youtube.com/iframe_api')) {
             init_iframe(true);
         }
@@ -41,7 +42,7 @@
 
     let tick = writable(0);
     const load_player = async () => {
-        if (!await has_iframe) {
+        if (!(await has_iframe)) {
             return;
         }
         if (player) {
@@ -63,6 +64,21 @@
         // await :/
         on_tick();
     }
+
+    let waiting = true;
+    let interval = setInterval(() => {
+        if (waiting) {
+            if (player && player.player) {
+                waiting = player.player.getPlayerState() !== YT.PlayerState.PLAYING;
+            }
+        } else {
+            clearInterval(interval);
+        }
+    }, 400);
+    const on_click = async (e: Event) => {
+        await player.toggle_pause();
+        waiting = false;
+    };
 </script>
 
 <svelte:head>
@@ -72,6 +88,9 @@
 <div class="video-parent">
     <div class="video" bind:this={video} id="video" />
     <div class="video-sibling" />
+    <div class:ctp={waiting} class:hide={!waiting} on:click={on_click} on:keydown={() => {}}>
+        click to play!
+    </div>
 </div>
 
 <style>
@@ -82,6 +101,30 @@
         background-color: #334433;
     }
 
+    .hide {
+        display: none;
+    }
+    .ctp {
+        --perc: 42%;
+
+        display: block;
+        position: absolute;
+        left: calc(50% - var(--perc) / 2);
+        top: calc(50% - var(--perc) / 2);
+        width: var(--perc);
+        height: var(--perc);
+        background-color: #aa5555;
+        z-index: 3;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+
+        border-radius: 15px;
+        font-size: calc(var(--queue-area-width) * 0.06);
+        user-select: none;
+    }
     .video-sibling {
         display: block;
         position: absolute;
@@ -99,4 +142,3 @@
         height: 100%;
     }
 </style>
-

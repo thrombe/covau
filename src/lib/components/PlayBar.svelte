@@ -174,10 +174,6 @@
         height: 50%;
     }
 
-    audio-slider input {
-        width: 100%;
-    }
-
     volume-control {
         width: var(--volume-control-width);
         background-color: #336633;
@@ -190,6 +186,13 @@
     }
     volume-icon {
         width: 60px;
+        height: 100%;
+    }
+    volume-icon button {
+        width: 100%;
+        height: 100%;
+        margin: 0px;
+        padding: 0px;
     }
     volume-slider {
         height: 100%;
