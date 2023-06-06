@@ -173,6 +173,7 @@
 
     :global(html, body) {
         margin: 0px;
+        overflow: hidden;
     }
 
     all {
