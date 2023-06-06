@@ -5,7 +5,8 @@
 
 <script lang="ts">
     export let progress: number;
-    export let thumb_size: number;
+    export let thumb_width: number;
+    export let thumb_height: number;
     export let onchange: (progress: number) => Promise<void>;
 
     let thumb_progress = 0;
@@ -34,15 +35,15 @@
     const get_thumb_progress = (p: number) => {
         let tp: number;
 
-        if (p * width < thumb_size / 2) {
+        if (p * width < thumb_width / 2) {
             tp = 0;
-        } else if (p * width + thumb_size / 2 > width) {
-            tp = width - thumb_size;
+        } else if (p * width + thumb_width / 2 > width) {
+            tp = width - thumb_width;
         } else {
-            tp = width * p - thumb_size / 2;
+            tp = width * p - thumb_width / 2;
         }
 
-        return tp / (width - thumb_size);
+        return tp / (width - thumb_width);
     };
 
     let width: number;
@@ -57,7 +58,7 @@
     };
     const dragend = async () => {
         await onchange(_progress);
-        console.log('awaited')
+        console.log('awaited');
         dragging = false;
         dragging_x = null;
     };
@@ -92,7 +93,7 @@
         set_progress_at_click(e);
         dragging = true;
         await onchange(_progress);
-        console.log('awaited')
+        console.log('awaited');
         dragging = false;
     };
 </script>
@@ -108,7 +109,11 @@
     on:dragend={dragend}
 >
     <completed style="width: {thumb_progress * width}px;" />
-    <thumb style="--side: {thumb_size}px; --prog: {thumb_progress * (width - thumb_size)}px;" />
+    <thumb
+        style="--thumb-width: {thumb_width}px;
+            --thumb-height: {thumb_height}px;
+            --prog: {thumb_progress * (width - thumb_width)}px;"
+    />
 </bar>
 
 <style>
@@ -128,10 +133,10 @@
 
     thumb {
         position: absolute;
-        top: calc(50% - var(--side) / 2);
+        top: calc(50% - var(--thumb-height) / 2);
         left: var(--prog);
-        width: var(--side);
-        height: var(--side);
+        width: var(--thumb-width);
+        height: var(--thumb-height);
 
         background-color: #558855;
     }

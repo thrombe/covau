@@ -67,7 +67,8 @@
             <ProgressBar
                 bind:progress={video_pos}
                 onchange={on_seek}
-                thumb_size={30}
+                thumb_width={30}
+                thumb_height={30}
             />
             {fmt_duration}
         </audio-slider>
@@ -118,7 +119,8 @@
             <ProgressBar
                 bind:progress={volume}
                 onchange={on_volume_change}
-                thumb_size={20}
+                thumb_width={20}
+                thumb_height={60}
             />
         </volume-slider>
     </volume-control>
