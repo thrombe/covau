@@ -12,12 +12,23 @@
     let _progress = 0;
 
     $: if (typeof progress !== 'undefined') {
-        if (!dragging) {
+        if (!dragging && !wait_for_update) {
             thumb_progress = get_thumb_progress(progress);
         }
     }
     $: if (_progress) {
         thumb_progress = get_thumb_progress(_progress);
+    }
+
+    // OOF: player does not await for enough time after calling methods on it.
+    // so wait for some hacky amount of time before
+    // syncing progress bar to the 'progress' variable
+    let wait_for_update = false;
+    $: if (!dragging) {
+        wait_for_update = true;
+        setTimeout(() => {
+            wait_for_update = false;
+        }, 500);
     }
 
     const get_thumb_progress = (p: number) => {
