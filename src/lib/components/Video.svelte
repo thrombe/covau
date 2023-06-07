@@ -76,7 +76,11 @@
         }
     }, 400);
     const on_click = async (e: Event) => {
-        await player.toggle_pause();
+        if (player) {
+            await player.toggle_pause();
+        }
+        // if button is clicked even before player is loaded - it should still work fine as all it needs
+        // is some kind of user interaction with the page for it to start the video
         waiting = false;
     };
 </script>
