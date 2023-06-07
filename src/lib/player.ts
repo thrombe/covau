@@ -1,6 +1,6 @@
 
 import {
-    addDoc, collection, deleteDoc, doc, DocumentReference, DocumentSnapshot, Firestore,
+    addDoc, collection, deleteDoc, doc, DocumentData, DocumentReference, DocumentSnapshot, Firestore,
     getDoc, onSnapshot, serverTimestamp, setDoc, type Unsubscribe
 } from 'firebase/firestore';
 import { Mutex } from 'async-mutex';
@@ -115,6 +115,7 @@ export class Player {
     // TODO: more consistent format for duration | position
     async get_player_pos() {
         await this.seek_promise;
+        await this.player_initialised;
 
         let curr_time = this.player.getCurrentTime();
         let duration = this.player.getDuration();
@@ -141,6 +142,7 @@ export class Player {
         let player = new Player(db, video_element_id, data_ref);
 
         await player.recalculate_time_error();
+        player.dispatch_time_error_routine();
 
         player.start_listener();
 
@@ -594,6 +596,43 @@ export class Player {
         await this.sync_yt_player();
     }
 
+    dispatch_time_error_routine() {
+        let threshold = 400;
+        let min_yet: number | null = null;
+        let timeout: number;
+        const one_iteration = async () => {
+            let sync_start = Date.now();
+            let added_doc = await addDoc(
+                collection(this.db, 'timesync'), {
+                ts: serverTimestamp(),
+            });
+            let d = await getDoc(added_doc);
+            let sync_end = Date.now();
+            await deleteDoc(added_doc);
+
+            let data = d.data() as DocumentData;
+            let server_now = data.ts.toMillis();
+
+            let now = (sync_start + sync_end) / 2;
+            let error = now - server_now;
+            let del = sync_end - sync_start;
+
+            if (min_yet === null || min_yet > del) {
+                this.local_time_error = error;
+                await this.sync_yt_player();
+                min_yet = del;
+            }
+
+            console.log('local time error: ', del);
+            if (del > threshold) {
+                clearTimeout(timeout);
+                timeout = setTimeout(one_iteration, 60 * 1000);
+            }
+        };
+
+        one_iteration();
+    }
+
     server_now() {
         return Date.now() - this.local_time_error;
     }
@@ -607,15 +646,14 @@ async function get_local_time_error(db: Firestore) {
     });
     let d = await getDoc(added_doc);
     let sync_end = Date.now();
-    let now = (sync_start + sync_end) / 2;
-    let data = d.data();
-    if (!data) {
-        throw "never";
-    }
-    // console.log(data.ts.toMillis());
-    let server_now = data.ts.toMillis();
-    let time_offset = now - server_now;
-    // console.log(time_offset, sync_end - sync_start);
     await deleteDoc(added_doc);
+
+    let now = (sync_start + sync_end) / 2;
+    let data = d.data() as DocumentData;
+    let server_now = data.ts.toMillis();
+
+    let time_offset = now - server_now;
     return time_offset;
 }
+
+
