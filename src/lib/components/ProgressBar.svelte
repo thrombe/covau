@@ -52,7 +52,7 @@
     let dragging_x: number | null = null;
     const dragstart = (e: DragEvent) => {
         e.dataTransfer?.setDragImage(img, 0, 0);
-        e.dataTransfer!.dropEffect = 'none';
+        e.dataTransfer?.setData('covau/ignore', 'covau/ignore');
         dragging = true;
         set_progress_at_click(e);
     };

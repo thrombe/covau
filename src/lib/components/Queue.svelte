@@ -141,7 +141,7 @@
     };
 
     const dragenter = (e: DragEvent, index: number) => {
-        if (e.dataTransfer?.dropEffect !== 'link' && e.dataTransfer?.dropEffect !== 'move') {
+        if (!!e.dataTransfer?.getData('covau/ignore')) {
             return;
         }
         if (items.length > index) {

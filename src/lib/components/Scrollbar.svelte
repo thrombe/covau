@@ -41,7 +41,7 @@
     const mousemove = (e: MouseEvent) => {};
     const dragstart = (e: DragEvent) => {
         e.dataTransfer?.setDragImage(img, 0, 0);
-        e.dataTransfer!.dropEffect = 'none';
+        e.dataTransfer?.setData('covau/ignore', 'covau/ignore');
         dragging = true;
     };
     const dragend = (e: DragEvent) => {
