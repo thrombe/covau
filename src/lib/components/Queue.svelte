@@ -24,13 +24,13 @@
     export let delete_item = async (index: number, id: string) => {};
     export let play_item = async (index: number) => {};
 
-    $: if (playing) {
+    $: if (playing !== null) {
         update_playing_vid_info();
     }
 
     const update_playing_vid_info = () => {
         if (
-            playing &&
+            playing !== null &&
             (playing_video_info === null ||
                 playing_video_info.basic_info.id !== items[playing].data)
         ) {
