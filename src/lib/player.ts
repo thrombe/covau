@@ -141,9 +141,9 @@ export class Player {
         let data_ref = doc(db, 'groups', group);
         let player = new Player(db, video_element_id, data_ref);
 
-        await player.recalculate_time_error();
         player.dispatch_time_error_routine();
 
+        await player.player_initialised;
         player.start_listener();
 
         return player;
@@ -588,9 +588,6 @@ export class Player {
         await setDoc(this.data_ref, data);
     }
 
-    // TODO: call this method every few seconds untill either or
-    //   - the set and fetch time delay gets lower than some threshold
-    //   - the time delays are very constant
     async recalculate_time_error() {
         this.local_time_error = await get_local_time_error(this.db);
         await this.sync_yt_player();
