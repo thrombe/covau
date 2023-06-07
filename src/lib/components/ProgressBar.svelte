@@ -88,8 +88,9 @@
         }
     };
 
+    let bar: HTMLElement;
     const set_progress_at_click = (e: MouseEvent | DragEvent) => {
-        let rect: DOMRect = (e as any).target.getBoundingClientRect();
+        let rect: DOMRect = bar.getBoundingClientRect();
         let p = e.clientX - rect.x;
         p = p / width;
         _progress = p;
@@ -105,6 +106,7 @@
 <svelte:window on:mousemove={mousemove} on:dragover={dragover} />
 
 <bar
+    bind:this={bar}
     bind:clientWidth={width}
     on:click={onclick}
     on:keydown={() => {}}
