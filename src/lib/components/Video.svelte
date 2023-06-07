@@ -68,7 +68,7 @@
     let waiting = true;
     let interval = setInterval(() => {
         if (waiting) {
-            if (player && player.player) {
+            if (player && player.player && player.player.getPlayerState) {
                 waiting = player.player.getPlayerState() !== YT.PlayerState.PLAYING;
             }
         } else {
@@ -77,7 +77,7 @@
     }, 400);
     const on_click = async (e: Event) => {
         if (player) {
-            await player.toggle_pause();
+            await player.play();
         }
         // if button is clicked even before player is loaded - it should still work fine as all it needs
         // is some kind of user interaction with the page for it to start the video

@@ -60,11 +60,14 @@
     };
     const dragend = async () => {
         await onchange(_progress);
-        console.log('awaited');
         dragging = false;
         dragging_x = null;
     };
-    const mousemove = (e: MouseEvent) => {};
+    const mousemove = (e: MouseEvent) => {
+        if (e.buttons == 1) {
+            // console.log(dragging);
+        }
+    };
     const dragover = async (e: DragEvent) => {
         if (dragging) {
             if (!dragging_x) {
@@ -95,7 +98,6 @@
         set_progress_at_click(e);
         dragging = true;
         await onchange(_progress);
-        console.log('awaited');
         dragging = false;
     };
 </script>
