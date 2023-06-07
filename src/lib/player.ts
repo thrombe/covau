@@ -200,15 +200,7 @@ export class Player {
                     this.player.playVideo();
                 }
 
-                let pos = this.player.getCurrentTime();
-                let seek_time = (this.server_now() - this.synced_data.started_at) / 1000;
-
-                this.seek_wait();
-
-                // only try to seek if it is desynced
-                if (Math.abs(seek_time - pos) > 0.5) {
-                    this.player.seekTo(seek_time, true);
-                }
+                this.maybe_seek_player(this.synced_data.started_at);
                 break;
             case 'Paused':
                 if (!this.current_yt_id) {
@@ -218,9 +210,26 @@ export class Player {
                     this.player.loadVideoById(this.current_yt_id);
                 }
                 this.player.pauseVideo();
+
+                this.maybe_seek_player(this.synced_data.started_at);
                 break;
             default:
                 throw 'unhandled state!!';
+        }
+    }
+
+    private maybe_seek_player(started_at: number) {
+        let pos = this.player.getCurrentTime();
+        let seek_time = (this.server_now() - started_at) / 1000;
+
+        if (this.seek_started_at === started_at) {
+            this.seek_wait();
+            this.seek_started_at = null;
+        }
+
+        // only try to seek if it is desynced
+        if (Math.abs(seek_time - pos) > 0.5) {
+            this.player.seekTo(seek_time, true);
         }
     }
 
@@ -438,6 +447,7 @@ export class Player {
 
     seek_promise: Promise<void> = Promise.resolve();
     seek_wait: (v: void) => void = () => {};
+    seek_started_at: number | null = null;
     async seek_perc(perc: number) {
         if (this.synced_data.state == 'Initialised') {
             await this.play();
@@ -465,7 +475,8 @@ export class Player {
                 return;
             }
 
-            // BUG: multiple things can modify seek_promise
+            this.seek_started_at = data.started_at;
+            this.seek_wait();
             this.seek_promise = new Promise(r => {
                 this.seek_wait = r;
             });
