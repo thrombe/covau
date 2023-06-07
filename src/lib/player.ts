@@ -57,6 +57,7 @@ export class Player {
             queue: [],
             tick: 0,
         };
+        this.last_state = this.synced_data;
 
         console.log("creating player!!!!");
         let initialised: (v: void) => void;
@@ -159,12 +160,6 @@ export class Player {
             console.log(data);
 
             if (d.metadata.hasPendingWrites) {
-                // TODO: this is simpler but lazier way to handle errors in updating stuff in firebase
-                //   a nicer alternative can be to cache this.synced_data in each function before trying sync
-                //   and catch errors on this.update_state. and restore stuff | retry updating depending on
-                //   what operation it is. (queueing new items should retry)
-                //   also need to handle cases like multiple people clicking the same thing (next_song)
-                return;
                 // lock should already be held in local writes
                 this.synced_data = data as PlayerSyncedData;
             } else {
@@ -172,6 +167,8 @@ export class Player {
                     // T-T: how do i communicate back the error?
                     if ((data as PlayerSyncedData).tick > this.synced_data.tick) {
                         this.synced_data = data as PlayerSyncedData;
+
+                        this.set_last_state(this.synced_data);
                     }
                 });
             }
@@ -179,7 +176,11 @@ export class Player {
             await this.sync_yt_player();
             this.on_update();
         };
-        this.snapshot_unsub = onSnapshot(this.data_ref, { includeMetadataChanges: true }, on_next);
+        this.snapshot_unsub = onSnapshot(
+            this.data_ref,
+            { includeMetadataChanges: false },
+            on_next,
+        );
     }
 
     private async sync_yt_player() {
@@ -581,11 +582,35 @@ export class Player {
         this.player.unMute();
     }
 
-    private async update_state(data: PlayerSyncedData) {
+    last_state: PlayerSyncedData;
+    private async update_state(data: PlayerSyncedData, on_err: ((e: any) => Promise<void>) | null = null) {
         // TODO: it is a inefficient to send the entire queue for every state change :/
         // - [TypeScript: Utility Types](https://www.typescriptlang.org/docs/handbook/utility-types.html)
         // maybe use Omit and stuff
-        await setDoc(this.data_ref, data);
+        this.set_last_state(this.synced_data);
+
+        if (!on_err) {
+            on_err = async (e) => {
+                // MAYBE: is it better to revert every update or
+                console.error(e);
+
+                await this.restore_last_state();
+            };
+        }
+
+        await setDoc(this.data_ref, data)
+        .catch(on_err);
+    }
+
+    private set_last_state(data: PlayerSyncedData) {
+        this.last_state = {...data};
+        this.last_state.queue = [...data.queue];
+    }
+    private async restore_last_state() {
+        this.synced_data = {...this.last_state};
+        this.synced_data.queue = [...this.last_state.queue];
+
+        await this.sync_yt_player();
     }
 
     async recalculate_time_error() {
