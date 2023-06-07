@@ -25,9 +25,11 @@
     // so wait for some hacky amount of time before
     // syncing progress bar to the 'progress' variable
     let wait_for_update = false;
+    let timeout: number;
     $: if (!dragging) {
         wait_for_update = true;
-        setTimeout(() => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
             wait_for_update = false;
         }, 500);
     }
