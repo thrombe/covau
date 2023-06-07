@@ -24,7 +24,7 @@
 
 <style>
     * {
-        --icon-right-margin: 10px;
+        --info-left-right-margin: 10px;
     }
 
     img {
@@ -35,11 +35,12 @@
 
     icon {
         width: var(--list-item-icon-width);
-        margin-right: var(--icon-right-margin);
     }
 
     info {
-        width: calc(100% - var(--list-item-icon-width) - var(--icon-right-margin));
+        width: calc(100% - var(--list-item-icon-width) - var(--info-left-right-margin) * 2);
+        margin-right: var(--info-left-right-margin);
+        margin-left: var(--info-left-right-margin);
 
         display: flex;
         flex-direction: column;
@@ -62,7 +63,7 @@
 
     txt {
         width: 100%;
-        text-overflow: '.. ';
+        text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
         user-select: none;
