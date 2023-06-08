@@ -137,6 +137,8 @@
         await tick();
         await on_item_click(items[selected]);
     };
+
+    $: scrollbar_total_height = items.length / columns * item_height;
 </script>
 
 <sbp>
@@ -198,7 +200,7 @@
 </cl>
 
     <sb>
-        <Scrollbar {root} total_height={items.length / columns * item_height} />
+        <Scrollbar {root} total_height={scrollbar_total_height} />
     </sb>
 </sbp>
 

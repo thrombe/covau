@@ -13,6 +13,12 @@
     $: if (visible_height || total_height) {
         thumb_height = visible_height * (visible_height / total_height);
     }
+    $: if (total_height && root) {
+        // inverse of the other calculation to set top_pad
+        top_pad =
+            (root.scrollTop * (visible_height - thumb_height)) /
+            (total_height - visible_height);
+    }
 
     // timeout to make sure the scrollbar is correctly synced (it does not get enough on:scroll events)
     let timeout: number;
