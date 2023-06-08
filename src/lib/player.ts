@@ -188,7 +188,8 @@ export class Player {
 
         switch (this.synced_data.state) {
             case 'Initialised':
-                // this should only be run when a new group is created. so nothing to be done here
+                this.player.stopVideo();
+                this.current_yt_id = '';
                 break;
             case 'Finished':
                 // T-T: video finishes by itself. no need to sync to finish ig
@@ -524,6 +525,8 @@ export class Player {
                 await this.pause();
             }
         } else if (this.synced_data.state === 'Paused') {
+            await this.play();
+        } else {
             await this.play();
         }
     }
