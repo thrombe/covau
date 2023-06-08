@@ -19,6 +19,11 @@
             (root.scrollTop * (visible_height - thumb_height)) /
             (total_height - visible_height);
     }
+    $: if (!total_height) {
+        // total height is 0
+        thumb_height = 0;
+        top_pad = 0;
+    }
 
     // timeout to make sure the scrollbar is correctly synced (it does not get enough on:scroll events)
     let timeout: number;
