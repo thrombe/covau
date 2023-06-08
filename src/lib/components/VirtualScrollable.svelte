@@ -38,19 +38,27 @@
 
     let top_padding = 0;
     let bottom_padding = 0;
+    let offset_observer = false;
     let on_update = async () => {
         if (!items) {
             return;
         }
         let st = window.getComputedStyle(grid);
         columns = st.getPropertyValue('grid-template-columns').split(' ').length;
-        // console.log(root.scrollTop, root.clientHeight, start, end, top_padding, bottom_padding);
+        
         let s = Math.floor(root.scrollTop / item_height);
         top_padding = s * item_height;
-        let e = start + Math.ceil(root.clientHeight / item_height) + 1;
-        bottom_padding = (Math.ceil(items.length / columns) - e) * item_height;
+        let e = s + Math.ceil(root.clientHeight / item_height) + 1;
+        let total_pos_req = Math.ceil(items.length / columns);
+        bottom_padding = Math.max(total_pos_req - e, 0) * item_height;
 
-        if ((start != s || end != e || edited) && items.length != 0) {
+        if (total_pos_req * item_height > margin) {
+            offset_observer = true;
+        } else {
+            offset_observer = false;
+        }
+
+        if (start != s || end != e || edited) {
             start = s;
             end = e;
             edited = false;
@@ -188,15 +196,9 @@
     <pad style="height: {bottom_padding}px; width: 100%;" />
 
     <!-- observer -->
-    {#if bottom_padding < margin}
-        <obs style="width: 100%;">
-            <Observer enter_screen={end_reached} bind:visible={end_is_visible} {root} {margin} />
-        </obs>
-    {:else}
-        <obs style="width: 100%; position: relative; top: -{margin}px;">
-            <Observer enter_screen={end_reached} bind:visible={end_is_visible} {root} {margin} />
-        </obs>
-    {/if}
+    <obs style="width: 100%; position: relative; top: {offset_observer ? -margin : 0}px;">
+        <Observer enter_screen={end_reached} bind:visible={end_is_visible} {root} {margin} />
+    </obs>
 </cl>
 
     <sb>
