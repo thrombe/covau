@@ -432,13 +432,40 @@ export class Player {
     }
 
     async queue_item_delete(index: number) {
+        if (index < 0) {
+            return;
+        }
+        
         await this.mutex.runExclusive(async () => {
             let data: PlayerSyncedData = {...this.synced_data};
             data.queue = [...data.queue];
 
             if (data.state !== 'Initialised') {
-                if (data.playing_index == data.queue.length - 1) {
+                if (data.playing_index > index) {
                     data.playing_index -= 1;
+                } else if (data.playing_index == index) {
+                    if (data.state !== 'Finished') {
+                        data.started_at = this.server_now();
+                    }
+
+                    if (data.queue.length <= 1) {
+                        // queue will have no items after removing
+                        data = {
+                            state: 'Initialised',
+                            tick: data.tick + 1,
+                            queue: [],
+                        };
+                        await this.update_state(data);
+                        return;
+                    } else if (index == data.queue.length - 1) {
+                        // queue.length > 1
+                        data.playing_index -= 1;
+                    } else {
+                        // if currently playing item is removed, then play the next one (assuming
+                        // there is a next item)
+                    }
+                } else {
+                    // do nothing if removed item comes after the currently playing one
                 }
             }
             data.queue.splice(index, 1);
