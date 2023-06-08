@@ -57,6 +57,8 @@
             }
             await next_page();
             await tick();
+            await new Promise<void>(r => setTimeout(() => r(), 100));
+            await tick();
         }
     };
     const next_page = async () => {
