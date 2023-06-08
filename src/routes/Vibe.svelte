@@ -39,6 +39,8 @@
         if (player.synced_data.state !== 'Initialised') {
             // queue_selected_item_index = player.synced_data.playing_index;
             playing_index = player.synced_data.playing_index;
+        } else {
+            playing_index = null;
         }
     };
 
