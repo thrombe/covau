@@ -61,7 +61,11 @@
     let queue_selected_item_index: number = -1; // -1 avoids selecting input bar in queue when nothing is in queue
     let queue_playing_vid_info: VideoInfo | null;
     let on_queue_item_add = async (id: string) => {
-        await player.queue(id);
+        if (player.synced_data.queue.filter(t => t == id).length > 0) {
+            // TODO: show popup saying that this id is already in the queue
+        } else {
+            await player.queue(id);
+        }
     };
     let on_queue_item_move = async (from: number, to: number) => {
         await player.queue_item_move(from, to);
