@@ -48,14 +48,19 @@
     let searched_item_map = new Map<string, VideoInfo>();
     export let searched_items: Array<Unique<VideoInfo | string, unknown>> = [];
     const fetch_info = async (items: Unique<string, unknown>[]) => {
-        for (const id of items) {
+        let wait_for = items.map(id => {
             if (searched_item_map.has(id.data)) {
-                continue;
+                return Promise.resolve();
+            } else {
+                return tube.getBasicInfo(id.data).then((info) => {
+                    // console.log(info);
+                    searched_item_map.set(id.data, info);
+                });
             }
+        })
 
-            let info = await tube.getBasicInfo(id.data);
-            // console.log(info);
-            searched_item_map.set(id.data, info);
+        for (const prom of wait_for) {
+            await prom;
         }
         searched_items = items.map((e) => {
             let info = searched_item_map.get(e.data);
