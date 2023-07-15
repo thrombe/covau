@@ -61,6 +61,7 @@
             event.dataTransfer!.effectAllowed = 'move';
             event.dataTransfer!.dropEffect = 'move';
             event.dataTransfer!.setData('covau/dragndropnew', t.id);
+            event.dataTransfer!.setData('text/plain', 'https://youtu.be/' + t.id);
         }
     };
 </script>
