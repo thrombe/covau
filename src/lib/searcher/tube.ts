@@ -1,4 +1,4 @@
-import Innertube, { UniversalCache } from "youtubei.js/agnostic";
+import Innertube, { UniversalCache } from "youtubei.js/web";
 
 export async function new_innertube_instance() {
     let yt = await Innertube.create({

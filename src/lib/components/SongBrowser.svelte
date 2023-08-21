@@ -14,7 +14,7 @@
     import AudioListItem from './AudioListItem.svelte';
     import Explorer from './Explorer.svelte';
     import InputBar from './InputBar.svelte';
-    import type Innertube from 'youtubei.js/agnostic';
+    import type Innertube from 'youtubei.js/web';
 
     export let item_width: number;
     export let item_height: number;

@@ -1,8 +1,9 @@
 
 import {
-    addDoc, collection, deleteDoc, doc, DocumentData, DocumentReference, DocumentSnapshot, Firestore,
+    addDoc, collection, deleteDoc, doc, DocumentReference, DocumentSnapshot, Firestore,
     getDoc, onSnapshot, serverTimestamp, setDoc, type Unsubscribe
 } from 'firebase/firestore';
+import * as firestore from "firebase/firestore";
 import { Mutex } from 'async-mutex';
 
 type PlayerSyncedData = {
@@ -662,7 +663,7 @@ export class Player {
             let sync_end = Date.now();
             await deleteDoc(added_doc);
 
-            let data = d.data() as DocumentData;
+            let data = d.data() as firestore.DocumentData;
             let server_now = data.ts.toMillis();
 
             let now = (sync_start + sync_end) / 2;
@@ -701,7 +702,7 @@ async function get_local_time_error(db: Firestore) {
     await deleteDoc(added_doc);
 
     let now = (sync_start + sync_end) / 2;
-    let data = d.data() as DocumentData;
+    let data = d.data() as firestore.DocumentData;
     let server_now = data.ts.toMillis();
 
     let time_offset = now - server_now;

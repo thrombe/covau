@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type Innertube from 'youtubei.js/agnostic';
+    import type Innertube from 'youtubei.js/web';
     import InputBar from '../lib/components/InputBar.svelte';
     import PlayBar from '../lib/components/PlayBar.svelte';
     import Queue from '../lib/components/Queue.svelte';
