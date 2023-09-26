@@ -89,60 +89,14 @@
     <script src="https://www.youtube.com/iframe_api"></script>
 </svelte:head>
 
-<div class="video-parent">
-    <div class="video" bind:this={video} id="video" />
-    <div class="video-sibling" />
-    <div class:ctp={waiting} class:hide={!waiting} on:click={on_click} on:keydown={() => {}}>
-        click to play!
+<div class="relative h-full w-full">
+    <div class="block w-full h-full" bind:this={video} id="video" />
+    <div class="block absolute left-0 top-0 w-full h-full opacity-0 z-10" />
+    <div class="absolute left-0 top-0 flex flex-col h-full w-full z-10 items-center justify-center {waiting ? '' : 'hidden'}">
+        <div
+            class='p-6 rounded-2xl bg-red-300 select-none'
+            on:click={on_click} on:keydown={() => {}}>
+            click to play!
+        </div>
     </div>
 </div>
-
-<style>
-    .video {
-        display: block;
-        width: 100%;
-        height: 100%;
-        background-color: #334433;
-    }
-
-    .hide {
-        display: none;
-    }
-    .ctp {
-        --perc: 42%;
-
-        display: block;
-        position: absolute;
-        left: calc(50% - var(--perc) / 2);
-        top: calc(50% - var(--perc) / 2);
-        width: var(--perc);
-        height: var(--perc);
-        background-color: #aa5555;
-        z-index: 3;
-
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        text-align: center;
-
-        border-radius: 15px;
-        font-size: calc(var(--queue-area-width) * 0.06);
-        user-select: none;
-    }
-    .video-sibling {
-        display: block;
-        position: absolute;
-        left: 0px;
-        top: 0px;
-        width: 100%;
-        height: 100%;
-        background-color: #00ff0000;
-        z-index: 2;
-    }
-
-    .video-parent {
-        position: relative;
-        width: 100%;
-        height: 100%;
-    }
-</style>

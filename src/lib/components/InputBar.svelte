@@ -27,23 +27,11 @@
 </script>
 
 <input
+    class='w-full h-full text-center focus:border-none focus:outline-none'
     {placeholder}
     bind:value
     on:keydown={_on_keydown}
     bind:this={input_element}
 />
 
-<style>
-    input {
-        width: 100%;
-        height: 100%;
-        background-color: #ffffff00;
-        border: 0px;
-        text-align: center;
-        padding: 0px;
-    }
-    input:focus {
-        border: none;
-        outline: none;
-    }
-</style>
+

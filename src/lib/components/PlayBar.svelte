@@ -52,8 +52,8 @@
     $: fmt_video_pos = fmt_time(video_pos * audio_duration);
 </script>
 
-<bar>
-    <audio-info>
+<div class='flex flex-row h-full'>
+    <audio-info class='flex flex-row'>
         <AudioListItem
             title={audio_info ? audio_info.title : ''}
             title_sub={audio_info ? audio_info.title_sub : ''}
@@ -62,7 +62,7 @@
     </audio-info>
 
     <audio-controls>
-        <audio-slider>
+        <div class='flex flex-row items-center h-1/2'>
             {fmt_video_pos}
             <ProgressBar
                 bind:progress={video_pos}
@@ -71,9 +71,9 @@
                 thumb_height={30}
             />
             {fmt_duration}
-        </audio-slider>
+        </div>
 
-        <buttons>
+        <div class='flex flex-row gap-2 justify-center h-1/2'>
             <button
                 on:click={async () => {
                     await player.play_prev();
@@ -96,13 +96,14 @@
             >
                 next
             </button>
-        </buttons>
+        </div>
     </audio-controls>
 
-    <volume-control>
+    <volume-control class='flex flex-row justify-center items-center'>
         <volume-icon>
             <!-- this is also the mute button -->
             <button
+                class='w-full h-full'
                 on:click={async () => {
                     if (await player.is_muted()) {
                         await player.unmute();
@@ -124,75 +125,36 @@
             />
         </volume-slider>
     </volume-control>
-</bar>
+</div>
 
-<style>
+<style lang='postcss'>
     * {
         --volume-control-width: 23%;
         --audio-info-width: 27%;
     }
 
-    bar {
-        height: 100%;
-        display: flex;
-        flex-direction: row;
-    }
-
     audio-info {
         width: var(--audio-info-width);
         background-color: #339933;
-
-        display: flex;
-        flex-direction: row;
-
         --list-item-icon-width: var(--play-bar-height);
     }
 
     audio-controls {
         width: calc(100% - var(--audio-info-width) - var(--volume-control-width));
         background-color: #882288;
-
-        display: flex;
-        flex-direction: column;
     }
 
-    buttons {
-        display: flex;
-        flex-direction: row;
-        background-color: #445543;
-
-        justify-content: center;
-
-        height: 50%;
-    }
-
-    audio-slider {
-        display: flex;
-        flex-direction: row;
-
-        align-items: center;
-        height: 50%;
+    button {
+        @apply rounded-md px-2 bg-red-300;
     }
 
     volume-control {
         width: var(--volume-control-width);
         background-color: #336633;
-
-        display: flex;
-        flex-direction: row;
-
-        justify-content: center;
-        align-items: center;
     }
     volume-icon {
         width: 60px;
         height: 100%;
-    }
-    volume-icon button {
-        width: 100%;
-        height: 100%;
-        margin: 0px;
-        padding: 0px;
     }
     volume-slider {
         height: 100%;

@@ -178,11 +178,6 @@
         font-family: monospace;
     }
 
-    :global(html, body) {
-        margin: 0px;
-        overflow: hidden;
-    }
-
     all {
         width: 100vw;
         height: 100vh;

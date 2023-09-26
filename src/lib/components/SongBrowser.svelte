@@ -66,7 +66,7 @@
     };
 </script>
 
-<browse>
+<div class='w-full h-full flex flex-col'>
     <search-bar>
         <InputBar
             placeholder={'Search'}
@@ -101,7 +101,8 @@
             let:item
             let:selected
         >
-            <item
+            <div
+                class='w-full h-full block'
                 draggable={true}
                 on:dragstart={(event) => dragstart(event, item)}
                 on:dragend={queue_dragend}
@@ -111,27 +112,12 @@
                     title_sub={get_artist_name(item)}
                     img_src={item.thumbnails.length > 0 ? item.thumbnails[0].url : ''}
                 />
-            </item>
+            </div>
         </Explorer>
     </browse-area>
-</browse>
+</div>
 
 <style>
-    item {
-        width: 100%;
-        height: 100%;
-
-        display: block;
-        background-color: #774477;
-    }
-
-    browse {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-    }
-
     search-bar {
         height: var(--name-bar-height);
         background-color: #446666;

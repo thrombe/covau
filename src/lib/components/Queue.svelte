@@ -158,7 +158,7 @@
     };
 </script>
 
-<queue>
+<div class='w-full h-full'>
     <VirtualScrollable
         bind:items={searched_items}
         {gap}
@@ -174,7 +174,7 @@
         let:selected
         let:index
     >
-        <item
+        <item class='w-full h-full block relative'
             draggable={index != items.length}
             on:dragstart={(event) => dragstart(event, index)}
             on:drop|preventDefault={(event) => drop(event, index)}
@@ -203,33 +203,28 @@
                         : ''}
                 />
                 <button
+                    class='absolute p-1 rounded-md bg-red-300 right-0 top-0'
                     on:click={async () => {
                         await delete_item(index, items[index].data);
-                    }}>pop</button
+                    }}
                 >
+                    pop
+                </button>
                 <button
+                    class='h-full bg-red-300 opacity-80 absolute left-0 top-0'
                     class:play-button={true}
                     on:click={async () => {
                         await play_item(index);
-                    }}>play</button
+                    }}
                 >
+                        play
+                </button>
             {/if}
         </item>
     </VirtualScrollable>
-</queue>
+</div>
 
-<style>
-    queue {
-        width: 100%;
-        height: 100%;
-    }
-
-    item {
-        width: 100%;
-        height: 100%;
-        display: block;
-        position: relative;
-    }
+<style lang='postcss'>
     item.is-dragging {
         background-color: #885555;
     }
@@ -247,20 +242,8 @@
     }
     item button {
         display: none;
-
-        position: absolute;
-        right: 0px;
-        top: 0px;
     }
     item button.play-button {
-        position: absolute;
-        left: 0px;
-        top: 0px;
-        height: var(--list-item-icon-width);
         width: var(--list-item-icon-width);
-        margin: 0px;
-        padding: 0px;
-        border: 0px;
-        background-color: #88555588;
     }
 </style>
