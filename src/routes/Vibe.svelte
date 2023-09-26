@@ -8,9 +8,22 @@
     import { Player } from '../lib/player';
     import type { Unique } from '../lib/virtual';
     import type { VideoInfo } from 'youtubei.js/dist/src/parser/youtube';
+    import { onMount } from 'svelte';
 
     export let params: { group?: string };
     export let tube: Innertube;
+
+    onMount(() => {
+        let update_hash = () => {
+            let h = window.location.hash.split('/');
+            group = h[h.length - 1];
+        };
+
+        window.addEventListener('hashchange', update_hash);
+        return () => {
+            window.removeEventListener('hashchange', update_hash);
+        };
+    })
 
     const hash_prefix = '#/vibe/';
 
@@ -27,7 +40,7 @@
         let url_without_hash = window.location.toString().replace(window.location.hash, '');
         let new_url = url_without_hash + hash_prefix + params.group;
         window.location.replace(new_url);
-        // window.location.reload();
+        window.location.reload();
     }
 
     let player: Player;
@@ -138,12 +151,6 @@
                                 return;
                             }
                             group = group_name_input;
-                            let url_without_hash = window.location
-                                .toString()
-                                .replace(window.location.hash, '');
-                            let new_url = url_without_hash + hash_prefix + group;
-                            window.location.replace(new_url);
-                            window.location.reload();
                         }}
                     />
                 </queue-name>
