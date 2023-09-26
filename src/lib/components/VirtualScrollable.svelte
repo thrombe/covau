@@ -1,26 +1,24 @@
 <script lang="ts">
     import Observer from './Observer.svelte';
     import { tick } from 'svelte';
-    import type { Unique } from '../virtual';
-    import Scrollbar from './Scrollbar.svelte';
+    import type { Unique } from '../virtual.ts';
 
     export let item_width: number;
     export let item_height: number;
     export let items: Array<Unique<T, unknown>>;
     export let selected: number;
-    export let gap: number;
 
     export let selected_item: Unique<T, unknown> | null = null;
     export let end_reached = async () => {};
     export let on_keydown = async (_: KeyboardEvent, _a: () => Promise<void>) => {};
-    export let on_item_click = async (t: Unique<T, unknown>) => {};
+    export let on_item_click = async (_: Unique<T, unknown>) => {};
     export let end_is_visible = true;
     export let keyboard_control = true;
+    export let width: number;
+    export let height: number;
 
     type T = $$Generic;
 
-    let width: number;
-    let height: number;
     let columns = 1;
 
     $: margin = item_height * 2;
@@ -30,6 +28,9 @@
     let visible = new Array<Unique<T, unknown>>();
     let edited = false;
     $: if (items) {
+        edited = true;
+    }
+    $: if (width) {
         edited = true;
     }
     let grid: HTMLElement;
@@ -47,16 +48,19 @@
         columns = st.getPropertyValue('grid-template-columns').split(' ').length;
         
         let s = Math.floor(root.scrollTop / item_height);
-        top_padding = s * item_height;
         let e = s + Math.ceil(root.clientHeight / item_height) + 1;
         let total_pos_req = Math.ceil(items.length / columns);
-        bottom_padding = Math.max(total_pos_req - e, 0) * item_height;
 
         if (total_pos_req * item_height > margin) {
             offset_observer = true;
         } else {
             offset_observer = false;
         }
+        // console.log('bottom padding', bottom_padding, e, total_pos_req, offset_observer);
+
+        s = Math.max(s-1, 0);
+        top_padding = s * item_height;
+        bottom_padding = Math.max(total_pos_req - e, 0) * item_height;
 
         if (start != s || end != e || edited) {
             start = s;
@@ -77,25 +81,27 @@
             return;
         }
 
-        if (event.key == 'ArrowLeft') {
+        if (event.key == 'ArrowLeft' || event.key == "h") {
             if (selected - 1 >= 0) {
                 selected -= 1;
             }
-        } else if (event.key == 'ArrowRight') {
+        } else if (event.key == 'ArrowRight' || event.key == "l") {
             if (selected + 1 < items.length) {
                 selected += 1;
             }
-        } else if (event.key == 'ArrowUp') {
+        } else if (event.key == 'ArrowUp' || event.key == "k") {
             if (selected - columns >= 0) {
                 selected -= columns;
             }
-        } else if (event.key == 'ArrowDown') {
+        } else if (event.key == 'ArrowDown' || event.key == "j") {
             if (selected + 1 < items.length) {
                 selected += columns;
             }
         } else {
             await on_keydown(event, try_scroll_into_view);
         }
+        await tick();
+        await try_scroll_into_view();
 
         if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].indexOf(event.key) > -1) {
             event.preventDefault();
@@ -124,7 +130,7 @@
         }
     };
     $: if (!(selected === undefined)) {
-        try_scroll_into_view();
+        // try_scroll_into_view();
     }
 
     $: if (_selected_item || items) {
@@ -143,27 +149,27 @@
     const _on_item_click = async (i: number) => {
         selected = i + start * columns;
         await tick();
+        await try_scroll_into_view();
         await on_item_click(items[selected]);
     };
-
-    $: scrollbar_total_height = items.length / columns * item_height;
 </script>
 
-<sbp>
-<cl on:scroll={on_update} bind:this={root} bind:clientWidth={width} bind:clientHeight={height}>
-    <pad style="height: {top_padding}px; width: 100%;" />
-    <gd
-        style="--item-width: {item_width}px; --item-height: {item_height}px; --gap: {gap}px; --columns: {columns};"
-        bind:this={grid}
+<cl on:scroll={on_update} bind:this={root} bind:clientHeight={height}
+    class='flex flex-row flex-wrap content-start overflow-y-auto w-full h-full' 
+>
+    <pad style="height: {top_padding}px;" bind:clientWidth={width} class='w-full mx-4' />
+    <gd bind:this={grid}
+        class='grid justify-evenly justify-items-center content-start overflow-visible w-full'
+        style="grid-template-columns: repeat(auto-fit, minmax({item_width}px, 1fr));"
     >
         {#each visible as item, i (item.id)}
             {#if selected == i + start * columns || (i + start * columns == items.length - 1 && selected >= items.length)}
-                <sel
-                    bind:this={_selected_item}
-                    on:keydown={() => {}}
+                <sel bind:this={_selected_item}
                     on:click={() => {
                         _on_item_click(i);
                     }}
+                    on:keydown={() => {}}
+                    style="width: {item_width}px; height: {item_height}px;"
                 >
                     <slot
                         {item_width}
@@ -180,6 +186,7 @@
                         _on_item_click(i);
                     }}
                     on:keydown={() => {}}
+                    style="width: {item_width}px; height: {item_height}px;"
                 >
                     <slot
                         {item_width}
@@ -193,69 +200,13 @@
             {/if}
         {/each}
     </gd>
-    <pad style="height: {bottom_padding}px; width: 100%;" />
+    <pad style="height: {bottom_padding}px;" class='w-full' />
 
     <!-- observer -->
-    <obs style="width: 100%; position: relative; top: {offset_observer ? -margin : 0}px;">
+    <obs style="top: {offset_observer ? -margin : 0}px;" class='w-full relative' >
         <Observer enter_screen={end_reached} bind:visible={end_is_visible} {root} {margin} />
     </obs>
 </cl>
 
-    <sb>
-        <Scrollbar {root} total_height={scrollbar_total_height} />
-    </sb>
-</sbp>
-
 <svelte:window on:keydown={_on_keydown} />
 
-<style>
-    cl {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        align-content: flex-start;
-
-        overflow-y: scroll;
-        width: calc(100% - var(--scrollbar-width));
-
-        scrollbar-width: none;
-    }
-    ::-webkit-scrollbar {
-        display: none;
-    }
-
-    sbp {
-        display: flex;
-        flex-direction: row;
-
-        width: 100%;
-        height: 100%;
-    }
-    sb {
-        height: 100%;
-        width: var(--scrollbar-width);
-        background-color: #555588;
-    }
-
-    gd {
-        --list-item-width: calc(var(--item-width) - var(--scrollbar-width) / var(--columns));
-
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(var(--list-item-width), 1fr));
-        align-content: start;
-        justify-content: space-evenly;
-        justify-items: center;
-        row-gap: var(--gap);
-        column-gap: var(--gap);
-        padding: 0px;
-
-        overflow: visible;
-        width: 100%;
-    }
-
-    sel,
-    clk {
-        width: var(--list-item-width);
-        height: var(--item-height);
-    }
-</style>
