@@ -62,7 +62,7 @@
     </audio-info>
 
     <audio-controls>
-        <div class='flex flex-row items-center h-1/2'>
+        <div class='flex flex-row items-center h-1/2 w-full'>
             {fmt_video_pos}
             <ProgressBar
                 bind:progress={video_pos}
