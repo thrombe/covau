@@ -2,6 +2,7 @@
     import Observer from './Observer.svelte';
     import { tick } from 'svelte';
     import type { Unique } from '../virtual.ts';
+    import Scrollbar from './Scrollbar.svelte';
 
     export let item_width: number;
     export let item_height: number;
@@ -152,15 +153,22 @@
         await try_scroll_into_view();
         await on_item_click(items[selected]);
     };
+
+    $: scrollbar_total_height = items.length / columns * item_height;
 </script>
 
+<sbp class='flex flex-row h-full w-full'>
 <cl on:scroll={on_update} bind:this={root} bind:clientHeight={height}
-    class='flex flex-row flex-wrap content-start overflow-y-auto w-full h-full' 
+    class='flex flex-row flex-wrap content-start overflow-y-auto h-full scrollbar-hide' 
+    style='width: calc(100% - var(--scrollbar-width));'
 >
     <pad style="height: {top_padding}px;" bind:clientWidth={width} class='w-full mx-4' />
     <gd bind:this={grid}
         class='grid justify-evenly justify-items-center content-start overflow-visible w-full'
-        style="grid-template-columns: repeat(auto-fit, minmax({item_width}px, 1fr));"
+        style="
+            --list-item-width: calc({item_width}px - var(--scrollbar-width)/{columns});
+            grid-template-columns: repeat(auto-fit, minmax(var(--list-item-width), 1fr));
+        "
     >
         {#each visible as item, i (item.id)}
             {#if selected == i + start * columns || (i + start * columns == items.length - 1 && selected >= items.length)}
@@ -169,7 +177,7 @@
                         _on_item_click(i);
                     }}
                     on:keydown={() => {}}
-                    style="width: {item_width}px; height: {item_height}px;"
+                    style="width: var(--list-item-width); height: {item_height}px;"
                 >
                     <slot
                         {item_width}
@@ -186,7 +194,7 @@
                         _on_item_click(i);
                     }}
                     on:keydown={() => {}}
-                    style="width: {item_width}px; height: {item_height}px;"
+                    style="width: var(--list-item-width); height: {item_height}px;"
                 >
                     <slot
                         {item_width}
@@ -208,5 +216,21 @@
     </obs>
 </cl>
 
+    <sb class='h-full' style='width: var(--scrollbar-width);'>
+        <Scrollbar {root} total_height={scrollbar_total_height} />
+    </sb>
+</sbp>
+
 <svelte:window on:keydown={_on_keydown} />
 
+<style>
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* For IE, Edge and Firefox */
+    .scrollbar-hide {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
+</style>
