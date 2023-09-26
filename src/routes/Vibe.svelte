@@ -89,6 +89,8 @@
     };
 
     let queue_dragend: (e: DragEvent) => void;
+
+    let watching = false;
 </script>
 
 <svelte:window on:resize={on_window_resize} />
@@ -96,15 +98,35 @@
 <all style="--list-item-icon-width: {item_height}px;">
     <all-contents>
         <search-area>
-            <top-menubar />
+            <top-menubar class='flex flex-row gap-4 justify-center'>
+                <button
+                    class='rounded-xl bg-red-300 p-2'
+                    on:click={() => {
+                        watching = !watching;
+                    }}
+                >
+                    Search
+                </button>
+                <button>
+                    Watch
+                </button>
+            </top-menubar>
 
             <browse>
-                <SongBrowser bind:item_height bind:item_width gap={0} bind:tube {queue_dragend} />
+                {#if watching}
+                    <Video bind:group bind:player bind:on_tick={on_player_tick} />
+                {/if}
+                <div class='w-full h-full {watching ? 'hidden' : ''}'>
+                    <SongBrowser bind:item_height bind:item_width gap={0} bind:tube {queue_dragend} />
+                </div>
             </browse>
         </search-area>
 
         <queue-area>
-            <queue bind:this={queue_element}>
+            <queue bind:this={queue_element}
+                class='flex flex-col overflow-hidden overflow-y-auto'
+                style='height: {watching ? '100%' : 'calc(100% - var(--video-height))'};'
+            >
                 <queue-name>
                     <InputBar
                         bind:placeholder={group}
@@ -146,9 +168,11 @@
                 </queue-content>
             </queue>
 
-            <video-box>
-                <Video bind:group bind:player bind:on_tick={on_player_tick} />
-            </video-box>
+            {#if !watching}
+                <video-box>
+                    <Video bind:group bind:player bind:on_tick={on_player_tick} />
+                </video-box>
+            {/if}
         </queue-area>
     </all-contents>
 
@@ -217,11 +241,7 @@
     }
 
     queue {
-        height: calc(100% - var(--video-height));
         background-color: #994499;
-
-        display: flex;
-        flex-direction: column;
     }
 
     queue-name {
