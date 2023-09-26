@@ -117,12 +117,17 @@
                 <button
                     class='rounded-xl bg-red-300 p-2'
                     on:click={() => {
-                        watching = !watching;
+                        watching = false;
                     }}
                 >
                     Search
                 </button>
-                <button>
+                <button
+                    class='rounded-xl bg-red-300 p-2'
+                    on:click={() => {
+                        watching = true;
+                    }}
+                >
                     Watch
                 </button>
             </top-menubar>
