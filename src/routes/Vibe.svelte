@@ -95,9 +95,11 @@
 
 <svelte:window on:resize={on_window_resize} />
 
-<all style="--list-item-icon-width: {item_height}px;">
-    <all-contents>
-        <search-area>
+<div style="--list-item-icon-width: {item_height}px;"
+    class='flex flex-col w-full h-full'
+>
+    <all-contents class='flex flex-row'>
+        <search-area class='flex flex-col'>
             <top-menubar class='flex flex-row gap-4 justify-center'>
                 <button
                     class='rounded-xl bg-red-300 p-2'
@@ -122,7 +124,7 @@
             </browse>
         </search-area>
 
-        <queue-area>
+        <queue-area class='flex flex-col'>
             <queue bind:this={queue_element}
                 class='flex flex-col overflow-hidden overflow-y-auto'
                 style='height: {watching ? '100%' : 'calc(100% - var(--video-height))'};'
@@ -187,7 +189,7 @@
             } : null}
         />
     </play-bar>
-</all>
+</div>
 
 <style>
     * {
@@ -202,25 +204,13 @@
         font-family: monospace;
     }
 
-    all {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-    }
-
     all-contents {
         height: calc(100% - var(--play-bar-height));
-        display: flex;
-        flex-direction: row;
     }
 
     search-area {
         width: calc(100% - var(--queue-area-width));
         background-color: #885555;
-
-        display: flex;
-        flex-direction: column;
     }
 
     top-menubar {
@@ -235,9 +225,6 @@
     queue-area {
         width: var(--queue-area-width);
         background-color: #558855;
-
-        display: flex;
-        flex-direction: column;
     }
 
     queue {
