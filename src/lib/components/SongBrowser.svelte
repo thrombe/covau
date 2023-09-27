@@ -33,6 +33,8 @@
                 search_objects();
             }
         })();
+        tabs = [tabs[0]];
+        curr_tab = tabs[0];
     }
 
     let search_query: string = '';
@@ -89,8 +91,8 @@
             on_enter={async (e) => {
                 e.preventDefault();
                 await search_objects();
-                tabs = [tabs[0]];
 
+                tabs = [tabs[0]];
                 curr_tab = tabs[0];
             }}
         />
