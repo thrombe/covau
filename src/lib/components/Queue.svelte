@@ -5,6 +5,7 @@
     import InputBar from './InputBar.svelte';
     import VirtualScrollable from './VirtualScrollable.svelte';
     import type { VideoInfo } from 'youtubei.js/dist/src/parser/youtube';
+    import { toaster } from '../toast/Toasts.svelte';
 
     export let items: Array<Unique<string, string>>;
     export let gap: number;
@@ -105,10 +106,16 @@
 
     const on_enter = async (e: KeyboardEvent) => {
         let id = await get_verified_id(new_queue_item);
+        new_queue_item = '';
         if (id) {
             await on_item_add(id);
+        } else {
+            await toaster.toast({
+                message: "could not add to queue",
+                classes: "whitespace-nowrap block bg-red-400 rounded-lg p-2 text-sm",
+                timeout: 1000,
+            });
         }
-        new_queue_item = '';
     };
 
     let new_queue_item = '';
