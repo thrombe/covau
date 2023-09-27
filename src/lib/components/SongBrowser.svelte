@@ -1,16 +1,16 @@
 <script lang="ts" context="module">
     import { tick } from 'svelte';
     import { writable } from 'svelte/store';
-    import type { RObject } from '../searcher/searcher';
-    import { type MusicResponsiveListItem, SongTube } from '../searcher/song_tube';
+    import type { RObject } from '../searcher/searcher.ts';
+    import { type MusicResponsiveListItem, SongTube, type Typ } from '../searcher/song_tube.ts';
 
-    let fac = writable(SongTube.factory(undefined as unknown as Innertube));
+    let song_fac = writable(SongTube.factory(undefined as unknown as Innertube, '' as Typ));
     // OOF: cannot search anything if query is '' anyway
-    let searcher = writable(SongTube.new('', undefined as unknown as Innertube));
+    let song_searcher = writable(SongTube.new('', undefined as unknown as Innertube, '' as Typ));
 </script>
 
 <script lang="ts">
-    import { type Unique } from '../virtual';
+    import { type Unique } from '../virtual.ts';
     import AudioListItem from './AudioListItem.svelte';
     import Explorer from './Explorer.svelte';
     import InputBar from './InputBar.svelte';
@@ -21,42 +21,38 @@
     export let gap: number;
     export let tube: Innertube;
     export let queue_dragend: (e: DragEvent) => void = () => {};
+    export let type: Typ;
 
-    $fac = SongTube.factory(tube);
-    $searcher = SongTube.new('', tube);
+    $song_searcher = SongTube.new('', tube, '' as Typ);
+    $song_fac = SongTube.factory(tube, type);
+    $: if (type != $song_searcher.type) {
+        (async () => {
+            $song_fac = SongTube.factory(tube, type);
+            await tick();
+            if (search_objects) {
+                search_objects();
+            }
+        })();
+    }
 
     let search_query: string = '';
     let search_input_element: HTMLElement | null;
 
     let t: MusicResponsiveListItem;
-    let selected_item: Unique<RObject<MusicResponsiveListItem>, string>;
+    type T = typeof t;
+    let selected_item: Unique<RObject<T>, string>;
     let selected_item_index = 0;
     let search_objects: () => Promise<void>;
     let try_scroll_selected_item_in_view: () => Promise<void>;
 
-    const _on_keydown = async (event: KeyboardEvent) => {
-        if (event.key == '?') {
-            selected_item_index = 0;
-            await tick();
-            await try_scroll_selected_item_in_view();
-            search_input_element?.focus();
-            event.preventDefault();
-        } else if (event.key == '/') {
-            search_query = '';
-            search_input_element?.focus();
-            event.preventDefault();
-            await search_objects();
-        }
-    };
-
-    const get_artist_name = (t: MusicResponsiveListItem) => {
+    const get_artist_name = (t: T) => {
         if (!t.artists || t.artists.length <= 0) {
             return '';
         }
         return t.artists[0].name;
     };
 
-    let dragstart = (event: DragEvent, t: MusicResponsiveListItem) => {
+    let dragstart = (event: DragEvent, t: T) => {
         if (t.id) {
             event.dataTransfer!.effectAllowed = 'move';
             event.dataTransfer!.dropEffect = 'move';
@@ -76,7 +72,6 @@
                 e.preventDefault();
                 await search_objects();
             }}
-            on_keydown={_on_keydown}
         />
     </search-bar>
 
@@ -85,8 +80,8 @@
     <browse-area>
         <Explorer
             {t}
-            bind:fac={$fac}
-            {searcher}
+            bind:fac={$song_fac}
+            searcher={song_searcher}
             bind:search_query
             bind:selected_item
             bind:item_width
@@ -107,11 +102,25 @@
                 on:dragstart={(event) => dragstart(event, item)}
                 on:dragend={queue_dragend}
             >
-                <AudioListItem
-                    title={item.title ? item.title : ''}
-                    title_sub={get_artist_name(item)}
-                    img_src={item.thumbnails.length > 0 ? item.thumbnails[0].url : ''}
-                />
+                {#if item.item_type == 'song' || item.item_type == 'video'}
+                    <AudioListItem
+                        title={item.title ?? ''}
+                        title_sub={get_artist_name(item)}
+                        img_src={item.thumbnails.length > 0 ? item.thumbnails[0].url : ''}
+                    />
+                {:else if item.item_type == 'album' || item.item_type == 'playlist'}
+                    <AudioListItem
+                        title={item.title ?? ''}
+                        title_sub={item.author?.name ?? ''}
+                        img_src={item.thumbnails.length > 0 ? item.thumbnails[0].url : ''}
+                    />
+                {:else if item.item_type == 'artist'}
+                    <AudioListItem
+                        title={item.name ?? ''}
+                        title_sub={item.subscribers ?? ''}
+                        img_src={item.thumbnails.length > 0 ? item.thumbnails[0].url : ''}
+                    />
+                {/if}
             </div>
         </Explorer>
     </browse-area>

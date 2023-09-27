@@ -6,22 +6,25 @@ import type { SearchContinuation } from "youtubei.js/dist/src/parser/ytmusic/Sea
 
 // https://github.com/LuanRT/YouTube.js/issues/321
 export type MusicResponsiveListItem = YTNodes.MusicResponsiveListItem;
+export type Typ =  'song' | 'video' | 'album' | 'playlist' | 'artist';
 
 export class SongTube extends Unpaged<MusicResponsiveListItem> {
     tube: Innertube;
+    type: Typ;
 
-    constructor(q: string, tube: Innertube) {
+    constructor(q: string, tube: Innertube, type: Typ) {
         super(q);
         this.tube = tube;
+        this.type = type;
     }
 
-    static new(q: string, tube: Innertube) {
+    static new(q: string, tube: Innertube, type: Typ) {
         const US = UniqueSearch<MusicResponsiveListItem, typeof SongTube>(SongTube);
         const SS = SavedSearch<MusicResponsiveListItem, typeof US>(US);
-        return new SS(q, tube);
+        return new SS(q, tube, type);
     }
 
-    static factory(tube: Innertube) {
+    static factory(tube: Innertube, type: Typ) {
         type R = RSearcher<MusicResponsiveListItem>;
         class Fac {
             tube: Innertube;
@@ -29,7 +32,7 @@ export class SongTube extends Unpaged<MusicResponsiveListItem> {
                 this.tube = tube;
             }
             async with_query(q: string) {
-                let t = SongTube.new(q, this.tube);
+                let t = SongTube.new(q, this.tube, type);
                 return t as R | null;
             }
         }
@@ -52,17 +55,18 @@ export class SongTube extends Unpaged<MusicResponsiveListItem> {
         }
         let songs: Array<MusicResponsiveListItem>;
         if (this.results === null) {
-            this.results = await this.tube.music.search(this.query, { type: 'song' });
+            this.results = await this.tube.music.search(this.query, { type: this.type });
             console.log(this.results);
 
-            if (!this.results.songs) {
+            if (!this.results.contents) {
                 this.has_next_page = false;
                 return [];
             }
 
-            let shelf = this.results.songs;
+            let contents = this.results.contents
+                .flatMap(e => e.contents?.filterType(YTNodes.MusicResponsiveListItem) ?? []);
 
-            songs = [...shelf.contents];
+            songs = contents;
         } else {
             if (this.cont === null) {
                 this.cont = await this.results.getContinuation();

@@ -1,6 +1,7 @@
 {
 	"extends": "@tsconfig/svelte/tsconfig.json",
 	"compilerOptions": {
+		"allowImportingTsExtensions": true,
     "target": "ESNext",
 		"allowJs": true,
 		"checkJs": true,

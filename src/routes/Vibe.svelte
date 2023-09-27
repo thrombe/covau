@@ -5,10 +5,11 @@
     import Queue from '../lib/components/Queue.svelte';
     import SongBrowser from '../lib/components/SongBrowser.svelte';
     import Video from '../lib/components/Video.svelte';
-    import { Player } from '../lib/player';
-    import type { Unique } from '../lib/virtual';
+    import { Player } from '../lib/player.ts';
+    import type { Unique } from '../lib/virtual.ts';
     import type { VideoInfo } from 'youtubei.js/dist/src/parser/youtube';
     import { onMount } from 'svelte';
+    import type { Typ } from '../lib/searcher/song_tube.ts';
 
     export let params: { group?: string };
     export let tube: Innertube;
@@ -105,6 +106,21 @@
     let queue_dragend: (e: DragEvent) => void;
 
     let watching = false;
+    type MenubarOption = { name: string } & 
+        ({ content_type: 'music', type: Typ } | 
+            { content_type: 'tube', type: string } | 
+            { content_type: 'watch' }); 
+
+    let menubar_options: MenubarOption[] = [
+        { name: "Watch", content_type: 'watch' },
+        { name: 'Song', content_type: 'music', type: 'song' }, 
+        { name: 'Music Video', content_type: 'music', type: 'video' },
+        { name: 'Music Playlist', content_type: 'music', type: 'playlist' },
+        { name: 'Artist', content_type: 'music', type: 'artist' },
+        { name: 'Album', content_type: 'music', type: 'album' },
+    ];
+    let menubar_option: MenubarOption = menubar_options[1];
+    let music_search_type: Typ = 'song';
 </script>
 
 <svelte:window on:resize={on_window_resize} />
@@ -114,23 +130,22 @@
 >
     <all-contents class='flex flex-row'>
         <search-area class='flex flex-col'>
-            <top-menubar class='flex flex-row gap-4 justify-center'>
-                <button
-                    class='rounded-xl bg-red-300 p-2'
-                    on:click={() => {
-                        watching = false;
-                    }}
-                >
-                    Search
-                </button>
-                <button
-                    class='rounded-xl bg-red-300 p-2'
-                    on:click={() => {
-                        watching = true;
-                    }}
-                >
-                    Watch
-                </button>
+            <top-menubar class='flex flex-row gap-2 justify-center'>
+                {#each menubar_options as typ}
+                    <button
+                        class='rounded-xl bg-red-300 p-2'
+                        class:bg-red-200={menubar_option == typ}
+                        on:click={() => {
+                            watching = typ.content_type == 'watch';
+                            menubar_option = typ;
+                            if (menubar_option.content_type == 'music') {
+                                music_search_type = menubar_option.type;
+                            }
+                        }}
+                    >
+                        {typ.name} 
+                    </button>
+                {/each}
             </top-menubar>
 
             <browse>
@@ -138,7 +153,14 @@
                     <Video bind:group bind:player bind:on_tick={on_player_tick} />
                 {/if}
                 <div class='w-full h-full {watching ? 'hidden' : ''}'>
-                    <SongBrowser bind:item_height bind:item_width gap={0} bind:tube {queue_dragend} />
+                    <SongBrowser
+                        bind:item_height
+                        bind:item_width
+                        gap={0}
+                        bind:tube
+                        {queue_dragend}
+                        type={music_search_type}
+                    />
                 </div>
             </browse>
         </search-area>
