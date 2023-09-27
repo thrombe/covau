@@ -1,4 +1,6 @@
 <script lang="ts">
+    import type { RObject } from '../searcher/searcher.ts';
+
     import Observer from './Observer.svelte';
     import { tick } from 'svelte';
     import type { Unique } from '../virtual.ts';
@@ -19,6 +21,16 @@
     export let height: number;
 
     type T = $$Generic;
+    interface $$Slots {
+        default: {
+            item: T;
+            index: number;
+            item_width: number;
+            item_height: number;
+            selected: boolean;
+            root: HTMLElement;
+        };
+    }
 
     let columns = 1;
 
