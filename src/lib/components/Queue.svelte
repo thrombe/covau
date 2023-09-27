@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type Innertube from 'youtubei.js/agnostic';
+    import type Innertube from 'youtubei.js/web';
     import type { Unique } from '../virtual';
     import AudioListItem from './AudioListItem.svelte';
     import InputBar from './InputBar.svelte';
@@ -62,6 +62,7 @@
         for (const prom of wait_for) {
             await prom;
         }
+
         searched_items = items.map((e) => {
             let info = searched_item_map.get(e.data);
             if (!info) {
@@ -137,6 +138,7 @@
         }
     };
 
+    // can't drag items and scroll at the same time. bummer
     const dragstart = (event: DragEvent, i: number) => {
         event.dataTransfer!.effectAllowed = 'move';
         event.dataTransfer!.dropEffect = 'move';

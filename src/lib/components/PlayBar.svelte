@@ -7,7 +7,6 @@
     export let player: Player;
     export let audio_info: { title: string; title_sub: string; img_src: string } | null;
 
-
     let video_pos = 0;
     let has_prev = false;
     let has_next = false;

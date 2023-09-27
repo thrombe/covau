@@ -80,7 +80,6 @@
 <span>{now_time.toString().slice(8, 10)}</span>
 {#if player}
     {#key $tick}
-        <span>{$player.player_pos}</span>
         {#each queue as id, i (i)}
             <span
                 on:click={async () => {

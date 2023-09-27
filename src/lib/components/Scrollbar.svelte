@@ -81,6 +81,8 @@
             }
         }
     };
+
+    // TODO: implement click and scroll
 </script>
 
 <svelte:window on:mousemove={mousemove} on:dragover={dragover} />

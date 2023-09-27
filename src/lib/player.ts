@@ -96,6 +96,10 @@ export class Player {
 
                         prev_player_state = eve.data;
                     } else if (eve.data == YT.PlayerState.ENDED) {
+                        // TODO: all clients call this method around the same time T-T
+                        // it does not skip any items as 'tick' blocks it :} - tho it throws an error in the console
+                        // it should never produce unwanted results as for it to be executed multiple times - it needs
+                        // to be in sync with the server's 'tick' value. and these methods also use mutex locks
                         await this.play_next();
                         prev_player_state = eve.data;
                     } else if (eve.data == YT.PlayerState.PAUSED) {
