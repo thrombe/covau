@@ -399,7 +399,7 @@ export class Player {
 
             if (data.state !== 'Initialised') {
                 if (from == data.playing_index) {
-                    data.playing_index = to;
+                    data.playing_index = Math.min(to, data.queue.length - 1);
                 } else if (
                     data.playing_index >= Math.min(from, to) &&
                     data.playing_index <= Math.max(from, to)
