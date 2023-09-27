@@ -63,6 +63,9 @@ export class SongTube extends Unpaged<MusicResponsiveListItem> {
     cont: SearchContinuation | null = null;
     pages: Array<MusicShelfContinuation> = new Array();
     async next_page() {
+        if (!this.has_next_page) {
+            return [];
+        }
         console.log(this.type);
         if (this.type.type == 'search') {
             return await this.next_page_search(this.type.search);
@@ -82,7 +85,11 @@ export class SongTube extends Unpaged<MusicResponsiveListItem> {
     }
     playlist: Playlist | null = null;
     protected async next_page_playlist(playlist_id: string) {
-        this.playlist = await this.tube.music.getPlaylist(playlist_id);
+        if (!this.playlist) {
+            this.playlist = await this.tube.music.getPlaylist(playlist_id);
+        } else {
+            this.playlist = await this.playlist.getContinuation();
+        }
         this.has_next_page = this.playlist.has_continuation;
 
         let a = this.playlist.items;
@@ -91,30 +98,13 @@ export class SongTube extends Unpaged<MusicResponsiveListItem> {
             return [];
         }
         
-        return a.filterType(YTNodes.MusicResponsiveListItem).filter(e => !!e.id).map(e => {
-                let p = e as RObject<MusicResponsiveListItem>;
-                p.get_key = function() {
-                    if (!this.id) {
-                        console.warn("item does not have an id :/", this);
-                    }
-                    return this.id;
-                };
-                return p;
-        });
+        let k = a.filterType(YTNodes.MusicResponsiveListItem);
+        return keyed(k);
     }
     protected async next_page_album(album_id: string) {
         this.has_next_page = false;
         let a = await this.tube.music.getAlbum(album_id);
-        return a.contents.filter(e => !!e.id).map(e => {
-                let p = e as RObject<MusicResponsiveListItem>;
-                p.get_key = function() {
-                    if (!this.id) {
-                        console.warn("item does not have an id :/", this);
-                    }
-                    return this.id;
-                };
-                return p;
-        });
+        return keyed(a.contents);
     }
     protected async next_page_artist_songs(artist_id: string) {
         this.has_next_page = false;
@@ -124,22 +114,12 @@ export class SongTube extends Unpaged<MusicResponsiveListItem> {
         if (!r) {
             arr = [];
         } else {
-            let contents = r.contents.filter(e => !!e.id);
-            arr = contents.map(e => {
-                let p = e as RObject<MusicResponsiveListItem>;
-                p.get_key = function() {
-                    if (!this.id) {
-                        console.warn("item does not have an id :/", this);
-                    }
-                    return this.id;
-                };
-                return p;
-            });
+            arr = keyed(r.contents);
         }
         return arr;
     }
     protected async next_page_search(type: Typ) {
-        if (this.query.length == 0 || !this.has_next_page) {
+        if (this.query.length == 0) {
             this.has_next_page = false;
             return [];
         }
@@ -178,16 +158,7 @@ export class SongTube extends Unpaged<MusicResponsiveListItem> {
         }
 
         songs = songs.filter(e => !!e.id);
-        let k = songs.map(e => {
-            let p = e as RObject<MusicResponsiveListItem>;
-            p.get_key = function() {
-                if (!this.id) {
-                    console.warn("item does not have an id :/", this);
-                }
-                return this.id;
-            };
-            return p;
-        });
+        let k = keyed(songs);
 
         this.has_next_page = this.results.has_continuation;
         console.log(k.map(e => e.id))
@@ -200,4 +171,17 @@ export class SongTube extends Unpaged<MusicResponsiveListItem> {
         }
         return t.id;
     }
+}
+
+const keyed = <T>(items: T[]): (T & Keyed)[] => {
+    return items.filter((e: unknown) => !!e.id).map((e: unknown) => {
+        let p = e as RObject<MusicResponsiveListItem>;
+        p.get_key = function() {
+            if (!p.id) {
+                console.warn("item does not have an id :/", p);
+            }
+            return p.id;
+        };
+        return p;
+    });
 }
