@@ -3,22 +3,24 @@ import Innertube, { MusicShelfContinuation, UniversalCache, YTNodes } from "yout
 import { SavedSearch, SlowSearch, UniqueSearch, Unpaged } from "./mixins";
 import type { Keyed, RObject, RSearcher } from "./searcher";
 import type { SearchContinuation } from "youtubei.js/dist/src/parser/ytmusic/Search";
+import type { Playlist } from "youtubei.js/dist/src/parser/ytmusic";
 
 // https://github.com/LuanRT/YouTube.js/issues/321
 export type MusicResponsiveListItem = YTNodes.MusicResponsiveListItem;
 export type Typ =  'song' | 'video' | 'album' | 'playlist' | 'artist';
+type SearchTyp = { type: 'search', search: Typ } | { type: 'artist', id: string } | { type: 'album', id: string } | { type: 'playlist', id: string };
 
 export class SongTube extends Unpaged<MusicResponsiveListItem> {
     tube: Innertube;
-    type: Typ;
+    type: SearchTyp;
 
-    constructor(q: string, tube: Innertube, type: Typ) {
+    constructor(q: string, tube: Innertube, type: SearchTyp) {
         super(q);
         this.tube = tube;
         this.type = type;
     }
 
-    static new(q: string, tube: Innertube, type: Typ) {
+    static new(q: string, tube: Innertube, type: SearchTyp) {
         const US = UniqueSearch<MusicResponsiveListItem, typeof SongTube>(SongTube);
         const SS = SavedSearch<MusicResponsiveListItem, typeof US>(US);
         return new SS(q, tube, type);
@@ -32,8 +34,20 @@ export class SongTube extends Unpaged<MusicResponsiveListItem> {
                 this.tube = tube;
             }
             async with_query(q: string) {
-                let t = SongTube.new(q, this.tube, type);
+                let t = SongTube.new(q, this.tube, { type: 'search', search: type });
                 return t as R | null;
+            }
+            async browse_artist_songs(artist_id: string) {
+                let t = SongTube.new('', this.tube, { type: 'artist', id: artist_id });
+                return t;
+            }
+            async browse_album(album_id: string) {
+                let t = SongTube.new('', this.tube, { type: 'album', id: album_id });
+                return t;
+            }
+            async browse_playlist(playlist_id: string) {
+                let t = SongTube.new('', this.tube, { type: 'playlist', id: playlist_id });
+                return t;
             }
         }
         const SS = SlowSearch<R, typeof Fac>(Fac);
@@ -49,13 +63,89 @@ export class SongTube extends Unpaged<MusicResponsiveListItem> {
     cont: SearchContinuation | null = null;
     pages: Array<MusicShelfContinuation> = new Array();
     async next_page() {
+        console.log(this.type);
+        if (this.type.type == 'search') {
+            return await this.next_page_search(this.type.search);
+        } else if (this.type.type == 'artist') {
+            let r = await this.next_page_artist_songs(this.type.id);
+            console.log(r);
+            return r;
+        } else if (this.type.type == 'album') {
+            let r = await this.next_page_album(this.type.id);
+            return r;
+        } else if (this.type.type == 'playlist') {
+            let r = await this.next_page_playlist(this.type.id);
+            return r;
+        }
+
+        throw 'unreachable';
+    }
+    playlist: Playlist | null = null;
+    protected async next_page_playlist(playlist_id: string) {
+        this.playlist = await this.tube.music.getPlaylist(playlist_id);
+        this.has_next_page = this.playlist.has_continuation;
+
+        let a = this.playlist.items;
+        if (!a || a.length == 0) {
+            this.has_next_page = false;
+            return [];
+        }
+        
+        return a.filterType(YTNodes.MusicResponsiveListItem).filter(e => !!e.id).map(e => {
+                let p = e as RObject<MusicResponsiveListItem>;
+                p.get_key = function() {
+                    if (!this.id) {
+                        console.warn("item does not have an id :/", this);
+                    }
+                    return this.id;
+                };
+                return p;
+        });
+    }
+    protected async next_page_album(album_id: string) {
+        this.has_next_page = false;
+        let a = await this.tube.music.getAlbum(album_id);
+        return a.contents.filter(e => !!e.id).map(e => {
+                let p = e as RObject<MusicResponsiveListItem>;
+                p.get_key = function() {
+                    if (!this.id) {
+                        console.warn("item does not have an id :/", this);
+                    }
+                    return this.id;
+                };
+                return p;
+        });
+    }
+    protected async next_page_artist_songs(artist_id: string) {
+        this.has_next_page = false;
+        let a = await this.tube.music.getArtist(artist_id);
+        let r = await a.getAllSongs();
+        let arr: RObject<MusicResponsiveListItem>[];
+        if (!r) {
+            arr = [];
+        } else {
+            let contents = r.contents.filter(e => !!e.id);
+            arr = contents.map(e => {
+                let p = e as RObject<MusicResponsiveListItem>;
+                p.get_key = function() {
+                    if (!this.id) {
+                        console.warn("item does not have an id :/", this);
+                    }
+                    return this.id;
+                };
+                return p;
+            });
+        }
+        return arr;
+    }
+    protected async next_page_search(type: Typ) {
         if (this.query.length == 0 || !this.has_next_page) {
             this.has_next_page = false;
             return [];
         }
         let songs: Array<MusicResponsiveListItem>;
         if (this.results === null) {
-            this.results = await this.tube.music.search(this.query, { type: this.type });
+            this.results = await this.tube.music.search(this.query, { type: type });
             console.log(this.results);
 
             if (!this.results.contents) {
