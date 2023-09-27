@@ -38,7 +38,8 @@
 
     $: if (group != params.group) {
         let url_without_hash = window.location.toString().replace(window.location.hash, '');
-        let new_url = url_without_hash + hash_prefix + params.group;
+        let new_url = url_without_hash + hash_prefix + group;
+        params.group = group;
         window.location.replace(new_url);
         window.location.reload();
     }
