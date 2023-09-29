@@ -1,12 +1,4 @@
 @tailwind base;
-html,body {
-    overflow: hidden;
-    width: 100vw;
-    /* - [21 Awesome Web Features you’re not using yet - YouTube](https://www.youtube.com/watch?v=q1fsBWLpYW4) */
-    /* - [Improving mobile design with the latest CSS viewport units - LogRocket Blog](https://blog.logrocket.com/improving-mobile-design-latest-css-viewport-units/) */
-    height: 100svh;
-}
-
 @tailwind components;
 @tailwind utilities;
 
