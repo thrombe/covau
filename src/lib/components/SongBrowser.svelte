@@ -16,7 +16,7 @@
     import InputBar from '$lib/components/InputBar.svelte';
     import type Innertube from 'youtubei.js/web';
 
-    export let item_width: number;
+    export let columns: number;
     export let item_height: number;
     export let gap: number;
     export let tube: Innertube;
@@ -120,7 +120,7 @@
             searcher={song_searcher}
             bind:search_query
             bind:selected_item
-            bind:item_width
+            {columns}
             bind:item_height
             keyboard_control={false}
             bind:selected_item_index
@@ -208,7 +208,7 @@
             searcher={tab.searcher}
             search_query={""}
             {selected_item}
-            {item_width}
+            {columns}
             {item_height}
             {selected_item_index}
             {search_objects}

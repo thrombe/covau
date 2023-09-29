@@ -63,13 +63,12 @@
 
     let group_name_input: string = '';
     let item_height: number = 70;
-    let item_width: number = window.innerWidth / 3;
+    let browse_columns: number = 1;
+    let browse_width: number;
     const on_window_resize = () => {
-        item_width = Number(
-            getComputedStyle(queue_element).getPropertyValue('width').replace('px', '')
-        );
+        browse_columns = Math.max(Math.floor(browse_width / 300), 1);
     };
-    $: if (queue_element) {
+    $: if (browse_width) {
         on_window_resize();
     }
 
@@ -182,7 +181,7 @@
             </top-menubar>
 
             <browse class='pr-4 pl-4'>
-                <div class='w-full h-full rounded-3xl overflow-hidden'>
+                <div class='w-full h-full rounded-3xl overflow-hidden' bind:clientWidth={browse_width}>
                     {#if watching}
                         <Video bind:group bind:player bind:on_tick={on_player_tick} />
                     {/if}
@@ -194,7 +193,7 @@
                         >
                         <SongBrowser
                             bind:item_height
-                            bind:item_width
+                            columns={browse_columns}
                             gap={0}
                             bind:tube
                             {queue_dragend}
@@ -228,7 +227,6 @@
                         <Queue
                             bind:items={queue_items}
                             gap={0}
-                            bind:item_width
                             bind:item_height
                             bind:selected_item_index={queue_selected_item_index}
                             bind:playing={playing_index}

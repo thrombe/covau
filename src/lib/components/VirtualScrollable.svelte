@@ -6,7 +6,7 @@
     import type { Unique } from '../virtual.ts';
     import Scrollbar from './Scrollbar.svelte';
 
-    export let item_width: number;
+    export let columns: number;
     export let item_height: number;
     export let items: Array<Unique<T, unknown>>;
     export let selected: number;
@@ -32,9 +32,8 @@
         };
     }
 
-    let columns = 1;
-
     $: margin = item_height * 2;
+    $: item_width = width/columns;
 
     let start = 0;
     let end = 0;
@@ -57,8 +56,8 @@
         if (!items) {
             return;
         }
-        let st = window.getComputedStyle(grid);
-        columns = st.getPropertyValue('grid-template-columns').split(' ').length;
+        // let st = window.getComputedStyle(grid);
+        // columns = st.getPropertyValue('grid-template-columns').split(' ').length;
         
         let s = Math.floor(root.scrollTop / item_height);
         let e = s + Math.ceil(root.clientHeight / item_height) + 1;
@@ -174,12 +173,12 @@
     class='flex flex-row flex-wrap content-start overflow-y-auto h-full scrollbar-hide' 
     style='width: calc(100% - var(--scrollbar-width));'
 >
-    <pad style="height: {top_padding}px;" bind:clientWidth={width} class='w-full mx-4' />
-    <gd bind:this={grid}
+    <pad style="height: {top_padding}px;" class='w-full mx-4' />
+    <gd bind:this={grid} bind:clientWidth={width}
         class='grid justify-evenly justify-items-center content-start overflow-visible w-full'
         style="
-            --list-item-width: calc({item_width}px - var(--scrollbar-width)/{columns});
-            grid-template-columns: repeat(auto-fit, minmax(var(--list-item-width), 1fr));
+            --list-item-width: {item_width}px;
+            grid-template-columns: {columns};
         "
     >
         {#each visible as item, i (item.id)}

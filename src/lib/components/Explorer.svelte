@@ -13,7 +13,7 @@
     export let searcher: Writable<RSearcher<T>>;
     export let selected_item_index: number;
     export let selected_item: Unique<RObject<T>, unknown>;
-    export let item_width: number;
+    export let columns: number;
     export let item_height: number;
     export let search_query: string;
     export let gap: number;
@@ -88,7 +88,7 @@
         <VirtualScrollable
             bind:items
             {gap}
-            {item_width}
+            {columns}
             {item_height}
             {on_item_click}
             {end_reached}

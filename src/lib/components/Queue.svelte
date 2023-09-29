@@ -9,7 +9,6 @@
 
     export let items: Array<Unique<string, string>>;
     export let gap: number;
-    export let item_width: number;
     export let item_height: number;
     export let selected_item_index: number;
     export let playing: number | null;
@@ -171,7 +170,7 @@
     <VirtualScrollable
         bind:items={searched_items}
         {gap}
-        {item_width}
+        columns={1}
         {item_height}
         {on_item_click}
         {end_reached}
