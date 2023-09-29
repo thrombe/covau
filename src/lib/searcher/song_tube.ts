@@ -8,7 +8,11 @@ import type { Playlist } from "youtubei.js/dist/src/parser/ytmusic";
 // https://github.com/LuanRT/YouTube.js/issues/321
 export type MusicResponsiveListItem = YTNodes.MusicResponsiveListItem;
 export type Typ =  'song' | 'video' | 'album' | 'playlist' | 'artist';
-type SearchTyp = { type: 'search', search: Typ } | { type: 'artist', id: string } | { type: 'album', id: string } | { type: 'playlist', id: string };
+type SearchTyp =
+    { type: 'search', search: Typ } |
+    { type: 'artist', id: string } |
+    { type: 'album', id: string } |
+    { type: 'playlist', id: string };
 
 export class SongTube extends Unpaged<MusicResponsiveListItem> {
     tube: Innertube;
