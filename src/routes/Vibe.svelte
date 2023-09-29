@@ -159,7 +159,7 @@
 <svelte:window on:resize={on_window_resize} />
 
 <div
-    class='flex flex-col w-full h-full bg-gray-900 bg-opacity-30'
+    class='relative flex flex-col w-full h-full bg-gray-900 bg-opacity-30'
 >
     <all-contents class='flex flex-row'>
         <search-area class='flex flex-col'>
