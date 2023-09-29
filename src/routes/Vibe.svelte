@@ -181,8 +181,8 @@
                 {/each}
             </top-menubar>
 
-            <browse class='pr-2'>
-                <div class='w-full h-full rounded-r-3xl overflow-hidden'>
+            <browse class='pr-4 pl-4'>
+                <div class='w-full h-full rounded-3xl overflow-hidden'>
                     {#if watching}
                         <Video bind:group bind:player bind:on_tick={on_player_tick} />
                     {/if}
@@ -246,14 +246,14 @@
             </queue>
 
             {#if !watching}
-                <video-box class='rounded-l-2xl overflow-hidden mt-2 flex-none aspect-video'>
+                <video-box class='rounded-2xl overflow-hidden mt-2 mr-4 flex-none aspect-video'>
                     <Video bind:group bind:player bind:on_tick={on_player_tick} />
                 </video-box>
             {/if}
         </queue-area>
     </all-contents>
 
-    <play-bar class='pb-1 pt-2'>
+    <play-bar class='pl-2 pb-2 pt-4'>
         <PlayBar bind:player
             audio_info={queue_playing_vid_info ? {
                 title: queue_playing_vid_info.basic_info.title ? queue_playing_vid_info.basic_info.title : '',

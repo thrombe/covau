@@ -68,8 +68,8 @@
             <ProgressBar
                 bind:progress={video_pos}
                 onchange={on_seek}
-                thumb_width={20}
-                thumb_height={20}
+                thumb_width={15}
+                thumb_height={15}
             />
             <div class='p-2 text-gray-400'>
                 {fmt_duration}
