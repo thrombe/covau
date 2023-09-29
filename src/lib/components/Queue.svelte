@@ -176,6 +176,7 @@
         {on_item_click}
         {end_reached}
         bind:try_scroll_into_view={try_scroll_selected_item_in_view}
+        keyboard_control={false}
         bind:selected={selected_item_index}
         bind:end_is_visible
         bind:selected_item

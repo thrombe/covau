@@ -20,6 +20,7 @@
     export let end_is_visible = true;
     export let on_item_click: (t: Unique<RObject<T>, unknown>) => Promise<void>;
     export let try_scroll_selected_item_in_view: () => Promise<void>;
+    export let keyboard_control = true;
 
     type T = $$Generic;
     interface $$Slots {
@@ -91,6 +92,7 @@
             {item_height}
             {on_item_click}
             {end_reached}
+            {keyboard_control}
             bind:try_scroll_into_view={try_scroll_selected_item_in_view}
             bind:selected={selected_item_index}
             bind:end_is_visible

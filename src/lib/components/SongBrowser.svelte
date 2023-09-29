@@ -122,6 +122,7 @@
             bind:selected_item
             bind:item_width
             bind:item_height
+            keyboard_control={false}
             bind:selected_item_index
             bind:search_objects
             bind:try_scroll_selected_item_in_view
