@@ -169,16 +169,16 @@
 </script>
 
 <sbp class='flex flex-row h-full w-full'>
-<cl on:scroll={on_update} bind:this={root} bind:clientHeight={height}
+<cl on:scroll={on_update} bind:this={root} bind:clientHeight={height} bind:clientWidth={width}
     class='flex flex-row flex-wrap content-start overflow-y-auto h-full scrollbar-hide' 
     style='width: calc(100% - var(--scrollbar-width));'
 >
     <pad style="height: {top_padding}px;" class='w-full mx-4' />
-    <gd bind:this={grid} bind:clientWidth={width}
+    <gd bind:this={grid}
         class='grid justify-evenly justify-items-center content-start overflow-visible w-full'
         style="
             --list-item-width: {item_width}px;
-            grid-template-columns: {columns};
+            grid-template-columns: repeat({columns}, minmax(var(--list-item-width), 1fr));
         "
     >
         {#each visible as item, i (item.id)}

@@ -66,7 +66,7 @@
     let browse_columns: number = 1;
     let browse_width: number;
     const on_window_resize = () => {
-        browse_columns = Math.max(Math.floor(browse_width / 300), 1);
+        browse_columns = Math.min(3, Math.max(Math.floor(browse_width / 300), 1));
     };
     $: if (browse_width) {
         on_window_resize();
