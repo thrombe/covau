@@ -12,7 +12,7 @@
 <script lang="ts">
     import { type Unique } from '../virtual.ts';
     import AudioListItem from './AudioListItem.svelte';
-    import Explorer from './Explorer.svelte';
+    import Explorer from '$lib/components/Explorer.svelte';
     import InputBar from '$lib/components/InputBar.svelte';
     import type Innertube from 'youtubei.js/web';
 

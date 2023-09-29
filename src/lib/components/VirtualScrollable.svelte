@@ -45,6 +45,9 @@
     $: if (width) {
         edited = true;
     }
+    $: if (columns) {
+        edited = true;
+    }
     let grid: HTMLElement;
 
     let root: HTMLElement;
@@ -119,7 +122,7 @@
             event.preventDefault();
         }
     };
-    $: if (height && width && root && items) {
+    $: if (height && width && root && items && columns) {
         on_update();
     }
     let _selected_item: HTMLElement;
