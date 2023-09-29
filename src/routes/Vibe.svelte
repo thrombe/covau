@@ -136,6 +136,9 @@
     let music_search_type: Typ = 'song';
 
     let img_src = '';
+    let img_h: number;
+    let img_w: number;
+    let img_squared = false;
 
     $: if (queue_playing_vid_info) {
         let q = queue_playing_vid_info.basic_info;
@@ -185,9 +188,14 @@
                     {#if watching}
                         <Video bind:group bind:player bind:on_tick={on_player_tick} />
                     {/if}
-                    <div class='relative w-full h-full {watching ? 'hidden' : ''}'>
+                    <div
+                        class='relative w-full h-full {watching ? 'hidden' : ''}'
+                        bind:clientWidth={img_w}
+                        bind:clientHeight={img_h}
+                    >
                         <img
                             class='absolute w-full h-full left-0 top-0 -z-10 overflow-hidden object-cover brightness-50 blur-md scale-110'
+                            style='{img_squared ? '' : 'lol'}height: {100 * Math.max((img_w / img_h), 1)}%;'
                             src={img_src}
                             alt=''
                         >
