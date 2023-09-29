@@ -206,10 +206,11 @@
 
         <queue-area class='flex flex-col'>
             <queue bind:this={queue_element}
-                class='flex flex-col overflow-hidden overflow-y-auto'
+                class='flex flex-col overflow-y-auto'
                 style='height: {watching ? '100%' : 'calc(100% - var(--video-height))'};'
             >
-                <queue-name class=''>
+                <queue-name class='p-2'>
+                    <div class='w-full rounded-xl h-full bg-gray-400 bg-opacity-20'>
                     <InputBar
                         bind:placeholder={group}
                         bind:value={group_name_input}
@@ -220,6 +221,7 @@
                             group = group_name_input;
                         }}
                     />
+                    </div>
                 </queue-name>
 
                 <queue-content class=''>
@@ -277,7 +279,8 @@
     * {
         --play-bar-height: 70px;
         --top-menubar-height: 50px;
-        --name-bar-height: 50px;
+        --name-bar-height: 60px;
+        --search-bar-height: 50px;
         --browse-tab-bar-height: 25px;
         --queue-area-width: min(475px, max(330px, 33.333vw));
         --video-height: calc(var(--queue-area-width) * 9 / 16);

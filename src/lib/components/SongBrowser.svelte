@@ -101,7 +101,9 @@
     <browse-tab-bar class='flex flex-row gap-1 justify-center bg-gray-900 bg-opacity-30'>
         {#each tabs as tab}
             <button 
-                class='border-b-2 px-1 {curr_tab == tab ? 'font-bold text-gray-400 border-gray-200' : 'text-gray-600 border-gray-600'}'
+                class='border-b-2 px-1 text-gray-400
+                    {curr_tab == tab ? 'font-bold border-gray-200' : 'border-gray-400'}
+                '
                 on:click={async () => {
                     curr_tab = tab;
                 }}
@@ -133,8 +135,7 @@
             let:item
             let:selected
         >
-            <div
-                class='w-full h-full block relative border-t border-gray-200 border-opacity-30'
+            <list-item
                 draggable={true}
                 on:dragstart={(event) => dragstart(event, item)}
                 on:dragend={queue_dragend}
@@ -199,7 +200,7 @@
                         open
                     </button>
                 {/if}
-            </div>
+            </list-item>
         </Explorer>
     {:else}
         <Explorer
@@ -220,8 +221,7 @@
             let:item
             let:selected
         >
-            <div
-                class='w-full h-full block relativ border-t border-gray-200 border-opacity-30'
+            <list-item
                 draggable={true}
                 on:dragstart={(event) => dragstart(event, item)}
                 on:dragend={queue_dragend}
@@ -239,16 +239,16 @@
                         img_src={''}
                     />
                 {/if}
-            </div>
+            </list-item>
         </Explorer>
     {/if}
     </browse-area>
     {/each}
 </div>
 
-<style>
+<style lang='postcss'>
     search-bar {
-        height: var(--name-bar-height);
+        height: var(--search-bar-height);
     }
 
     browse-tab-bar {
@@ -257,5 +257,9 @@
 
     browse-area {
         height: calc(100% - var(--browse-tab-bar-height) - var(--name-bar-height));
+    }
+
+    list-item {
+        @apply w-full h-full block relative border-t border-gray-200 border-opacity-30 pl-2;
     }
 </style>
