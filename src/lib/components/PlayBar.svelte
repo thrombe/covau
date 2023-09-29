@@ -61,18 +61,22 @@
     </audio-info>
 
     <audio-controls>
-        <div class='flex flex-row items-center h-1/2 w-full'>
-            {fmt_video_pos}
+        <div class='flex flex-row items-center h-1/3 w-full'>
+            <div class='p-2 text-gray-400'>
+                {fmt_video_pos}
+            </div>
             <ProgressBar
                 bind:progress={video_pos}
                 onchange={on_seek}
-                thumb_width={30}
-                thumb_height={30}
+                thumb_width={25}
+                thumb_height={25}
             />
-            {fmt_duration}
+            <div class='p-2 text-gray-400'>
+                {fmt_duration}
+            </div>
         </div>
 
-        <div class='flex flex-row gap-2 justify-center h-1/2'>
+        <div class='flex flex-row gap-2 justify-center h-2/3'>
             <button
                 on:click={async () => {
                     await player.play_prev();
@@ -99,10 +103,10 @@
     </audio-controls>
 
     <volume-control class='flex flex-row justify-center items-center'>
-        <volume-icon>
+        <volume-icon class='flex flex-col justify-center'>
             <!-- this is also the mute button -->
             <button
-                class='w-full h-full'
+                class='w-full p-2'
                 on:click={async () => {
                     if (await player.is_muted()) {
                         await player.unmute();
@@ -115,12 +119,12 @@
             </button>
         </volume-icon>
 
-        <volume-slider>
+        <volume-slider class='h-5 px-4'>
             <ProgressBar
                 bind:progress={volume}
                 onchange={on_volume_change}
-                thumb_width={20}
-                thumb_height={60}
+                thumb_width={30}
+                thumb_height={30}
             />
         </volume-slider>
     </volume-control>
@@ -134,30 +138,25 @@
 
     audio-info {
         width: var(--audio-info-width);
-        background-color: #339933;
         --list-item-icon-width: var(--play-bar-height);
     }
 
     audio-controls {
         width: calc(100% - var(--audio-info-width) - var(--volume-control-width));
-        background-color: #882288;
     }
 
     button {
-        @apply rounded-md px-2 bg-red-300;
+        @apply rounded-lg px-2 my-1 text-gray-200 font-bold bg-gray-200 bg-opacity-10;
     }
 
     volume-control {
         width: var(--volume-control-width);
-        background-color: #336633;
     }
     volume-icon {
         width: 60px;
         height: 100%;
     }
     volume-slider {
-        height: 100%;
         width: calc(100% - 60px);
-        background-color: #885555;
     }
 </style>

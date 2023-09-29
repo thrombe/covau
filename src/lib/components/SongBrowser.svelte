@@ -1,8 +1,8 @@
 <script lang="ts" context="module">
     import { tick } from 'svelte';
     import { writable, type Writable } from 'svelte/store';
-    import type { RFactory, RObject, RSearcher } from '../searcher/searcher.ts';
-    import { type MusicResponsiveListItem, SongTube, type Typ } from '../searcher/song_tube.ts';
+    import type { RFactory, RObject, RSearcher } from '$lib/searcher/searcher.ts';
+    import { type MusicResponsiveListItem, SongTube, type Typ } from '$lib/searcher/song_tube.ts';
 
     let song_fac = writable(SongTube.factory(undefined as unknown as Innertube, '' as Typ));
     // OOF: cannot search anything if query is '' anyway
@@ -13,7 +13,7 @@
     import { type Unique } from '../virtual.ts';
     import AudioListItem from './AudioListItem.svelte';
     import Explorer from './Explorer.svelte';
-    import InputBar from './InputBar.svelte';
+    import InputBar from '$lib/components/InputBar.svelte';
     import type Innertube from 'youtubei.js/web';
 
     export let item_width: number;
@@ -83,7 +83,7 @@
 </script>
 
 <div class='w-full h-full flex flex-col'>
-    <search-bar>
+    <search-bar class='bg-gray-900 bg-opacity-30'>
         <InputBar
             placeholder={'Search'}
             bind:value={search_query}
@@ -98,10 +98,10 @@
         />
     </search-bar>
 
-    <browse-tab-bar class='flex flex-row gap-2 justify-center'>
+    <browse-tab-bar class='flex flex-row gap-1 justify-center bg-gray-900 bg-opacity-30'>
         {#each tabs as tab}
             <button 
-                class='border-b-2 {curr_tab == tab ? 'border-red-300' : ''}'
+                class='border-b-2 px-1 {curr_tab == tab ? 'font-bold text-gray-400 border-gray-200' : 'text-gray-600 border-gray-600'}'
                 on:click={async () => {
                     curr_tab = tab;
                 }}
@@ -134,7 +134,7 @@
             let:selected
         >
             <div
-                class='w-full h-full block relative'
+                class='w-full h-full block relative border-t border-gray-200 border-opacity-30 bg-gray-900 bg-opacity-30'
                 draggable={true}
                 on:dragstart={(event) => dragstart(event, item)}
                 on:dragend={queue_dragend}
@@ -221,7 +221,7 @@
             let:selected
         >
             <div
-                class='w-full h-full block relative'
+                class='w-full h-full block relativ border-t border-gray-200 border-opacity-30 bg-gray-900 bg-opacity-30'
                 draggable={true}
                 on:dragstart={(event) => dragstart(event, item)}
                 on:dragend={queue_dragend}
@@ -249,16 +249,13 @@
 <style>
     search-bar {
         height: var(--name-bar-height);
-        background-color: #446666;
     }
 
     browse-tab-bar {
         height: var(--browse-tab-bar-height);
-        background-color: #228855;
     }
 
     browse-area {
         height: calc(100% - var(--browse-tab-bar-height) - var(--name-bar-height));
-        background-color: #aa4444;
     }
 </style>

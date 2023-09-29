@@ -87,9 +87,14 @@
 
 <svelte:window on:mousemove={mousemove} on:dragover={dragover} />
 
-<gutter bind:clientHeight={visible_height} draggable={false}>
+<gutter 
+    bind:clientHeight={visible_height} 
+    draggable={false} 
+    class='h-full w-full flex flex-col bg-gray-900 {!total_height ? 'bg-opacity-0' : 'bg-opacity-30'}'
+>
     <top-pad style="height: {top_pad}px" />
     <thumb
+        class='bg-gray-200 bg-opacity-20'
         draggable={true}
         on:dragstart={dragstart}
         on:dragend={dragend}
@@ -97,16 +102,3 @@
     />
 </gutter>
 
-<style>
-    gutter {
-        width: 100%;
-        height: 100%;
-
-        display: flex;
-        flex-direction: column;
-    }
-
-    thumb {
-        background-color: #885555;
-    }
-</style>

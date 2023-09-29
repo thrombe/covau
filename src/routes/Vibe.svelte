@@ -1,16 +1,17 @@
 <script lang="ts">
     import type Innertube from 'youtubei.js/web';
-    import InputBar from '../lib/components/InputBar.svelte';
-    import PlayBar from '../lib/components/PlayBar.svelte';
-    import Queue from '../lib/components/Queue.svelte';
-    import SongBrowser from '../lib/components/SongBrowser.svelte';
-    import Video from '../lib/components/Video.svelte';
-    import { Player } from '../lib/player.ts';
-    import type { Unique } from '../lib/virtual.ts';
+    import InputBar from '$lib/components/InputBar.svelte';
+    import PlayBar from '$lib/components/PlayBar.svelte';
+    import Queue from '$lib/components/Queue.svelte';
+    import SongBrowser from '$lib/components/SongBrowser.svelte';
+    import Video from '$lib/components/Video.svelte';
+    import { Player } from '$lib/player.ts';
+    import type { Unique } from '$lib/virtual.ts';
     import type { VideoInfo } from 'youtubei.js/dist/src/parser/youtube';
     import { onMount } from 'svelte';
-    import type { Typ } from '../lib/searcher/song_tube.ts';
-    import Toasts, { toaster } from '../lib/toast/Toasts.svelte';
+    import type { Typ } from '$lib/searcher/song_tube.ts';
+    import Toasts, { toaster } from '$lib/toast/Toasts.svelte';
+    import BlobBg from '$lib/components/BlobBg.svelte';
 
     export let params: { group?: string };
     export let tube: Innertube;
@@ -134,6 +135,26 @@
     ];
     let menubar_option: MenubarOption = menubar_options[1];
     let music_search_type: Typ = 'song';
+
+    let img_src = '';
+
+    $: if (queue_playing_vid_info) {
+        let q = queue_playing_vid_info.basic_info;
+        if (q.thumbnail && q.thumbnail.length > 0) {
+            img_src = q.thumbnail[0].url;
+        }
+    }
+
+    // $: if (img_src) {
+    //     (async () => {
+    //         let res = await fetch('/.netlify/functions/palette', {
+    //             method: 'POST',
+    //             headers: { 'Content-Type': 'application/json' },
+    //             body: JSON.stringify({ src: img_src })
+    //         });
+    //         console.log(res);
+    //     })();
+    // }
 </script>
 
 <svelte:window on:resize={on_window_resize} />
@@ -143,11 +164,10 @@
 >
     <all-contents class='flex flex-row'>
         <search-area class='flex flex-col'>
-            <top-menubar class='flex flex-row gap-2 justify-center'>
+            <top-menubar class='flex flex-row gap-2 py-1 justify-center text-gray-200 bg-gray-900 bg-opacity-30'>
                 {#each menubar_options as typ}
                     <button
-                        class='rounded-xl bg-red-300 p-2'
-                        class:bg-red-200={menubar_option == typ}
+                        class='rounded-xl p-2 font-bold bg-gray-200 {menubar_option == typ ? 'bg-opacity-30' : 'bg-opacity-10'}'
                         on:click={() => {
                             watching = typ.content_type == 'watch';
                             menubar_option = typ;
@@ -161,11 +181,18 @@
                 {/each}
             </top-menubar>
 
-            <browse>
+            <browse class='bg-gray-900 bg-opacity-30'>
                 {#if watching}
                     <Video bind:group bind:player bind:on_tick={on_player_tick} />
                 {/if}
-                <div class='w-full h-full {watching ? 'hidden' : ''}'>
+                <div class='relative w-full h-full rounded-tr-3xl overflow-hidden {watching ? 'hidden' : ''}'>
+                    <div class='absolute w-full h-full left-0 top-0 -z-10 overflow-hidden'>
+                        <img
+                            class='w-full h-full object-cover brightness-50 blur-md scale-110'
+                            src={img_src}
+                            alt=''
+                        >
+                    </div>
                     <SongBrowser
                         bind:item_height
                         bind:item_width
@@ -183,7 +210,7 @@
                 class='flex flex-col overflow-hidden overflow-y-auto'
                 style='height: {watching ? '100%' : 'calc(100% - var(--video-height))'};'
             >
-                <queue-name>
+                <queue-name class='bg-gray-900 bg-opacity-30'>
                     <InputBar
                         bind:placeholder={group}
                         bind:value={group_name_input}
@@ -226,7 +253,7 @@
         </queue-area>
     </all-contents>
 
-    <play-bar>
+    <play-bar class='bg-gray-900 bg-opacity-30'>
         <PlayBar bind:player
             audio_info={queue_playing_vid_info ? {
                 title: queue_playing_vid_info.basic_info.title ? queue_playing_vid_info.basic_info.title : '',
@@ -237,6 +264,12 @@
             } : null}
         />
     </play-bar>
+
+    <div class='w-full h-full absolute -z-20 brightness-50'>
+        <BlobBg
+            animate={false}
+        />
+    </div>
 </div>
 
 <Toasts
@@ -245,8 +278,8 @@
 <style>
     * {
         --play-bar-height: 60px;
-        --top-menubar-height: 36px;
-        --name-bar-height: 50px;
+        --top-menubar-height: 40px;
+        --name-bar-height: 60px;
         --browse-tab-bar-height: 25px;
         --queue-area-width: min(475px, max(330px, 33.333vw));
         --video-height: calc(var(--queue-area-width) * 1080 / 1920);
@@ -261,12 +294,10 @@
 
     search-area {
         width: calc(100% - var(--queue-area-width));
-        background-color: #885555;
     }
 
     top-menubar {
         height: var(--top-menubar-height);
-        background-color: #aa5555;
     }
 
     browse {
@@ -275,30 +306,24 @@
 
     queue-area {
         width: var(--queue-area-width);
-        background-color: #558855;
     }
 
     queue {
-        background-color: #994499;
     }
 
     queue-name {
         height: var(--name-bar-height);
-        background-color: #772299;
     }
 
     queue-content {
         height: calc(100% - var(--name-bar-height));
-        background-color: #995599;
     }
 
     video-box {
         height: var(--video-height);
-        background-color: #225522;
     }
 
     play-bar {
         height: var(--play-bar-height);
-        background-color: #555588;
     }
 </style>

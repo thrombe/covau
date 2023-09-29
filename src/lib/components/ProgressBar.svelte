@@ -106,6 +106,7 @@
 <svelte:window on:mousemove={mousemove} on:dragover={dragover} />
 
 <bar
+    class='w-full h-full flex flex-row relative bg-gray-200 bg-opacity-10 rounded-md'
     bind:this={bar}
     bind:clientWidth={width}
     on:click={onclick}
@@ -114,8 +115,11 @@
     on:dragstart={dragstart}
     on:dragend={dragend}
 >
-    <completed style="width: {thumb_progress * width}px;" />
+    <completed 
+        class='rounded-l-md bg-gray-200 bg-opacity-30'
+        style="width: {thumb_progress * width}px;" />
     <thumb
+        class='absolute rounded-md bg-gray-500'
         style="--thumb-width: {thumb_width}px;
             --thumb-height: {thumb_height}px;
             --prog: {thumb_progress * (width - thumb_width)}px;"
@@ -123,27 +127,10 @@
 </bar>
 
 <style>
-    bar {
-        width: 100%;
-        height: 100%;
-
-        display: flex;
-        flex-direction: row;
-
-        position: relative;
-    }
-
-    completed {
-        background-color: #555588;
-    }
-
     thumb {
-        position: absolute;
         top: calc(50% - var(--thumb-height) / 2);
         left: var(--prog);
         width: var(--thumb-width);
         height: var(--thumb-height);
-
-        background-color: #558855;
     }
 </style>

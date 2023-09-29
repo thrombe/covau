@@ -6,7 +6,7 @@
     // TODO: somehow setup retrying and see if images load more reliably
 </script>
 
-<div class='w-full h-full flex flex-row'>
+<div class='w-full h-full flex flex-row text-gray-200'>
     <icon>
         <img class='w-full h-full object-cover' src={img_src} alt="" />
     </icon>

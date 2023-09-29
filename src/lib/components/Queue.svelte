@@ -184,7 +184,7 @@
         let:selected
         let:index
     >
-        <item class='w-full h-full block relative'
+        <item class='w-full h-full block relative border-t border-gray-200 border-opacity-30 bg-gray-900 bg-opacity-30'
             draggable={index != items.length}
             on:dragstart={(event) => dragstart(event, index)}
             on:drop|preventDefault={(event) => drop(event, index)}
@@ -236,16 +236,16 @@
 
 <style lang='postcss'>
     item.is-dragging {
-        background-color: #885555;
-    }
-    item.is-selected {
-        background-color: #888855;
+        @apply opacity-40;
     }
     item.is-playing {
-        background-color: #885588;
+        @apply bg-gray-200 bg-opacity-20;
+    }
+    item.is-selected {
+        /* @apply bg-yellow-200 bg-opacity-20; */
     }
     item.is-active {
-        background-color: #558855;
+        @apply bg-green-400 bg-opacity-20;
     }
     item:hover button {
         display: block;

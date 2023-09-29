@@ -27,7 +27,7 @@
 </script>
 
 <input
-    class='w-full h-full text-center focus:border-none focus:outline-none'
+    class='w-full h-full text-center focus:border-none focus:outline-none bg-opacity-0 bg-gray-50 text-gray-200 text-lg'
     {placeholder}
     bind:value
     on:keydown={_on_keydown}
