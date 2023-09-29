@@ -159,12 +159,12 @@
 
 <svelte:window on:resize={on_window_resize} />
 
-<div style="--list-item-icon-width: {item_height}px;"
-    class='flex flex-col w-full h-full'
+<div
+    class='flex flex-col w-full h-full bg-gray-900 bg-opacity-30'
 >
     <all-contents class='flex flex-row'>
         <search-area class='flex flex-col'>
-            <top-menubar class='flex flex-row gap-2 py-1 justify-center text-gray-200 bg-gray-900 bg-opacity-30'>
+            <top-menubar class='flex flex-row gap-2 py-2 justify-center text-gray-200'>
                 {#each menubar_options as typ}
                     <button
                         class='rounded-xl p-2 font-bold bg-gray-200 {menubar_option == typ ? 'bg-opacity-30' : 'bg-opacity-10'}'
@@ -181,26 +181,26 @@
                 {/each}
             </top-menubar>
 
-            <browse class='bg-gray-900 bg-opacity-30'>
-                {#if watching}
-                    <Video bind:group bind:player bind:on_tick={on_player_tick} />
-                {/if}
-                <div class='relative w-full h-full rounded-tr-3xl overflow-hidden {watching ? 'hidden' : ''}'>
-                    <div class='absolute w-full h-full left-0 top-0 -z-10 overflow-hidden'>
+            <browse class='pr-2'>
+                <div class='w-full h-full rounded-r-3xl overflow-hidden'>
+                    {#if watching}
+                        <Video bind:group bind:player bind:on_tick={on_player_tick} />
+                    {/if}
+                    <div class='relative w-full h-full {watching ? 'hidden' : ''}'>
                         <img
-                            class='w-full h-full object-cover brightness-50 blur-md scale-110'
+                            class='absolute w-full h-full left-0 top-0 -z-10 overflow-hidden object-cover brightness-50 blur-md scale-110'
                             src={img_src}
                             alt=''
                         >
+                        <SongBrowser
+                            bind:item_height
+                            bind:item_width
+                            gap={0}
+                            bind:tube
+                            {queue_dragend}
+                            type={music_search_type}
+                        />
                     </div>
-                    <SongBrowser
-                        bind:item_height
-                        bind:item_width
-                        gap={0}
-                        bind:tube
-                        {queue_dragend}
-                        type={music_search_type}
-                    />
                 </div>
             </browse>
         </search-area>
@@ -210,7 +210,7 @@
                 class='flex flex-col overflow-hidden overflow-y-auto'
                 style='height: {watching ? '100%' : 'calc(100% - var(--video-height))'};'
             >
-                <queue-name class='bg-gray-900 bg-opacity-30'>
+                <queue-name class=''>
                     <InputBar
                         bind:placeholder={group}
                         bind:value={group_name_input}
@@ -223,7 +223,7 @@
                     />
                 </queue-name>
 
-                <queue-content>
+                <queue-content class=''>
                     {#if player}
                         <Queue
                             bind:items={queue_items}
@@ -246,14 +246,14 @@
             </queue>
 
             {#if !watching}
-                <video-box>
+                <video-box class='rounded-l-2xl overflow-hidden mt-2 flex-none aspect-video'>
                     <Video bind:group bind:player bind:on_tick={on_player_tick} />
                 </video-box>
             {/if}
         </queue-area>
     </all-contents>
 
-    <play-bar class='bg-gray-900 bg-opacity-30'>
+    <play-bar class='pb-1 pt-2'>
         <PlayBar bind:player
             audio_info={queue_playing_vid_info ? {
                 title: queue_playing_vid_info.basic_info.title ? queue_playing_vid_info.basic_info.title : '',
@@ -277,13 +277,13 @@
 
 <style>
     * {
-        --play-bar-height: 60px;
-        --top-menubar-height: 40px;
-        --name-bar-height: 60px;
+        --play-bar-height: 70px;
+        --top-menubar-height: 50px;
+        --name-bar-height: 50px;
         --browse-tab-bar-height: 25px;
         --queue-area-width: min(475px, max(330px, 33.333vw));
-        --video-height: calc(var(--queue-area-width) * 1080 / 1920);
-        --scrollbar-width: 13px;
+        --video-height: calc(var(--queue-area-width) * 9 / 16);
+        --scrollbar-width: 8px;
 
         font-family: monospace;
     }
@@ -320,7 +320,6 @@
     }
 
     video-box {
-        height: var(--video-height);
     }
 
     play-bar {

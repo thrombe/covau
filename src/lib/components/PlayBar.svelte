@@ -61,15 +61,15 @@
     </audio-info>
 
     <audio-controls>
-        <div class='flex flex-row items-center h-1/3 w-full'>
+        <div class='flex flex-row items-center h-1/3 w-full py-1'>
             <div class='p-2 text-gray-400'>
                 {fmt_video_pos}
             </div>
             <ProgressBar
                 bind:progress={video_pos}
                 onchange={on_seek}
-                thumb_width={25}
-                thumb_height={25}
+                thumb_width={20}
+                thumb_height={20}
             />
             <div class='p-2 text-gray-400'>
                 {fmt_duration}
@@ -102,7 +102,7 @@
         </div>
     </audio-controls>
 
-    <volume-control class='flex flex-row justify-center items-center'>
+    <volume-control class='flex flex-row justify-center items-center pb-1'>
         <volume-icon class='flex flex-col justify-center'>
             <!-- this is also the mute button -->
             <button
@@ -119,12 +119,12 @@
             </button>
         </volume-icon>
 
-        <volume-slider class='h-5 px-4'>
+        <volume-slider class='h-3 px-4'>
             <ProgressBar
                 bind:progress={volume}
                 onchange={on_volume_change}
-                thumb_width={30}
-                thumb_height={30}
+                thumb_width={20}
+                thumb_height={20}
             />
         </volume-slider>
     </volume-control>
@@ -133,12 +133,11 @@
 <style lang='postcss'>
     * {
         --volume-control-width: 23%;
-        --audio-info-width: 27%;
+        --audio-info-width: 23%;
     }
 
     audio-info {
         width: var(--audio-info-width);
-        --list-item-icon-width: var(--play-bar-height);
     }
 
     audio-controls {

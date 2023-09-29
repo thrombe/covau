@@ -184,7 +184,7 @@
         let:selected
         let:index
     >
-        <item class='w-full h-full block relative border-t border-gray-200 border-opacity-30 bg-gray-900 bg-opacity-30'
+        <item class='w-full h-full block relative border-t border-gray-200 border-opacity-30'
             draggable={index != items.length}
             on:dragstart={(event) => dragstart(event, index)}
             on:drop|preventDefault={(event) => drop(event, index)}
@@ -198,7 +198,7 @@
         >
             {#if typeof item === 'string'}
                 <InputBar
-                    placeholder="Add new item"
+                    placeholder="Add Video"
                     bind:input_element={new_item_input}
                     bind:value={new_queue_item}
                     {on_enter}
@@ -254,6 +254,5 @@
         display: none;
     }
     item button.play-button {
-        width: var(--list-item-icon-width);
     }
 </style>

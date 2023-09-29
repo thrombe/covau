@@ -134,7 +134,7 @@
             let:selected
         >
             <div
-                class='w-full h-full block relative border-t border-gray-200 border-opacity-30 bg-gray-900 bg-opacity-30'
+                class='w-full h-full block relative border-t border-gray-200 border-opacity-30'
                 draggable={true}
                 on:dragstart={(event) => dragstart(event, item)}
                 on:dragend={queue_dragend}
@@ -221,7 +221,7 @@
             let:selected
         >
             <div
-                class='w-full h-full block relativ border-t border-gray-200 border-opacity-30 bg-gray-900 bg-opacity-30'
+                class='w-full h-full block relativ border-t border-gray-200 border-opacity-30'
                 draggable={true}
                 on:dragstart={(event) => dragstart(event, item)}
                 on:dragend={queue_dragend}

@@ -90,11 +90,11 @@
 <gutter 
     bind:clientHeight={visible_height} 
     draggable={false} 
-    class='h-full w-full flex flex-col bg-gray-900 {!total_height ? 'bg-opacity-0' : 'bg-opacity-30'}'
+    class='h-full w-full flex flex-col {!total_height ? '' : ''}'
 >
     <top-pad style="height: {top_pad}px" />
     <thumb
-        class='bg-gray-200 bg-opacity-20'
+        class='bg-gray-200 bg-opacity-20 rounded-full'
         draggable={true}
         on:dragstart={dragstart}
         on:dragend={dragend}
