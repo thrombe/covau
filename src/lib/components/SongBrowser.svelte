@@ -105,7 +105,7 @@
         {#each tabs as tab}
             <button 
                 class='border-b-2 px-1 text-gray-400
-                    {curr_tab == tab ? 'font-bold border-gray-200' : 'border-gray-400'}
+                    {curr_tab == tab ? 'font-bold border-gray-200' : 'border-gray-600'}
                 '
                 on:click={async () => {
                     curr_tab = tab;
