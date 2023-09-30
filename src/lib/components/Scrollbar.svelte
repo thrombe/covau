@@ -82,6 +82,11 @@
         }
     };
 
+    let hide_scrollbar = false;
+    $: if (thumb_height && visible_height) {
+        hide_scrollbar = (visible_height - thumb_height) < 1;
+    }
+
     // TODO: implement click and scroll
 </script>
 
@@ -94,7 +99,7 @@
 >
     <top-pad style="height: {top_pad}px" />
     <thumb
-        class='bg-gray-200 bg-opacity-20 rounded-full'
+        class='bg-gray-200 rounded-full {hide_scrollbar ? 'bg-opacity-0' : 'bg-opacity-20'}'
         draggable={true}
         on:dragstart={dragstart}
         on:dragend={dragend}
