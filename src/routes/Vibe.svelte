@@ -63,10 +63,11 @@
 
     let group_name_input: string = '';
     let item_height: number = 75;
+    let item_min_width = 290;
     let browse_columns: number = 1;
     let browse_width: number;
     const on_window_resize = () => {
-        browse_columns = Math.min(3, Math.max(Math.floor(browse_width / 290), 1));
+        browse_columns = Math.min(3, Math.max(Math.floor(browse_width / item_min_width), 1));
     };
     $: if (browse_width) {
         on_window_resize();
@@ -110,18 +111,49 @@
     type MenubarOption = { name: string } & 
         ({ content_type: 'music', type: Typ } | 
             { content_type: 'tube', type: string } | 
+            { content_type: 'queue' } | 
             { content_type: 'watch' }); 
 
     let menubar_options: MenubarOption[] = [
-        { name: "Watch", content_type: 'watch' },
+        { name: 'Watch', content_type: 'watch' },
         { name: 'Song', content_type: 'music', type: 'song' }, 
         { name: 'Music Video', content_type: 'music', type: 'video' },
         { name: 'Music Playlist', content_type: 'music', type: 'playlist' },
         { name: 'Artist', content_type: 'music', type: 'artist' },
         { name: 'Album', content_type: 'music', type: 'album' },
     ];
-    let menubar_option: MenubarOption = menubar_options[1];
+    let menubar_song_option = menubar_options[1];
+    let menubar_queue_option: MenubarOption = { name: 'Queue', content_type: 'queue' };
+    let menubar_option: MenubarOption = menubar_song_option;
     let music_search_type: Typ = 'song';
+
+    $: if (menubar_option) {
+        if (menubar_option.content_type == 'watch') {
+            watching = true;
+        } else {
+            watching = false;
+        }
+    }
+
+    let width: number;
+    let mobile = false;
+    $: if (width) {
+       if (width < item_min_width + 330 + 50) {
+            if (!mobile) {
+                menubar_options = [menubar_queue_option, ...menubar_options];
+                menubar_option = menubar_queue_option;
+            }
+            mobile = true;
+        } else {
+            if (mobile) {
+                menubar_options = menubar_options.filter(o => o.content_type != 'queue');
+                if (menubar_option == menubar_queue_option) {
+                    menubar_option = menubar_song_option;
+                }
+            }
+            mobile = false;
+        }
+    }
 
     let img_src = '';
     let img_h: number;
@@ -147,19 +179,19 @@
     // }
 </script>
 
-<svelte:window on:resize={on_window_resize} />
+<svelte:window on:resize={on_window_resize} bind:innerWidth={width} />
 
 <div
     class='relative flex flex-col w-full h-full bg-gray-900 bg-opacity-30'
+    style='--queue-area-width: {!mobile ? 'min(475px, max(330px, 33.333vw))' : '0px'};'
 >
     <all-contents class='flex flex-row'>
         <search-area class='flex flex-col'>
-            <top-menubar class='flex flex-row gap-2 py-2 justify-center text-gray-200'>
+            <top-menubar class='w-full flex flex-row gap-2 py-2 px-6 justify-start text-gray-200 overflow-x-auto'>
                 {#each menubar_options as typ}
                     <button
-                        class='rounded-xl p-2 font-bold bg-gray-200 {menubar_option == typ ? 'bg-opacity-30' : 'bg-opacity-10'}'
+                        class='flex-none rounded-xl p-2 font-bold bg-gray-200 {menubar_option == typ ? 'bg-opacity-30' : 'bg-opacity-10'}'
                         on:click={() => {
-                            watching = typ.content_type == 'watch';
                             menubar_option = typ;
                             if (menubar_option.content_type == 'music') {
                                 music_search_type = menubar_option.type;
@@ -171,7 +203,7 @@
                 {/each}
             </top-menubar>
 
-            <browse class='pr-4 pl-4'>
+            <browse class='{!mobile ? 'pr-4 pl-4' : ''}'>
                 <div class='w-full h-full rounded-3xl overflow-hidden' bind:clientWidth={browse_width}>
                     {#if watching}
                         <Video bind:group bind:player bind:on_tick={on_player_tick} />
@@ -181,76 +213,137 @@
                         bind:clientWidth={img_w}
                         bind:clientHeight={img_h}
                     >
+                        {#if mobile}
+                            <div class='flex flex-col w-full {menubar_option == menubar_queue_option ? 'h-full' :'h-0'}'>
+                                <div bind:this={queue_element}
+                                    class='flex flex-col overflow-y-auto h-full'
+                                >
+                                    <div class='p-2 bg-gray-900 bg-opacity-30 h-14'>
+                                        <div class='w-full h-full'>
+                                            <InputBar
+                                                bind:placeholder={group}
+                                                bind:value={group_name_input}
+                                                on_enter={async (e) => {
+                                                    if (!group_name_input) {
+                                                        return;
+                                                    }
+                                                    group = group_name_input;
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div class='pl-2'
+                                        style='height: calc(100% - 3.5rem);'
+                                    >
+                                        {#if player}
+                                            <Queue
+                                                bind:items={queue_items}
+                                                gap={0}
+                                                bind:item_height
+                                                bind:selected_item_index={queue_selected_item_index}
+                                                bind:playing={playing_index}
+                                                bind:on_item_add={on_queue_item_add}
+                                                bind:tube
+                                                bind:dragend={queue_dragend}
+                                                bind:playing_video_info={queue_playing_vid_info}
+                                                {mobile}
+                                                insert_item={on_queue_item_insert}
+                                                move_item={on_queue_item_move}
+                                                delete_item={on_queue_item_delete}
+                                                play_item={on_queue_item_play}
+                                            />
+                                        {/if}
+                                    </div>
+                                </div>
+
+                                {#if !watching}
+                                    <video-box class='absolute -z-40 left-0 bottom-0 w-full rounded-2xl overflow-hidden scale-75 flex-none aspect-video'>
+                                        <Video bind:group bind:player bind:on_tick={on_player_tick} />
+                                    </video-box>
+                                {/if}
+                            </div>
+                        {/if}
+
                         <img
-                            class='absolute w-full h-full left-0 top-0 -z-10 overflow-hidden object-cover brightness-50 blur-md scale-110'
+                            class='absolute w-full h-full left-0 top-0 -z-20 overflow-hidden object-cover brightness-50 blur-md scale-110'
                             style='{img_squared ? '' : 'lol'}height: {100 * Math.max((img_w / img_h), 1)}%;'
                             src={img_src}
                             alt=''
                         >
-                        <SongBrowser
-                            bind:item_height
-                            columns={browse_columns}
-                            gap={0}
-                            bind:tube
-                            {queue_dragend}
-                            type={music_search_type}
-                        />
+                        <div class='w-full h-full {menubar_option.content_type == 'queue' ? 'h-0 overflow-hidden' : ''}'>
+                            <SongBrowser
+                                bind:item_height
+                                columns={browse_columns}
+                                gap={0}
+                                bind:tube
+                                {queue_dragend}
+                                queue_item_add={async (id) => {
+                                    await on_queue_item_add(id);
+                                    await toast('item added to queue');
+                                }}
+                                type={music_search_type}
+                            />
+                        </div>
                     </div>
                 </div>
             </browse>
         </search-area>
 
-        <queue-area class='flex flex-col'>
-            <queue bind:this={queue_element}
-                class='flex flex-col overflow-y-auto'
-                style='height: {watching ? '100%' : 'calc(100% - var(--video-height))'};'
-            >
-                <queue-name class='p-2'>
-                    <div class='w-full rounded-xl h-full bg-gray-400 bg-opacity-20'>
-                    <InputBar
-                        bind:placeholder={group}
-                        bind:value={group_name_input}
-                        on_enter={async (e) => {
-                            if (!group_name_input) {
-                                return;
-                            }
-                            group = group_name_input;
-                        }}
-                    />
-                    </div>
-                </queue-name>
+        {#if !mobile}
+            <queue-area class='flex flex-col'>
+                <queue bind:this={queue_element}
+                    class='flex flex-col overflow-y-auto'
+                    style='height: {watching ? '100%' : 'calc(100% - var(--video-height))'};'
+                >
+                    <queue-name class='p-2'>
+                        <div class='w-full rounded-xl h-full bg-gray-400 bg-opacity-20'>
+                            <InputBar
+                                bind:placeholder={group}
+                                bind:value={group_name_input}
+                                on_enter={async (e) => {
+                                    if (!group_name_input) {
+                                        return;
+                                    }
+                                    group = group_name_input;
+                                }}
+                            />
+                        </div>
+                    </queue-name>
 
-                <queue-content class=''>
-                    {#if player}
-                        <Queue
-                            bind:items={queue_items}
-                            gap={0}
-                            bind:item_height
-                            bind:selected_item_index={queue_selected_item_index}
-                            bind:playing={playing_index}
-                            bind:on_item_add={on_queue_item_add}
-                            bind:tube
-                            bind:dragend={queue_dragend}
-                            bind:playing_video_info={queue_playing_vid_info}
-                            insert_item={on_queue_item_insert}
-                            move_item={on_queue_item_move}
-                            delete_item={on_queue_item_delete}
-                            play_item={on_queue_item_play}
-                        />
-                    {/if}
-                </queue-content>
-            </queue>
+                    <queue-content class=''>
+                        {#if player}
+                            <Queue
+                                bind:items={queue_items}
+                                gap={0}
+                                bind:item_height
+                                bind:selected_item_index={queue_selected_item_index}
+                                bind:playing={playing_index}
+                                bind:on_item_add={on_queue_item_add}
+                                bind:tube
+                                bind:dragend={queue_dragend}
+                                bind:playing_video_info={queue_playing_vid_info}
+                                insert_item={on_queue_item_insert}
+                                move_item={on_queue_item_move}
+                                delete_item={on_queue_item_delete}
+                                play_item={on_queue_item_play}
+                            />
+                        {/if}
+                    </queue-content>
+                </queue>
 
-            {#if !watching}
-                <video-box class='rounded-2xl overflow-hidden mt-2 mr-4 flex-none aspect-video'>
-                    <Video bind:group bind:player bind:on_tick={on_player_tick} />
-                </video-box>
-            {/if}
-        </queue-area>
+                {#if !watching}
+                    <video-box class='rounded-2xl overflow-hidden mt-2 mr-4 flex-none aspect-video'>
+                        <Video bind:group bind:player bind:on_tick={on_player_tick} />
+                    </video-box>
+                {/if}
+            </queue-area>
+        {/if}
     </all-contents>
 
     <play-bar class='pl-2 pb-2 pt-4'>
         <PlayBar bind:player
+            {mobile}
             audio_info={queue_playing_vid_info ? {
                 title: queue_playing_vid_info.basic_info.title ? queue_playing_vid_info.basic_info.title : '',
                 title_sub: queue_playing_vid_info.basic_info.author ? queue_playing_vid_info.basic_info.author : '',
@@ -261,7 +354,7 @@
         />
     </play-bar>
 
-    <div class='w-full h-full absolute -z-20 brightness-50'>
+    <div class='w-full h-full absolute -z-30 brightness-50'>
         <BlobBg
             animate={false}
         />
@@ -277,8 +370,7 @@
         --top-menubar-height: 50px;
         --name-bar-height: 60px;
         --search-bar-height: 50px;
-        --browse-tab-bar-height: 25px;
-        --queue-area-width: min(475px, max(330px, 33.333vw));
+        --browse-tab-bar-height: 25px; 
         --video-height: calc(var(--queue-area-width) * 9 / 16);
         --scrollbar-width: 8px;
 
@@ -321,5 +413,15 @@
 
     play-bar {
         height: var(--play-bar-height);
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* For IE, Edge and Firefox */
+    .scrollbar-hide {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
     }
 </style>

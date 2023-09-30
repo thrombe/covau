@@ -22,6 +22,7 @@
     export let tube: Innertube;
     export let queue_dragend: (e: DragEvent) => void = () => {};
     export let type: Typ;
+    export let queue_item_add: (id: string) => Promise<void>;
 
     $song_searcher = SongTube.new('', tube, '' as Typ);
     $song_fac = SongTube.factory(tube, type);
@@ -136,6 +137,7 @@
             let:selected
         >
             <list-item
+                class:selected={selected}
                 draggable={true}
                 on:dragstart={(event) => dragstart(event, item)}
                 on:dragend={queue_dragend}
@@ -147,6 +149,16 @@
                         title_sub={get_artist_name(item)}
                         img_src={item.thumbnails.length > 0 ? item.thumbnails[0].url : ''}
                     />
+                    <button class='open-button'
+                        on:click={async () => {
+                            if (!item.id) {
+                                return;
+                            }
+                            await queue_item_add(item.id);
+                        }}
+                    >
+                       Queue 
+                    </button>
                 {:else if item.item_type == 'album' || item.item_type == 'playlist'}
                     <AudioListItem
                         title={item.title ?? ''}
@@ -224,6 +236,7 @@
             let:selected
         >
             <list-item
+                class:selected={selected}
                 draggable={true}
                 on:dragstart={(event) => dragstart(event, item)}
                 on:dragend={queue_dragend}
@@ -235,6 +248,16 @@
                         title_sub={get_artist_name(item)}
                         img_src={item.thumbnails.length > 0 ? item.thumbnails[0].url : curr_tab.thumbnail ?? ''}
                     />
+                    <button class='open-button'
+                        on:click={async () => {
+                            if (!item.id) {
+                                return;
+                            }
+                            await queue_item_add(item.id);
+                        }}
+                    >
+                       Queue 
+                    </button>
                 {:else}
                     <AudioListItem
                         title={'unknown item'}
@@ -272,14 +295,15 @@
     }
 
     .open-button {
+        @apply absolute h-full aspect-square ml-4 left-0 top-0 bg-gray-200 bg-opacity-50 rounded-md text-gray-900 text-lg font-bold scale-[70%];
         @apply hidden;
     }
 
-    list-item:hover .open-button {
-        @apply block absolute h-full aspect-square ml-4 left-0 top-0 bg-gray-200 bg-opacity-50 rounded-md text-gray-900 text-lg font-bold scale-[70%];
+    list-item:hover .open-button, .selected .open-button {
+        @apply block;
     }
 
-    list-item:hover .item-bg {
+    list-item:hover .item-bg, .selected .item-bg {
         @apply bg-gray-200 bg-opacity-10 rounded-xl;
     }
 </style>

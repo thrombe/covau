@@ -23,6 +23,7 @@
     export let insert_item = async (index: number, id: string) => {};
     export let delete_item = async (index: number, id: string) => {};
     export let play_item = async (index: number) => {};
+    export let mobile = false;
 
     $: if (playing !== null) {
         update_playing_vid_info();
@@ -189,7 +190,7 @@
             class:is-active={hovering === index && items.length != index}
             class:is-dragging={dragging_index === index}
             class:is-playing={index === playing}
-            class:is-selected={index === selected_item_index}
+            class:is-selected={selected}
         >
             {#if typeof item === 'string'}
                 <InputBar
@@ -208,7 +209,7 @@
                         : ''}
                 />
                 <button
-                    class='absolute p-1 m-1 rounded-md bg-gray-200 bg-opacity-50 text-gray-900 font-bold right-0 top-0'
+                    class='pop-button'
                     on:click={async () => {
                         await delete_item(index, items[index].data);
                     }}
@@ -216,15 +217,15 @@
                     Pop
                 </button>
                 <div class='absolute h-full flex flex-col justify-center left-0 top-0'>
-                <button
-                    class='aspect-square h-full scale-[70%] rounded-md bg-gray-200 bg-opacity-50 text-xl text-gray-900 font-bold'
-                    class:play-button={true}
-                    on:click={async () => {
-                        await play_item(index);
-                    }}
-                >
-                        Play
-                </button>
+                    <button
+                        class='queue-button'
+                        class:play-button={true}
+                        on:click={async () => {
+                            await play_item(index);
+                        }}
+                    >
+                            Play
+                    </button>
                 </div>
             {/if}
         </item>
@@ -239,14 +240,22 @@
         @apply bg-gray-200 bg-opacity-20;
     }
     item.is-selected {
-        /* @apply bg-yellow-200 bg-opacity-20; */
+        @apply bg-gray-200 bg-opacity-10;
     }
     item.is-active {
         @apply bg-green-400 bg-opacity-20;
     }
-    item:hover button {
+    item:hover button, .is-selected button {
         display: block;
     }
+
+    .pop-button {
+        @apply absolute p-1 m-1 rounded-md bg-gray-200 bg-opacity-50 text-gray-900 font-bold right-0 top-0;
+    }
+    .queue-button {
+        @apply aspect-square h-full scale-[70%] rounded-md bg-gray-200 bg-opacity-50 text-xl text-gray-900 font-bold;
+    }
+
     item button {
         display: none;
     }
