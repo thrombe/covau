@@ -140,6 +140,7 @@
                 on:dragstart={(event) => dragstart(event, item)}
                 on:dragend={queue_dragend}
             >
+                <div class='item-bg'>
                 {#if item.item_type == 'song' || item.item_type == 'video'}
                     <AudioListItem
                         title={item.title ?? ''}
@@ -152,7 +153,7 @@
                         title_sub={item.author?.name ?? ''}
                         img_src={item.thumbnails.length > 0 ? item.thumbnails[0].url : ''}
                     />
-                    <button class='absolute left-0 top-0 p-2 bg-red-300'
+                    <button class='open-button'
                         on:click={async () => {
                             if (!item.id) {
                                 return;
@@ -175,7 +176,7 @@
                             curr_tab = new_tab;
                         }}
                     >
-                        open
+                        Open
                     </button>
                 {:else if item.item_type == 'artist'}
                     <AudioListItem
@@ -183,7 +184,7 @@
                         title_sub={item.subscribers ?? ''}
                         img_src={item.thumbnails.length > 0 ? item.thumbnails[0].url : ''}
                     />
-                    <button class='absolute left-0 top-0 p-2 bg-red-300'
+                    <button class='open-button'
                         on:click={async () => {
                             if (!item.id) {
                                 return;
@@ -197,9 +198,10 @@
                             curr_tab = new_tab;
                         }}
                     >
-                        open
+                        Open
                     </button>
                 {/if}
+                </div>
             </list-item>
         </Explorer>
     {:else}
@@ -226,6 +228,7 @@
                 on:dragstart={(event) => dragstart(event, item)}
                 on:dragend={queue_dragend}
             >
+                <div class='item-bg'>
                 {#if item.item_type == 'song' || item.item_type == 'video'}
                     <AudioListItem
                         title={item.title ?? ''}
@@ -239,6 +242,7 @@
                         img_src={''}
                     />
                 {/if}
+                </div>
             </list-item>
         </Explorer>
     {/if}
@@ -260,6 +264,22 @@
     }
 
     list-item {
-        @apply w-full h-full block relative border-t border-gray-200 border-opacity-30 pl-2;
+        @apply w-full h-full block relative pl-4;
+    }
+
+    .item-bg {
+        @apply w-full h-full py-1;
+    }
+
+    .open-button {
+        @apply hidden;
+    }
+
+    list-item:hover .open-button {
+        @apply block absolute h-full aspect-square ml-4 left-0 top-0 bg-gray-200 bg-opacity-50 rounded-md text-gray-900 text-lg font-bold scale-[70%];
+    }
+
+    list-item:hover .item-bg {
+        @apply bg-gray-200 bg-opacity-10 rounded-xl;
     }
 </style>

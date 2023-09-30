@@ -93,10 +93,11 @@
     <div class="block w-full h-full" bind:this={video} id="video" />
     <div class="block absolute left-0 top-0 w-full h-full opacity-0 z-10" />
     <div class="absolute left-0 top-0 flex flex-col h-full w-full z-10 items-center justify-center {waiting ? '' : 'hidden'}">
-        <div
-            class='p-6 rounded-2xl bg-red-300 select-none'
-            on:click={on_click} on:keydown={() => {}}>
-            click to play!
-        </div>
+        <button
+            class='p-3 rounded-2xl bg-[#513A61] brightness-75 text-lg font-bold w-40 text-center select-none'
+            on:click={on_click} on:keydown={() => {}}
+        >
+            Click to Play!
+        </button>
     </div>
 </div>

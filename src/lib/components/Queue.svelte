@@ -183,7 +183,7 @@
         let:selected
         let:index
     >
-        <item class='w-full h-full block relative border-t border-gray-200 border-opacity-30'
+        <item class='w-full h-full block relative py-1 rounded-xl'
             draggable={index != items.length}
             on:dragstart={(event) => dragstart(event, index)}
             on:drop|preventDefault={(event) => drop(event, index)}
@@ -212,22 +212,24 @@
                         : ''}
                 />
                 <button
-                    class='absolute p-1 rounded-md bg-red-300 right-0 top-0'
+                    class='absolute p-1 m-1 rounded-md bg-gray-200 bg-opacity-50 text-gray-900 font-bold right-0 top-0'
                     on:click={async () => {
                         await delete_item(index, items[index].data);
                     }}
                 >
-                    pop
+                    Pop
                 </button>
+                <div class='absolute h-full flex flex-col justify-center left-0 top-0'>
                 <button
-                    class='h-full bg-red-300 opacity-80 absolute left-0 top-0'
+                    class='aspect-square h-full scale-[70%] rounded-md bg-gray-200 bg-opacity-50 text-xl text-gray-900 font-bold'
                     class:play-button={true}
                     on:click={async () => {
                         await play_item(index);
                     }}
                 >
-                        play
+                        Play
                 </button>
+                </div>
             {/if}
         </item>
     </VirtualScrollable>

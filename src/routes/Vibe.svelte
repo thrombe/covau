@@ -62,7 +62,7 @@
     };
 
     let group_name_input: string = '';
-    let item_height: number = 70;
+    let item_height: number = 75;
     let browse_columns: number = 1;
     let browse_width: number;
     const on_window_resize = () => {
