@@ -237,7 +237,7 @@
     item.is-dragging {
         @apply opacity-40;
     }
-    item.is-selected {
+    item.is-selected, item:hover {
         @apply bg-gray-200 bg-opacity-10;
     }
     item.is-playing {
