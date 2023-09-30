@@ -101,12 +101,13 @@
         />
     </search-bar>
 
-    <browse-tab-bar class='flex flex-row gap-1 justify-center bg-gray-900 bg-opacity-30'>
+    <browse-tab-bar class='flex flex-row overflow-x-auto gap-1 px-1 justify-center bg-gray-900 bg-opacity-30'>
         {#each tabs as tab}
             <button 
-                class='border-b-2 px-1 text-gray-400
+                class='border-b-2 px-1 text-gray-400 flex-none text-ellipsis whitespace-nowrap overflow-hidden
                     {curr_tab == tab ? 'font-bold border-gray-200' : 'border-gray-600'}
                 '
+                style='max-width: 12rem;'
                 on:click={async () => {
                     curr_tab = tab;
                 }}
