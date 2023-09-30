@@ -81,6 +81,8 @@
 
     let tabs: Tab[] = [{ name: 'Search', searcher: song_searcher, thumbnail: null }];
     let curr_tab = tabs[0];
+
+    let icon_scale = 101;
 </script>
 
 <div class='w-full h-full flex flex-col'>
@@ -148,6 +150,7 @@
                         title={item.title ?? ''}
                         title_sub={get_artist_name(item)}
                         img_src={item.thumbnails.length > 0 ? item.thumbnails[0].url : ''}
+                        scale={icon_scale}
                     />
                     <button class='open-button'
                         on:click={async () => {
@@ -164,6 +167,7 @@
                         title={item.title ?? ''}
                         title_sub={item.author?.name ?? ''}
                         img_src={item.thumbnails.length > 0 ? item.thumbnails[0].url : ''}
+                        scale={icon_scale}
                     />
                     <button class='open-button'
                         on:click={async () => {
@@ -195,6 +199,7 @@
                         title={item.name ?? ''}
                         title_sub={item.subscribers ?? ''}
                         img_src={item.thumbnails.length > 0 ? item.thumbnails[0].url : ''}
+                        scale={icon_scale}
                     />
                     <button class='open-button'
                         on:click={async () => {
@@ -247,6 +252,7 @@
                         title={item.title ?? ''}
                         title_sub={get_artist_name(item)}
                         img_src={item.thumbnails.length > 0 ? item.thumbnails[0].url : curr_tab.thumbnail ?? ''}
+                        scale={icon_scale}
                     />
                     <button class='open-button'
                         on:click={async () => {
@@ -263,6 +269,7 @@
                         title={'unknown item'}
                         title_sub={''}
                         img_src={''}
+                        scale={icon_scale}
                     />
                 {/if}
                 </div>

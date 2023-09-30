@@ -2,6 +2,7 @@
     export let title: string;
     export let title_sub: string;
     export let img_src: string;
+    export let scale = 100;
 
     // TODO: somehow setup retrying and see if images load more reliably
 </script>
@@ -9,7 +10,7 @@
 <div class='w-full h-full pl-1 flex flex-row text-gray-200'>
     <icon class='block p-1 aspect-square flex-none h-full'>
         <div class='w-full h-full rounded-md overflow-hidden'>
-            <img class='w-full h-full object-cover scale-[101%]' src={img_src} alt="" />
+            <img class='w-full h-full object-cover scale-[{scale}%]' src={img_src} alt="" />
         </div>
     </icon>
 

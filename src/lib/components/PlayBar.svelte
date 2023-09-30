@@ -65,6 +65,7 @@
             title={audio_info ? audio_info.title : ''}
             title_sub={audio_info ? audio_info.title_sub : ''}
             img_src={audio_info ? audio_info.img_src : ''}
+            scale={103}
         />
     </audio-info>
 
