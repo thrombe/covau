@@ -184,6 +184,9 @@
 </script>
 
 <svelte:window on:resize={on_window_resize} bind:innerWidth={width} />
+<svelte:head>
+    <title>covau! vibe amongst {group}</title>
+</svelte:head>
 
 <div
     class='relative flex flex-col w-full h-full bg-gray-900 bg-opacity-30'
