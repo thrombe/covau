@@ -7,6 +7,22 @@
 
     // export let toasts = writable([]);
     export let toaster: Toaster = new Toaster();
+
+    export let toast = async (message: string, level: 'info' | 'error' = 'info') => {
+        let color: string;
+        if (level == 'error') {
+            color = 'red';
+        } else if (level == 'info') {
+            color = 'blue';
+        } else {
+            color = 'gray';
+        }
+        await toaster.toast({
+            message,
+            classes: `whitespace-nowrap block bg-${color}-400 rounded-lg p-2 text-sm`,
+            timeout: 1000,
+        });
+    };
     
     let toasts = toaster.active;
 </script>

@@ -10,7 +10,7 @@
     import type { VideoInfo } from 'youtubei.js/dist/src/parser/youtube';
     import { onMount } from 'svelte';
     import type { Typ } from '$lib/searcher/song_tube.ts';
-    import Toasts, { toaster } from '$lib/toast/Toasts.svelte';
+    import Toasts, { toast } from '$lib/toast/Toasts.svelte';
     import BlobBg from '$lib/components/BlobBg.svelte';
 
     export let params: { group?: string };
@@ -78,11 +78,7 @@
     let queue_playing_vid_info: VideoInfo | null;
     let on_queue_item_add = async (id: string) => {
         if (player.synced_data.queue.filter(t => t == id).length > 0) {
-            await toaster.toast({
-                message: "item already in queue",
-                classes: "whitespace-nowrap block bg-blue-400 rounded-lg p-2 text-sm",
-                timeout: 1000,
-            });
+            await toast('item already in queue');
         } else {
             await player.queue(id);
         }
@@ -92,11 +88,7 @@
     };
     let on_queue_item_insert = async (index: number, id: string) => {
         if (player.synced_data.queue.filter(t => t == id).length > 0) {
-            await toaster.toast({
-                message: "item already in queue",
-                classes: "whitespace-nowrap block bg-blue-400 rounded-lg p-2 text-sm",
-                timeout: 1000,
-            });
+            await toast('item already in queue');
         } else {
             await player.queue_item_insert(index, id);
         }
@@ -105,11 +97,7 @@
         if (player.synced_data.queue[index] === id) {
             await player.queue_item_delete(index);
         } else {
-            await toaster.toast({
-                message: `item at index ${index} is not ${id}`,
-                classes: "whitespace-nowrap block bg-red-400 rounded-lg p-2 text-sm",
-                timeout: 1000,
-            });
+            await toast(`item at index ${index} is not ${id}`, 'error');
         }
     };
     let on_queue_item_play = async (index: number) => {
