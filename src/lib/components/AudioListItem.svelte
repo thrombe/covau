@@ -7,8 +7,10 @@
 </script>
 
 <div class='w-full h-full pl-1 flex flex-row text-gray-200'>
-    <icon class='p-1 aspect-square h-full'>
-        <img class='w-full h-full object-cover rounded-md overflow-hidden' src={img_src} alt="" />
+    <icon class='block p-1 aspect-square flex-none h-full'>
+        <div class='w-full h-full rounded-md overflow-hidden'>
+            <img class='w-full h-full object-cover scale-[101%]' src={img_src} alt="" />
+        </div>
     </icon>
 
     <info class='flex flex-col mx-2 overflow-hidden pt-1'>
