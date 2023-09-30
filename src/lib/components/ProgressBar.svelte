@@ -8,6 +8,7 @@
     export let thumb_width: number;
     export let thumb_height: number;
     export let onchange: (progress: number) => Promise<void>;
+    export let dragging = false;
 
     let thumb_progress = 0;
     let _progress = 0;
@@ -50,7 +51,6 @@
 
     let width: number;
 
-    let dragging = false;
     let dragging_x: number | null = null;
     const dragstart = (e: DragEvent) => {
         e.dataTransfer?.setDragImage(img, 0, 0);

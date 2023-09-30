@@ -6,6 +6,7 @@
 
     export let player: Player;
     export let audio_info: { title: string; title_sub: string; img_src: string } | null;
+    export let mobile = false;
 
     let video_pos = 0;
     let has_prev = false;
@@ -49,10 +50,17 @@
 
     $: fmt_duration = fmt_time(audio_duration);
     $: fmt_video_pos = fmt_time(video_pos * audio_duration);
+
+    let dragging_volume = false;
 </script>
 
-<div class='flex flex-row h-full'>
-    <audio-info class='flex flex-row'>
+<div class='flex flex-row h-full'
+    style='
+        --volume-control-width: 8rem;
+        --audio-info-width: {mobile ? '0px' : '15rem'};
+    '
+>
+    <audio-info class='flex flex-row {mobile ? 'hidden' : ''}'>
         <AudioListItem
             title={audio_info ? audio_info.title : ''}
             title_sub={audio_info ? audio_info.title_sub : ''}
@@ -102,40 +110,42 @@
         </div>
     </audio-controls>
 
-    <volume-control class='flex flex-row justify-center items-center pb-1'>
-        <volume-icon class='flex flex-col justify-center'>
-            <!-- this is also the mute button -->
-            <button
-                class='w-full p-2'
-                on:click={async () => {
-                    if (await player.is_muted()) {
-                        await player.unmute();
-                    } else {
-                        await player.mute();
-                    }
-                }}
+    <volume-control class='relative flex flex-row justify-center items-center pb-1'>
+        <button class='volume-button p-2'>
+            volume {Math.round(100 * volume)}
+            <div 
+                class='volume-box absolute flex flex-row gap-4 right-0 bottom-10 h-16 px-6 py-4 mr-2 bg-gray-200 bg-opacity-10 rounded-xl backdrop-blur-md {dragging_volume ? 'z-10' : '-z-40'}'
             >
-                {is_muted ? 'unmute' : 'mute'}
-            </button>
-        </volume-icon>
-
-        <volume-slider class='h-3 px-4'>
-            <ProgressBar
-                bind:progress={volume}
-                onchange={on_volume_change}
-                thumb_width={20}
-                thumb_height={20}
-            />
-        </volume-slider>
+                <div class='relative h-full w-40 py-3 {is_muted ? 'brightness-50' : ''}'>
+                    {#if is_muted}
+                        <div class='absolute block z-20 w-full h-full left-0 top-0'></div>
+                    {/if}
+                    <ProgressBar
+                        bind:progress={volume}
+                        onchange={on_volume_change}
+                        thumb_width={20}
+                        thumb_height={20}
+                        bind:dragging={dragging_volume}
+                    />
+                </div>
+                <button
+                    class='p-2'
+                    on:click={async () => {
+                        if (await player.is_muted()) {
+                            await player.unmute();
+                        } else {
+                            await player.mute();
+                        }
+                    }}
+                >
+                    {is_muted ? 'unmute' : 'mute'}
+                </button>
+            </div>
+        </button>
     </volume-control>
 </div>
 
 <style lang='postcss'>
-    * {
-        --volume-control-width: 23%;
-        --audio-info-width: 23%;
-    }
-
     audio-info {
         width: var(--audio-info-width);
     }
@@ -145,7 +155,15 @@
     }
 
     button {
-        @apply rounded-lg px-2 my-1 text-gray-200 font-bold bg-gray-200 bg-opacity-10;
+        @apply rounded-lg text-gray-200 font-bold bg-gray-200 bg-opacity-10;
+    }
+
+    audio-controls button {
+        @apply px-2 my-1;
+    }
+
+    .volume-button:hover .volume-box, .volume-box:hover {
+       @apply z-10; 
     }
 
     volume-control {
@@ -154,8 +172,5 @@
     volume-icon {
         width: 60px;
         height: 100%;
-    }
-    volume-slider {
-        width: calc(100% - 60px);
     }
 </style>
