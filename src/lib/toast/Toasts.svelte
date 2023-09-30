@@ -19,7 +19,7 @@
         }
         await toaster.toast({
             message,
-            classes: `whitespace-nowrap block bg-${color}-400 rounded-lg p-2 text-sm`,
+            classes: `whitespace-nowrap block bg-${color}-400 bg-opacity-90 font-bold text-gray-900 rounded-lg p-2 text-sm`,
             timeout: 1000,
         });
     };
