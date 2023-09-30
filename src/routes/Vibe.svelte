@@ -297,10 +297,7 @@
                                 gap={0}
                                 bind:tube
                                 {queue_dragend}
-                                queue_item_add={async (id) => {
-                                    await on_queue_item_add(id);
-                                    await toast('item added to queue');
-                                }}
+                                queue_item_add={on_queue_item_add}
                                 type={music_search_type}
                             />
                         </div>
