@@ -237,11 +237,11 @@
     item.is-dragging {
         @apply opacity-40;
     }
-    item.is-playing {
-        @apply bg-gray-200 bg-opacity-20;
-    }
     item.is-selected {
         @apply bg-gray-200 bg-opacity-10;
+    }
+    item.is-playing {
+        @apply bg-gray-200 bg-opacity-20;
     }
     item.is-active {
         @apply bg-green-400 bg-opacity-20;
