@@ -265,12 +265,28 @@
                             </div>
                         {/if}
 
-                        <img
-                            class='absolute w-full h-full left-0 top-0 -z-20 overflow-hidden object-cover brightness-50 blur-md scale-110'
-                            style='{img_squared ? '' : 'lol'}height: {100 * Math.max((img_w / img_h), 1)}%;'
-                            src={img_src}
-                            alt=''
-                        >
+                        {#if img_src === ''}
+                            <div class='absolute h-full w-full left-0 top-0 -z-20 brightness-75'>
+                                <BlobBg
+                                    colors={[
+                                        "#4F0D1B",
+                                        "#912E40",
+                                        "#504591",
+                                        "#5197B9",
+                                        "#16183E",
+                                        "#925FD6",
+                                    ]}
+                                    animate={false}
+                                />
+                            </div>
+                        {:else}
+                            <img
+                                class='absolute w-full h-full left-0 top-0 -z-20 overflow-hidden object-cover brightness-50 blur-md scale-110'
+                                style='{img_squared ? '' : 'lol'}height: {100 * Math.max((img_w / img_h), 1)}%;'
+                                src={img_src}
+                                alt=''
+                            >
+                        {/if}
                         <div class='w-full h-full {menubar_option.content_type == 'queue' ? 'h-0 overflow-hidden' : ''}'>
                             <SongBrowser
                                 bind:item_height
