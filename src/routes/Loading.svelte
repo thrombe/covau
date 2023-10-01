@@ -30,6 +30,7 @@
             animate={false}
         />
     </div>
+    <div class=' grainy grainy-bg'></div>
 </div>
 
 <style lang='postcss'>

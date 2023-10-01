@@ -292,6 +292,7 @@
                             alt=''
                             on:error={on_img_err}
                         >
+                        <div class='-z-20 grainy grainy-bg'></div>
 
                         <div class='w-full h-full {menubar_option.content_type == 'queue' ? 'h-0 overflow-hidden' : ''}'>
                             <SongBrowser
@@ -378,12 +379,13 @@
             animate={false}
         />
     </div>
+    <div class='-z-20 grainy grainy-bg'></div>
 </div>
 
 <Toasts
 />
 
-<style>
+<style lang='postcss'>
     * {
         --play-bar-height: 70px;
         --top-menubar-height: 50px;

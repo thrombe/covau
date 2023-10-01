@@ -12,6 +12,37 @@
 
   <title>covau!</title>
 
+  <div class='h-0'>
+    <svg>
+        <filter id='grainy-turbulence'>
+            <feTurbulence
+                type='turbulance'
+                baseFrequency='0.55'
+            />
+        </filter>
+    </svg>
+    <svg>
+        <filter id='grainy-fractal'>
+            <feTurbulence
+                type='fractalNoise'
+                baseFrequency='0.45'
+            />
+        </filter>
+    </svg>
+  </div>
+
+  <style lang='postcss'>
+    .grainy {
+        @apply opacity-[35%];
+        filter: url(#grainy-fractal) blur(0.0px) contrast(200%);
+        mix-blend-mode: multiply;
+    }
+
+    .grainy-bg {
+      @apply absolute w-full h-full left-0 top-0;
+    }
+  </style>
+
   <style>
     body {
       background: #282828;
