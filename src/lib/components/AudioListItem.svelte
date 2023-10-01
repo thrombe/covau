@@ -15,6 +15,7 @@
 
     const on_err = async () => {
         hide_border = true;
+        img_src = '/static/default-music-icon.svg';
     };
 
     const on_load = async () => {
