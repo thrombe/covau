@@ -94,10 +94,10 @@
     <div class="block absolute left-0 top-0 w-full h-full opacity-0 z-10" />
     <div class="absolute left-0 top-0 flex flex-col h-full w-full z-10 items-center justify-center {waiting ? '' : 'hidden'}">
         <button
-            class='p-3 rounded-2xl bg-[#513A61] brightness-75 text-lg font-bold w-40 text-center select-none'
+            class='py-3 px-6 rounded-2xl bg-[#513A61] h-20 text-lg font-bold text-center select-none'
             on:click={on_click} on:keydown={() => {}}
         >
-            Click to Play!
+            <img class='h-full' src='/static/play.svg'>
         </button>
     </div>
 </div>

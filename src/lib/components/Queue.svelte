@@ -215,7 +215,7 @@
                         await delete_item(index, items[index].data);
                     }}
                 >
-                    Pop
+                    <img class='h-3 opacity-50' src='/static/remove.svg'>
                 </button>
                 <div class='absolute h-full flex flex-col justify-center left-0 top-0'>
                     <button
@@ -225,7 +225,7 @@
                             await play_item(index);
                         }}
                     >
-                            Play
+                        <img class='scale-[50%]' src='/static/play.svg'>
                     </button>
                 </div>
             {/if}
@@ -251,10 +251,10 @@
     }
 
     .pop-button {
-        @apply absolute p-1 m-1 rounded-md bg-gray-200 bg-opacity-50 text-gray-900 font-bold right-0 top-0;
+        @apply absolute p-1 m-2 rounded-md bg-gray-200 bg-opacity-30 text-gray-900 font-bold right-0 top-0;
     }
     .queue-button {
-        @apply aspect-square h-full scale-[70%] rounded-md bg-gray-200 bg-opacity-50 text-xl text-gray-900 font-bold;
+        @apply aspect-square h-full scale-[50%] rounded-md bg-gray-600 bg-opacity-50 text-xl text-gray-900 font-bold;
     }
 
     item button {

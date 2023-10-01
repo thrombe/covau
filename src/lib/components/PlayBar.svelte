@@ -52,11 +52,26 @@
     $: fmt_video_pos = fmt_time(video_pos * audio_duration);
 
     let dragging_volume = false;
+
+    let volume_icon: 'max' | 'mid' | 'min' = 'max';
+
+    $: if (volume) {
+        if (volume < 1/3) {
+            volume_icon = 'min';
+        } else if (volume < 2/3) {
+            volume_icon = 'mid';
+        } else {
+            volume_icon = 'max';
+        }
+        if (is_muted) {
+            volume_icon = 'min';
+        }
+    }
 </script>
 
 <div class='flex flex-row h-full'
     style='
-        --volume-control-width: 8rem;
+        --volume-control-width: 6rem;
         --audio-info-width: {mobile ? '0px' : '15rem'};
     '
 >
@@ -91,7 +106,7 @@
                     await player.play_prev();
                 }}
             >
-                prev
+                <img class='h-3' src='/static/prev.svg'>
             </button>
             <button
                 on:click={async () => {
@@ -99,21 +114,21 @@
                     is_playing = player.is_playing();
                 }}
             >
-                {is_playing ? 'Pause' : 'Play'}
+                <img class='h-3' src='/static/{is_playing ? 'pause' : 'play'}.svg'>
             </button>
             <button
                 on:click={async () => {
                     await player.play_next();
                 }}
             >
-                next
+                <img class='h-3' src='/static/next.svg'>
             </button>
         </div>
     </audio-controls>
 
     <volume-control class='relative flex flex-row justify-center items-center pb-1'>
         <button class='volume-button p-2'>
-            volume {Math.round(100 * volume)}
+            <img class='h-6 {is_muted ? 'brightness-50 opacity-50' : ''}' src='/static/volume-{volume_icon}.svg'>
             <div 
                 class='volume-box absolute flex flex-row gap-4 right-0 bottom-10 h-16 px-6 py-4 mr-2 bg-gray-200 bg-opacity-10 rounded-xl backdrop-blur-md {dragging_volume ? 'z-10' : '-z-40 opacity-0'}'
             >
@@ -139,7 +154,7 @@
                         }
                     }}
                 >
-                    {is_muted ? 'unmute' : 'mute'}
+                    <img class='h-full w-6 aspect-square {is_muted ? 'brightness-50 opacity-50' : ''}' src='/static/volume-{volume_icon}.svg'>
                 </button>
             </div>
         </button>

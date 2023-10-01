@@ -79,7 +79,7 @@
         thumbnail: string | null,
     };
 
-    let tabs: Tab[] = [{ name: 'Search', searcher: song_searcher, thumbnail: null }];
+    let tabs: Tab[] = [{ name: 'Results', searcher: song_searcher, thumbnail: null }];
     let search_tab = tabs[0];
     let curr_tab = search_tab;
 
@@ -162,7 +162,7 @@
                                         await queue_item_add(item.id);
                                     }}
                                 >
-                                   Queue 
+                                    <img class='h-3' src='/static/add.svg'>
                                 </button>
                             {:else if item.item_type == 'album' || item.item_type == 'playlist'}
                                 <AudioListItem
@@ -194,7 +194,7 @@
                                         curr_tab = new_tab;
                                     }}
                                 >
-                                    Open
+                                    <img class='h-3' src='/static/open-new-tab.svg'>
                                 </button>
                             {:else if item.item_type == 'artist'}
                                 <AudioListItem
@@ -217,7 +217,7 @@
                                         curr_tab = new_tab;
                                     }}
                                 >
-                                    Open
+                                    <img class='h-3' src='/static/open-new-tab.svg'>
                                 </button>
                             {/if}
                         </div>
@@ -264,7 +264,7 @@
                                         await queue_item_add(item.id);
                                     }}
                                 >
-                                   Queue 
+                                    <img class='h-3' src='/static/add.svg'>
                                 </button>
                             {:else}
                                 <AudioListItem
@@ -304,7 +304,7 @@
     }
 
     .open-button {
-        @apply absolute h-full aspect-square ml-4 left-0 top-0 bg-gray-200 bg-opacity-50 rounded-md text-gray-900 text-lg font-bold scale-[70%];
+        @apply absolute aspect-square p-1 m-2 right-0 top-0 bg-gray-200 bg-opacity-30 rounded-md text-gray-900 text-lg font-bold;
         @apply hidden;
     }
 
