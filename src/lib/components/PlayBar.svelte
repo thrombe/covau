@@ -115,7 +115,7 @@
         <button class='volume-button p-2'>
             volume {Math.round(100 * volume)}
             <div 
-                class='volume-box absolute flex flex-row gap-4 right-0 bottom-10 h-16 px-6 py-4 mr-2 bg-gray-200 bg-opacity-10 rounded-xl backdrop-blur-md {dragging_volume ? 'z-10' : '-z-40'}'
+                class='volume-box absolute flex flex-row gap-4 right-0 bottom-10 h-16 px-6 py-4 mr-2 bg-gray-200 bg-opacity-10 rounded-xl backdrop-blur-md {dragging_volume ? 'z-10' : '-z-40 opacity-0'}'
             >
                 <div class='relative h-full w-40 py-3 {is_muted ? 'brightness-50' : ''}'>
                     {#if is_muted}
@@ -164,14 +164,14 @@
     }
 
     .volume-button:hover .volume-box, .volume-box:hover {
-       @apply z-10; 
+        @apply z-10 opacity-100; 
+        transition: 0.0s;
+    }
+    .volume-button .volume-box, .volume-box {
+        transition-delay: 0.7s;
     }
 
     volume-control {
         width: var(--volume-control-width);
-    }
-    volume-icon {
-        width: 60px;
-        height: 100%;
     }
 </style>
