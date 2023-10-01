@@ -243,7 +243,7 @@
                                             />
                                         </div>
                                         <button 
-                                            class='my-1 p-1 bg-gray-200 bg-opacity-20 rounded-md aspect-square'
+                                            class='my-1 p-1 bg-gray-200 bg-opacity-10 rounded-md aspect-square'
                                             on:click={on_group_button_click}
                                         >
                                             <img class='w-full h-full opacity-75' src='/static/copy.svg'>
@@ -341,7 +341,7 @@
                                 />
                             </div>
                             <button 
-                                class='my-2 p-1 bg-gray-200 bg-opacity-20 rounded-md aspect-square'
+                                class='my-2 p-1 aspect-square'
                                 on:click={on_group_button_click}
                             >
                                 <img class='w-full h-full opacity-75' src='/static/copy.svg'>
@@ -379,7 +379,7 @@
         {/if}
     </all-contents>
 
-    <play-bar class='pl-2 pb-2 pt-4'>
+    <play-bar class='px-2 pb-2 pt-4'>
         <PlayBar bind:player
             {mobile}
             audio_info={queue_playing_vid_info ? {
