@@ -18,9 +18,38 @@
     };
 </script>
 
-<div class='relative w-full h-full flex flex-col bg-gray-900 bg-opacity-30'>
-    <div class='w-full h-full flex items-center justify-center'>
-        <div class='relative flex flex-col w-[60%] overflow-hidden rounded-3xl py-6 px-8 gap-6'>
+<div class='relative w-full h-full flex flex-col gap-6 justify-center items-center bg-gray-900 bg-opacity-30'>
+    <div class='w-[60%] xl:w-[40%] flex flex-col items-center justify-center'>
+        <div class='relative flex flex-col items-center w-full overflow-hidden rounded-3xl py-6 px-8 gap-2'>
+            <div class='px-6 text-[1.5rem] w-full text-center'>
+                Welcome to the Home page of Covau!
+            </div>
+            <div class='px-6 text-md w-full'>
+                Covau is a webapp for sharing music and videos with friends in real-time.
+            </div>
+            <a href='https://github.com/thrombe/covau' target='_blank' class='px-6'>
+                <img src='/static/github.svg' class='h-8 aspect-square' >
+            </a>
+
+            <div class='absolute h-full w-full left-0 top-0 -z-20 brightness-[90%]'>
+                <BlobBg
+                    colors={[
+                        "#4F0D1B",
+                        "#912E40",
+                        "#504591",
+                        "#5197B9",
+                        "#16183E",
+                        "#925FD6",
+                    ]}
+                    animate={false}
+                />
+            </div>
+            <div class='-z-20 grainy grainy-bg'></div>
+        </div>
+    </div>
+
+    <div class='w-[60%] xl:w-[40%] flex flex-col items-center justify-center'>
+        <div class='relative flex flex-col w-full overflow-hidden rounded-3xl py-6 px-8 gap-6'>
             <div class='px-6 text-2xl w-full text-center'>
                 Join / Create a room
             </div>
