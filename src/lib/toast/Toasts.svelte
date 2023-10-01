@@ -11,15 +11,15 @@
     export let toast = async (message: string, level: 'info' | 'error' = 'info') => {
         let color: string;
         if (level == 'error') {
-            color = 'red';
+            color = 'bg-red-400';
         } else if (level == 'info') {
-            color = 'blue';
+            color = 'bg-blue-400';
         } else {
-            color = 'gray';
+            color = 'bg-gray-400';
         }
         await toaster.toast({
             message,
-            classes: `whitespace-nowrap block bg-${color}-400 bg-opacity-90 font-bold text-gray-900 rounded-lg p-2 text-sm`,
+            classes: `whitespace-nowrap block ${color} bg-opacity-90 font-bold text-gray-900 rounded-lg p-2 text-sm`,
             timeout: 1000,
         });
     };
