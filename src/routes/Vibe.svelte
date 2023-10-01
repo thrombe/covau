@@ -17,8 +17,8 @@
     export let tube: Innertube;
 
     onMount(() => {
-        let update_hash = () => {
-            let h = window.location.hash.split('/');
+        let update_hash = (e: HashChangeEvent) => {
+            let h = new URL(e.newURL).hash.split('/');
             group = h[h.length - 1];
         };
 
@@ -43,7 +43,7 @@
         let url_without_hash = window.location.toString().replace(window.location.hash, '');
         let new_url = url_without_hash + hash_prefix + group;
         params.group = group;
-        window.location.replace(new_url);
+        window.history.pushState({}, '', new_url);
         window.location.reload();
     }
 
