@@ -181,6 +181,10 @@
     //         console.log(res);
     //     })();
     // }
+
+    const on_group_button_click = async () => {
+        navigator.clipboard.writeText(window.location.toString());
+    };
 </script>
 
 <svelte:window on:resize={on_window_resize} bind:innerWidth={width} />
@@ -225,8 +229,8 @@
                                 <div bind:this={queue_element}
                                     class='flex flex-col overflow-y-auto h-full'
                                 >
-                                    <div class='p-2 bg-gray-900 bg-opacity-30 h-14'>
-                                        <div class='w-full h-full'>
+                                    <div class='flex flex-row p-2 bg-gray-900 bg-opacity-30 h-14'>
+                                        <div class='w-full h-full px-2' style='width: calc(100% - var(--name-bar-height) + 1.5rem);'>
                                             <InputBar
                                                 bind:placeholder={group}
                                                 bind:value={group_name_input}
@@ -238,6 +242,12 @@
                                                 }}
                                             />
                                         </div>
+                                        <button 
+                                            class='my-1 p-1 bg-gray-200 bg-opacity-20 rounded-md aspect-square'
+                                            on:click={on_group_button_click}
+                                        >
+                                            <img class='w-full h-full opacity-75' src='/static/copy.svg'>
+                                        </button>
                                     </div>
 
                                     <div class='pl-2'
@@ -317,17 +327,25 @@
                     style='height: {watching ? '100%' : 'calc(100% - var(--video-height))'};'
                 >
                     <queue-name class='p-2'>
-                        <div class='w-full rounded-xl h-full bg-gray-400 bg-opacity-20'>
-                            <InputBar
-                                bind:placeholder={group}
-                                bind:value={group_name_input}
-                                on_enter={async (e) => {
-                                    if (!group_name_input) {
-                                        return;
-                                    }
-                                    group = group_name_input;
-                                }}
-                            />
+                        <div class='flex flex-row rounded-xl h-full bg-gray-400 bg-opacity-20'>
+                            <div class='h-full pl-4 pr-2' style='width: calc(100% - var(--name-bar-height) + 1.5rem);'>
+                                <InputBar
+                                    bind:placeholder={group}
+                                    bind:value={group_name_input}
+                                    on_enter={async (e) => {
+                                        if (!group_name_input) {
+                                            return;
+                                        }
+                                        group = group_name_input;
+                                    }}
+                                />
+                            </div>
+                            <button 
+                                class='my-2 p-1 bg-gray-200 bg-opacity-20 rounded-md aspect-square'
+                                on:click={on_group_button_click}
+                            >
+                                <img class='w-full h-full opacity-75' src='/static/copy.svg'>
+                            </button>
                         </div>
                     </queue-name>
 
