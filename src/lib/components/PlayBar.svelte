@@ -1,8 +1,8 @@
 <script lang="ts">
     import { onDestroy } from 'svelte';
-    import { Player } from '../player';
-    import AudioListItem from './AudioListItem.svelte';
-    import ProgressBar from './ProgressBar.svelte';
+    import { Player } from '$lib/player.ts';
+    import AudioListItem from '$lib/components/AudioListItem.svelte';
+    import ProgressBar from '$lib/components/ProgressBar.svelte';
 
     export let player: Player;
     export let audio_info: { title: string; title_sub: string; img_src: string } | null;
@@ -80,7 +80,6 @@
             title={audio_info ? audio_info.title : ''}
             title_sub={audio_info ? audio_info.title_sub : ''}
             img_src={audio_info ? audio_info.img_src : ''}
-            scale={103}
         />
     </audio-info>
 

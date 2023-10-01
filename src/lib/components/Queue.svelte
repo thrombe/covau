@@ -207,7 +207,6 @@
                     img_src={item.basic_info.thumbnail
                         ? item.basic_info.thumbnail[item.basic_info.thumbnail.length - 1].url
                         : ''}
-                    scale={101}
                 />
                 <button
                     class='pop-button'

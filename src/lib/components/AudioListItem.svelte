@@ -2,15 +2,36 @@
     export let title: string;
     export let title_sub: string;
     export let img_src: string;
-    export let scale = 100;
 
     // TODO: somehow setup retrying and see if images load more reliably
+
+    let hide_border = true;
+
+    $: if (img_src || true) {
+        if (img_src == '') {
+            hide_border = true;
+        }
+    }
+
+    const on_err = async () => {
+        hide_border = true;
+    };
+
+    const on_load = async () => {
+        hide_border = false;
+    };
 </script>
 
 <div class='w-full h-full pl-1 flex flex-row text-gray-200'>
     <icon class='block p-1 aspect-square flex-none h-full'>
         <div class='w-full h-full rounded-md overflow-hidden'>
-            <img class='w-full h-full object-cover scale-[{scale}%]' src={img_src} alt="" />
+            <img
+                class='w-full h-full object-cover {hide_border ? 'scale-150' : ''}'
+                src={img_src}
+                alt=""
+                on:error={on_err}
+                on:load={on_load}
+            />
         </div>
     </icon>
 
