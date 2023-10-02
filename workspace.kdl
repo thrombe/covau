@@ -1,0 +1,72 @@
+layout {
+    // 'base' swap layout is exactly whatever you define in the actual layout stuff
+    // first one takes precidence
+    swap_tiled_layout name="stack" min_panes=2 {
+        tab {
+            pane stacked=true {
+                pane
+                pane
+            }
+        }
+    }
+    swap_tiled_layout name="no stack" min_panes=2 {
+        tab {
+            pane
+        }
+    }
+
+    default_tab_template {
+        pane size=1 borderless=true {
+            plugin location="zellij:tab-bar"
+        }
+        children
+        pane size=1 borderless=true {
+            plugin location="zellij:status-bar"
+        }
+    }
+
+    pane_template name="nix" {
+        command "cached-nix-shell"
+    }
+
+
+    tab name="git / broot" stacked=true {
+        pane stacked=true {
+            pane start_suspended=true name="gitui" {
+                command "gitui"
+            }
+            pane start_suspended=true name="broot" {
+                command "broot"
+            }
+        }
+    }
+    tab name="helix" focus=true {
+        pane stacked=true {
+            nix name="helix" {
+                args "--command" "hx ."
+            }
+            nix name="nvim" {
+                args "--command" "nvim -c 'Telescope git_files'"
+            }
+        }
+    }
+    tab name="shell"{
+        pane stacked=true {
+            nix name="nix-shell"
+            pane name="zsh"
+        }
+    }
+    tab name="server/build" {
+        pane stacked=true {
+            nix start_suspended=true name="bun dev server" {
+                args "--command" "bun run netlify-dev"
+            }
+            nix start_suspended=true name="deploy" {
+                args "--command" "bun run netlify-deploy"
+            }
+            nix start_suspended=true name="deploy prod" {
+                args "--command" "bun run netlify-deploy-prod"
+            }
+        }
+    }
+}
