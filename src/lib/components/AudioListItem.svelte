@@ -29,6 +29,7 @@
             <img
                 class='w-full h-full object-cover {hide_border ? 'scale-150' : ''}'
                 src={img_src}
+                draggable={false}
                 alt=""
                 on:error={on_err}
                 on:load={on_load}

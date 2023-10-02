@@ -159,7 +159,7 @@
                                         await queue_item_add(item.id);
                                     }}
                                 >
-                                    <img class='h-3' src='/static/add.svg'>
+                                    <img draggable={false} class='h-3' src='/static/add.svg'>
                                 </button>
                             {:else if item.item_type == 'album' || item.item_type == 'playlist'}
                                 <AudioListItem
@@ -190,7 +190,7 @@
                                         curr_tab = new_tab;
                                     }}
                                 >
-                                    <img class='h-3' src='/static/open-new-tab.svg'>
+                                    <img draggable={false} class='h-3' src='/static/open-new-tab.svg'>
                                 </button>
                             {:else if item.item_type == 'artist'}
                                 <AudioListItem
@@ -212,7 +212,7 @@
                                         curr_tab = new_tab;
                                     }}
                                 >
-                                    <img class='h-3' src='/static/open-new-tab.svg'>
+                                    <img draggable={false} class='h-3' src='/static/open-new-tab.svg'>
                                 </button>
                             {/if}
                         </div>
@@ -258,7 +258,7 @@
                                         await queue_item_add(item.id);
                                     }}
                                 >
-                                    <img class='h-3' src='/static/add.svg'>
+                                    <img draggable={false} class='h-3' src='/static/add.svg'>
                                 </button>
                             {:else}
                                 <AudioListItem
