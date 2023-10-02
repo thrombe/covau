@@ -1,9 +1,10 @@
 <script lang='ts'>
-    import BlobBg from '$lib/components/BlobBg.svelte';
+    import BlobBg, { get_seed } from '$lib/components/BlobBg.svelte';
     import InputBar from '$lib/components/InputBar.svelte';
     import { nanoid } from 'nanoid';
 
     let group: string;
+    let seed = get_seed();
 
     const on_room_enter = async (group: string) => {
         let url_without_hash = window.location.toString().replace(window.location.hash, '');
@@ -42,6 +43,7 @@
                         "#925FD6",
                     ]}
                     animate={false}
+                    seed={seed + '1'}
                 />
             </div>
             <div class='-z-20 grainy grainy-bg'></div>
@@ -85,6 +87,7 @@
                         "#925FD6",
                     ]}
                     animate={false}
+                    seed={seed + '2'}
                 />
             </div>
             <div class='-z-20 grainy grainy-bg'></div>
@@ -94,6 +97,7 @@
     <div class='w-full h-full absolute -z-30 brightness-50'>
         <BlobBg
             animate={false}
+            seed={seed + '3'}
         />
     </div>
     <div class='-z-20 grainy grainy-bg'></div>

@@ -40,6 +40,9 @@
     export const set_seed = (seed: string) => {
         _seed = seed;
     };
+    export const get_seed = () => {
+        return _seed;
+    };
 </script>
 
 <script lang='ts'>
