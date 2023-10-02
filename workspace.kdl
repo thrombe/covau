@@ -26,7 +26,8 @@ layout {
     }
 
     pane_template name="nix" {
-        command "cached-nix-shell"
+        command "nix"
+        args "develop"
     }
 
 
@@ -43,10 +44,10 @@ layout {
     tab name="helix" focus=true {
         pane stacked=true {
             nix name="helix" {
-                args "--command" "hx ."
+                args "develop" "-c" "hx" "."
             }
             nix name="nvim" {
-                args "--command" "nvim -c 'Telescope git_files'"
+                args "develop" "-c" "nvim" "-c" "Telescope git_files"
             }
         }
     }
@@ -56,16 +57,16 @@ layout {
             pane name="zsh"
         }
     }
-    tab name="server/build" {
+    tab name="commands" {
         pane stacked=true {
             nix start_suspended=true name="bun dev server" {
-                args "--command" "bun run netlify-dev"
+                args "develop" "-c" "bun" "run" "netlify-dev"
             }
             nix start_suspended=true name="deploy" {
-                args "--command" "bun run netlify-deploy"
+                args "develop" "-c" "bun" "run" "netlify-deploy"
             }
             nix start_suspended=true name="deploy prod" {
-                args "--command" "bun run netlify-deploy-prod"
+                args "develop" "-c" "bun" "run" "netlify-deploy-prod"
             }
         }
     }
