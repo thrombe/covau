@@ -28,7 +28,9 @@ export default defineConfig({
 		outDir: 'build'
 	},
 	server: {
-		port: 5178
+		port: 5178,
+		open: false,
+		host: true
 	},
 	resolve: {
 		alias: tsconfigPathAliases,

@@ -42,7 +42,6 @@
                         "#16183E",
                         "#925FD6",
                     ]}
-                    animate={false}
                     seed={seed + '1'}
                 />
             </div>
@@ -86,7 +85,6 @@
                         "#16183E",
                         "#925FD6",
                     ]}
-                    animate={false}
                     seed={seed + '2'}
                 />
             </div>
@@ -96,7 +94,6 @@
 
     <div class='w-full h-full absolute -z-30 brightness-50'>
         <BlobBg
-            animate={false}
             seed={seed + '3'}
         />
     </div>

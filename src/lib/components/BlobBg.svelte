@@ -49,58 +49,48 @@
     export let count = 30;
     export let colors = ['#AB62C4', '#E35A84', '#FFACAC'];
     export let bg_color = '#4E2A69';
-    export let animate = true;
     export let size = 250;
     export let seed: string | undefined = undefined;
 
-    let rand = get_rng(seed ?? (_seed ?? Date.now().toString()));
+    let final_seed = seed ?? (_seed ?? Date.now().toString());
+
+
+    let canvas: HTMLCanvasElement;
+    let width: number;
+    let height: number;
+    $: if (canvas && width && height) {
+        let rand = get_rng(final_seed);
+        canvas.height = height;
+        canvas.width = width;
+
+        const ctx = canvas.getContext('2d') as unknown as CanvasRenderingContext2D;
+
+        ctx.fillStyle = bg_color;
+        ctx.fillRect(0, 0, width, height);
+        ctx.filter = "blur(32px)";
+
+        function draw_blob() {
+            const radius = rand() * size;
+            const x = rand() * canvas.width;
+            const y = rand() * canvas.height;
+
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, 2 * Math.PI);
+
+            ctx.fillStyle = colors[Math.floor(rand() * colors.length)];
+            ctx.fill();
+        }
+
+        for (let i = 0; i < count; i++) {
+            draw_blob();
+        }
+    }
 </script>
 
 <div 
-    class='w-full h-full relative blur-xl scale-125 overflow-hidden'
-    style='
-        background: {bg_color};
-    '
+    bind:clientWidth={width}
+    bind:clientHeight={height}
+    class='w-full h-full relative scale-100 overflow-hidden'
 >
-    {#each Array(count).keys() as k (k)}
-        <div
-            class='absolute rounded-full blob'
-            style='
-                --duration: {Math.max(400 * rand(), 30)}s;
-                --color: {colors[Math.floor(rand() * colors.length)]};
-                --size: {size * rand()}px;
-                --xpos: {1.0 - 2.0*rand()};
-                --ypos: {1.0 - 2.0*rand()};
-                --xorigin: {2 * (-1.0 + 2.0*Math.max(rand(), 0.0))};
-                --yorigin: {2 * (-1.0 + 2.0*Math.max(rand(), 0.0))};
-                --delay: {-100 * rand()}s;
-                --clock: {animate ? (rand() > 0.5 ? 1 : -1) : 0};
-            '
-        ></div>
-    {/each}
+    <canvas bind:this={canvas} class='w-full h-full'></canvas>
 </div>
-
-<style>
-    @keyframes move {
-        100% {
-            transform: translate3d(0, 0, 1px) rotate(calc(var(--clock) * 360deg));
-        }
-    }
-
-    .blob {
-        position: absolute;
-        animation: move;
-        animation-timing-function: linear;
-        animation-iteration-count: infinite;
-        will-change: transform;
-
-        background-color: var(--color);
-        padding: var(--size);
-        animation-duration: var(--duration);
-        translate: -50% 50%;
-        bottom: calc(50% + 50% * var(--ypos));
-        left: calc(50% + 50% * var(--xpos));
-        animation-delay: var(--delay);
-        transform-origin: calc(50% + 50% * var(--xorigin)) calc(50% + 50% * var(--yorigin));
-    }
-</style>

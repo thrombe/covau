@@ -292,7 +292,6 @@
                                     "#16183E",
                                     "#925FD6",
                                 ]}
-                                animate={false}
                             />
                         </div>
                         <img
@@ -392,9 +391,7 @@
     </play-bar>
 
     <div class='w-full h-full absolute -z-30 brightness-50'>
-        <BlobBg
-            animate={false}
-        />
+        <BlobBg />
     </div>
 
     <!-- grain applies over both the bg and the song-browser image cuz of z-index i think -->
