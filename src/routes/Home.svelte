@@ -20,12 +20,12 @@
 </script>
 
 <div class='relative w-full h-full flex flex-col gap-6 justify-center items-center bg-gray-900 bg-opacity-30'>
-    <div class='w-[60%] xl:w-[40%] flex flex-col items-center justify-center'>
-        <div class='relative flex flex-col items-center w-full overflow-hidden rounded-3xl py-6 px-8 gap-2'>
-            <div class='px-6 text-[1.5rem] w-full text-center'>
+    <div class='w-[80%] md:w-[60%] xl:w-[40%] flex flex-col items-center justify-center'>
+        <div class='relative flex flex-col items-center w-full overflow-hidden rounded-3xl py-6 px-4 md:px-8 gap-2'>
+            <div class='px-3 md:px-6 text-[1.2rem] md:text-[1.5rem] w-full text-center'>
                 Welcome to the Home page of Covau!
             </div>
-            <div class='px-6 text-md w-full'>
+            <div class='px-3 md:px-6 text-md w-full'>
                 Covau is a webapp for sharing music and videos with friends in real-time.
             </div>
             <a href='https://github.com/thrombe/covau' target='_blank' class='px-6'>
@@ -49,9 +49,9 @@
         </div>
     </div>
 
-    <div class='w-[60%] xl:w-[40%] flex flex-col items-center justify-center'>
-        <div class='relative flex flex-col w-full overflow-hidden rounded-3xl py-6 px-8 gap-6'>
-            <div class='px-6 text-2xl w-full text-center'>
+    <div class='w-[80%] md:w-[60%] xl:w-[40%] flex flex-col items-center justify-center'>
+        <div class='relative flex flex-col w-full overflow-hidden rounded-3xl py-6 px-4 md:px-8 gap-3 md:gap-6'>
+            <div class='px-3 md:px-6 text-xl md:text-2xl w-full text-center'>
                 Join / Create a room
             </div>
             <div class='w-full h-full bg-gray-900 bg-opacity-30 rounded-3xl p-4'>
@@ -62,13 +62,13 @@
                 />
             </div>
 
-            <div class='px-6 text-2xl w-full text-center'>
+            <div class='px-3 md:px-6 text-xl md:text-2xl w-full text-center'>
                 Or
             </div>
 
             <div class='w-full'>
                 <button 
-                    class='p-4 bg-gray-200 bg-opacity-20 rounded-3xl w-full text-gray-200 text-xl font-bold'
+                    class='p-4 bg-gray-200 bg-opacity-20 rounded-3xl w-full text-gray-200 text-[1.1rem] md:text-xl font-bold'
                     on:click={random_room}
                 >
                     Create a random room
