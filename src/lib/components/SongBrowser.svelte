@@ -85,36 +85,38 @@
 </script>
 
 <div class='w-full h-full flex flex-col'>
-    <search-bar class='bg-gray-900 bg-opacity-30'>
-        <InputBar
-            placeholder={'Search'}
-            bind:value={search_query}
-            bind:input_element={search_input_element}
-            on_enter={async (e) => {
-                e.preventDefault();
-                await search_objects();
+    <bar-area class='flex flex-col bg-gray-900 bg-opacity-30'>
+        <search-bar class=''>
+            <InputBar
+                placeholder={'Search'}
+                bind:value={search_query}
+                bind:input_element={search_input_element}
+                on_enter={async (e) => {
+                    e.preventDefault();
+                    await search_objects();
 
-                tabs = [tabs[0]];
-                curr_tab = tabs[0];
-            }}
-        />
-    </search-bar>
-
-    <browse-tab-bar class='flex flex-row overflow-x-auto gap-1 px-1 justify-center bg-gray-900 bg-opacity-30'>
-        {#each tabs as tab}
-            <button 
-                class='border-b-2 px-1 text-gray-400 flex-none text-ellipsis whitespace-nowrap overflow-hidden
-                    {curr_tab == tab ? 'font-bold border-gray-200' : 'border-gray-600'}
-                '
-                style='max-width: 12rem;'
-                on:click={async () => {
-                    curr_tab = tab;
+                    tabs = [tabs[0]];
+                    curr_tab = tabs[0];
                 }}
-            >
-                {tab.name}
-            </button>
-        {/each}
-    </browse-tab-bar>
+            />
+        </search-bar>
+
+        <browse-tab-bar class='flex flex-row overflow-x-auto gap-1 px-1 justify-center'>
+            {#each tabs as tab}
+                <button 
+                    class='border-b-2 px-1 text-gray-400 flex-none text-ellipsis whitespace-nowrap overflow-hidden
+                        {curr_tab == tab ? 'font-bold border-gray-200' : 'border-gray-600'}
+                    '
+                    style='max-width: 12rem;'
+                    on:click={async () => {
+                        curr_tab = tab;
+                    }}
+                >
+                    {tab.name}
+                </button>
+            {/each}
+        </browse-tab-bar>
+    </bar-area>
 
     {#each tabs as tab (tab.name)}
         <browse-area class='{curr_tab == tab ? '' : 'hidden'}'>
@@ -276,6 +278,9 @@
 </div>
 
 <style lang='postcss'>
+    bar-area {
+        height: calc(var(--search-bar-height) + var(--browse-tab-bar-height));
+    }
     search-bar {
         height: var(--search-bar-height);
     }

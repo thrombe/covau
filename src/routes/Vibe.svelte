@@ -302,7 +302,6 @@
                             alt=''
                             on:error={on_img_err}
                         >
-                        <div class='-z-20 grainy grainy-bg'></div>
 
                         <div class='w-full h-full {menubar_option.content_type == 'queue' ? 'h-0 overflow-hidden' : ''}'>
                             <SongBrowser
@@ -397,6 +396,8 @@
             animate={false}
         />
     </div>
+
+    <!-- grain applies over both the bg and the song-browser image cuz of z-index i think -->
     <div class='-z-20 grainy grainy-bg'></div>
 </div>
 
