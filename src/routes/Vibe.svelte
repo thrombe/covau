@@ -230,7 +230,7 @@
                                     class='flex flex-col overflow-y-auto h-full'
                                 >
                                     <div class='flex flex-row p-2 bg-gray-900 bg-opacity-30 h-14'>
-                                        <div class='w-full h-full px-2' style='width: calc(100% - var(--name-bar-height) + 1.5rem);'>
+                                        <div class='w-full h-full pr-2 pl-[2.5rem]' style='width: calc(100% - var(--name-bar-height) + 1.5rem);'>
                                             <InputBar
                                                 bind:placeholder={group}
                                                 bind:value={group_name_input}
