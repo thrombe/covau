@@ -290,7 +290,7 @@
     }
 
     browse-area {
-        height: calc(100% - var(--browse-tab-bar-height) - var(--name-bar-height));
+        height: calc(100% - var(--browse-tab-bar-height) - var(--search-bar-height));
     }
 
     list-item {
