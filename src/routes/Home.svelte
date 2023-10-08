@@ -26,7 +26,7 @@
                 Welcome to the Home page of Covau!
             </div>
             <div class='px-3 md:px-6 text-md w-full'>
-                Covau is a webapp for sharing music and videos with friends in real-time.
+                Covau is a webapp for enjoying music and videos with friends in real-time.
             </div>
             <a href='https://github.com/thrombe/covau' target='_blank' class='px-6'>
                 <img src='/static/github.svg' class='h-8 aspect-square' >

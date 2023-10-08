@@ -67,10 +67,10 @@
 
         ctx.fillStyle = bg_color;
         ctx.fillRect(0, 0, width, height);
-        ctx.filter = "blur(32px)";
+        // ctx.filter = "blur(12px)";
 
         function draw_blob() {
-            const radius = rand() * size;
+            const radius = Math.max(rand(), 0.5) * size * 2.9 * Math.min((width / 1920), (height / 1080));
             const x = rand() * canvas.width;
             const y = rand() * canvas.height;
 
@@ -90,7 +90,7 @@
 <div 
     bind:clientWidth={width}
     bind:clientHeight={height}
-    class='w-full h-full relative scale-100 overflow-hidden'
+    class='w-full h-full relative scale-100 overflow-hidden blur-3xl scale-125'
 >
     <canvas bind:this={canvas} class='w-full h-full'></canvas>
 </div>
