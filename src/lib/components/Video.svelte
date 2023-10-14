@@ -11,7 +11,7 @@
 </script>
 
 <script lang="ts">
-    import { Player } from '../player';
+    import { Player } from '$lib/player.ts';
     import { initializeApp } from 'firebase/app';
     import { getFirestore } from 'firebase/firestore';
     import { onDestroy } from 'svelte';

@@ -7,6 +7,7 @@
     export let player: Player;
     export let audio_info: { title: string; title_sub: string; img_src: string } | null;
     export let mobile = false;
+    export let keyboard_control = true;
 
     let video_pos = 0;
     let has_prev = false;
@@ -67,6 +68,32 @@
             volume_icon = 'min';
         }
     }
+
+    const _on_keydown = async (event: KeyboardEvent) => {
+        if (!keyboard_control || document.activeElement?.tagName == 'INPUT') {
+            return;
+        }
+
+        if (event.key == ' ') {
+            if (player.is_playing()) {
+                await player.toggle_pause();
+            } else {
+                await player.play();
+            }
+        } else if (event.key == 'ArrowLeft' || event.key == 'h') {
+            let pos = Math.max(0, video_pos - 10/audio_duration);
+            await player.seek_perc(pos);
+        } else if (event.key == 'ArrowRight' || event.key == 'l') {
+            let pos = Math.min(1, video_pos + 10/audio_duration);
+            await player.seek_perc(pos);
+        } else if (event.key == 'ArrowDown' || event.key == 'j') {
+            await player.play_next();
+        } else if (event.key == 'ArrowUp' || event.key == 'k') {
+            await player.play_prev();
+        } else if (event.key == 'm') {
+            await player.toggle_mute();
+        }
+    };
 </script>
 
 <div class='flex flex-row h-full'
@@ -153,11 +180,7 @@
                 <button
                     class='p-2'
                     on:click={async () => {
-                        if (await player.is_muted()) {
-                            await player.unmute();
-                        } else {
-                            await player.mute();
-                        }
+                        await player.toggle_mute();
                     }}
                 >
                     <img class='h-full w-6 aspect-square {is_muted ? 'brightness-50 opacity-50' : ''}' src='/static/volume-{volume_icon}.svg'>
@@ -166,6 +189,8 @@
         </button>
     </volume-control>
 </div>
+
+<svelte:window on:keydown={_on_keydown} />
 
 <style lang='postcss'>
     audio-info {

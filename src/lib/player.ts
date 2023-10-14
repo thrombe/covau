@@ -602,6 +602,14 @@ export class Player {
         this.player.setVolume(100*t);
     }
 
+    async toggle_mute() {
+        if (await this.is_muted()) {
+            await this.unmute();
+        } else {
+            await this.mute();
+        }
+    }
+
     async is_muted() {
         await this.player_initialised;
         return this.player.isMuted();
