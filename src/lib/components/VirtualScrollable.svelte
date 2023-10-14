@@ -125,12 +125,11 @@
     $: if (height && width && root && items && columns) {
         on_update();
     }
-    let _selected_item: HTMLElement;
+    let _selected_item: HTMLElement | undefined;
     export const try_scroll_into_view = async () => {
         await tick();
-        if (!(selected === undefined) && items) {
-            // console.log(items[selected]);
-        }
+        update_selected_item();
+
         if (_selected_item) {
             _selected_item.scrollIntoView({ block: 'nearest' });
         } else {
@@ -144,8 +143,21 @@
             on_update();
         }
     };
-    $: if (!(selected === undefined)) {
-        // try_scroll_into_view();
+
+    const update_selected_item = () => {
+        let ele = document.getElementById('selected');
+        if (ele) {
+            _selected_item = ele;
+        } else {
+            _selected_item = undefined;
+        }
+    };
+
+    $: if (selected) {
+        (async () => {
+            await tick();
+            update_selected_item();
+        })();
     }
 
     $: if (_selected_item || items) {
@@ -168,6 +180,11 @@
         await on_item_click(items[selected]);
     };
 
+    const is_selected = (index: number, selected: number) => {
+        let i = index + start * columns;
+        return selected == i || (i == items.length - 1 && selected >= items.length);
+    };
+
     $: scrollbar_total_height = items.length / columns * item_height;
 </script>
 
@@ -185,41 +202,23 @@
         "
     >
         {#each visible as item, i (item.id)}
-            {#if selected == i + start * columns || (i + start * columns == items.length - 1 && selected >= items.length)}
-                <sel bind:this={_selected_item}
-                    on:click={() => {
-                        _on_item_click(i);
-                    }}
-                    on:keydown={() => {}}
-                    style="width: var(--list-item-width); height: {item_height}px;"
-                >
-                    <slot
-                        {item_width}
-                        {item_height}
-                        {root}
-                        item={item.data}
-                        index={i + start * columns}
-                        selected={true}
-                    />
-                </sel>
-            {:else}
-                <clk
-                    on:click={() => {
-                        _on_item_click(i);
-                    }}
-                    on:keydown={() => {}}
-                    style="width: var(--list-item-width); height: {item_height}px;"
-                >
-                    <slot
-                        {item_width}
-                        {item_height}
-                        {root}
-                        item={item.data}
-                        index={i + start * columns}
-                        selected={false}
-                    />
-                </clk>
-            {/if}
+            <sel
+                id={is_selected(i, selected) ? 'selected' : ''}
+                on:click={() => {
+                    _on_item_click(i);
+                }}
+                on:keydown={() => {}}
+                style="width: var(--list-item-width); height: {item_height}px;"
+            >
+                <slot
+                    {item_width}
+                    {item_height}
+                    {root}
+                    item={item.data}
+                    index={i + start * columns}
+                    selected={is_selected(i, selected)}
+                />
+            </sel>
         {/each}
     </gd>
     <pad style="height: {bottom_padding}px;" class='w-full' />
