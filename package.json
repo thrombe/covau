@@ -2,6 +2,7 @@
 	"name": "covau",
 	"version": "0.0.1",
 	"scripts": {
+		"bun-i": "rm -rf ./node_modules; bun i; cd ./functions; rm -rf ./node_modules; bun i; cd ..",
 		"netlify-dev": "cd functions && netlify dev",
 		"netlify-serve": "cd functions && netlify serve",
 		"netlify-deploy": "npm run build && cd functions && netlify deploy",
