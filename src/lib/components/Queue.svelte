@@ -56,6 +56,8 @@
                 return tube.getBasicInfo(id.data).then((info) => {
                     // console.log(info);
                     searched_item_map.set(id.data, info);
+                }).catch(e => {
+                    searched_item_map.set(id.data, { basic_info: { title: id.data, author: '' }})
                 });
             }
         })
