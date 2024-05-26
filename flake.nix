@@ -2,35 +2,71 @@
   description = "yaaaaaaaaaaaaaaaaaaaaa";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
-    unstable-nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-23.11";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, unstable-nixpkgs }:
-  let
-    system = "x86_64-linux";
+  outputs = inputs:
+    inputs.flake-utils.lib.eachDefaultSystem (system: let
+      flakePackage = flake: package: flake.packages."${system}"."${package}";
+      flakeDefaultPackage = flake: flakePackage flake "default";
 
-    pkgs = import nixpkgs {
-      inherit system;
-    };
-    unstable = import unstable-nixpkgs {
-      inherit system;
-      # - [Overlays | NixOS & Flakes Book](https://nixos-and-flakes.thiscute.world/nixpkgs/overlays)
-      overlays = [
-        (self: super: {
-          # bun 1.0 is not available in nixpkgs yet
-          bun = super.bun.overrideAttrs (old: rec {
-            version = "1.0.0";
-            src = pkgs.fetchurl {
-              url = "https://github.com/oven-sh/bun/releases/download/bun-v${version}/bun-linux-x64.zip";
-              hash = "sha256-1ju7ZuW82wRfXEiU24Lx9spCoIhhddJ2p4dTTQmsa7A=";
+      pkgs = import inputs.nixpkgs {
+        inherit system;
+        overlays = [
+          (final: prev: {
+            unstable = import inputs.nixpkgs-unstable {
+              inherit system;
             };
-          });
-        })
+          })
+        ];
+      };
+
+      fhs = pkgs.buildFHSEnv {
+        name = "fhs-shell";
+        targetPkgs = p: (env-packages p) ++ (custom-commands p);
+        runScript = "${pkgs.zsh}/bin/zsh";
+        profile = ''
+          export FHS=1
+          # source ./.venv/bin/activate
+          # source .env
+        '';
+      };
+      custom-commands = pkgs: [
+        (pkgs.writeShellScriptBin "nothingfornowlol" ''
+          #!/usr/bin/env bash
+          cd $PROJECT_ROOT
+        '')
       ];
-    };
-  in
-  {
-    devShells."${system}".default = (import ./shell.nix { inherit pkgs; inherit unstable; });
-  };
+
+      env-packages = pkgs:
+        with pkgs;
+          [
+            nodejs_21
+            unstable.bun
+            unstable.deno
+            netlify-cli
+
+            nodePackages_latest.svelte-language-server
+            nodePackages_latest.typescript-language-server
+            tailwindcss-language-server
+          ]
+          ++ (custom-commands pkgs);
+    in {
+      packages = {
+        # default = hyprkool-rs;
+        # inherit hyprkool-rs hyprkool-plugin;
+      };
+
+      devShells.default =
+        pkgs.mkShell {
+          nativeBuildInputs = (env-packages pkgs) ++ [fhs];
+          inputsFrom = [
+          ];
+          shellHook = ''
+            export PROJECT_ROOT="$(pwd)"
+          '';
+        };
+    });
 }
