@@ -1,20 +1,14 @@
 import { wrap } from 'svelte-spa-router/wrap';
 
-import Home from './routes/Home.svelte'
-import Loading from './routes/Loading.svelte'
-import NotFound from './routes/NotFound.svelte'
+import Home from '$lib/components/Home.svelte'
+import Loading from '$lib/components/Loading.svelte'
+import NotFound from '$lib/components/NotFound.svelte'
 
 export default {
     '/': Home,
 
-    '/play/:group?': wrap({
-        asyncComponent: () => import('./routes/Play.svelte'),
-        loadingComponent: Loading,
-        loadingParams: {},
-    }),
-
     '/vibe/:group?': wrap({
-        asyncComponent: () => import('./routes/VibeWrap.svelte'),
+        asyncComponent: () => import('$lib/sync/VibeWrap.svelte'),
         loadingComponent: Loading,
         loadingParams: {},
     }),
@@ -23,7 +17,7 @@ export default {
     // This is dynamically imported, so the code is loaded on-demand from the server
     '/hello/:first/:last?': wrap({
         // Note that this is a function that returns the import
-        asyncComponent: () => import('./routes/Name.svelte'),
+        asyncComponent: () => import('$lib/components/Name.svelte'),
         // Show the loading component while the component is being downloaded
         loadingComponent: Loading,
         // Pass values for the `params` prop of the loading component
@@ -40,7 +34,7 @@ export default {
         // We're adding an artificial delay of 5 seconds so you can experience the loading even on localhost
         // Note that normally the modules loaded with `import()` are cached, so the delay exists only on the first request.
         // In this case, we're adding a delay every time the component is loaded
-        asyncComponent: () => import('./routes/Wild.svelte')
+        asyncComponent: () => import('$lib/components/Wild.svelte')
             .then((component) => {
                 return new Promise((resolve) => {
                     // Wait 5 seconds before returning

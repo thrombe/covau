@@ -10,16 +10,16 @@ const sleep = (ms: number) => {
 };
 
 
-export interface ISlow<T> {
-    with_query(q: string): Promise<T | null>;
+export interface ISlow<T, Q> {
+    search_query(q: Q): Promise<T | null>;
 }
-export function SlowSearch<T, S extends Constructor<{
-    with_query(q: string): Promise<T | null>;
+export function SlowSearch<T, Q, S extends Constructor<{
+    search_query(q: Q): Promise<T | null>;
 }>>(s: S) {
-    return class extends s implements ISlow<T> {
+    return class extends s implements ISlow<T, Q> {
         last_search: number = 0;
         search_generation: number = 0;
-        async with_query(q: string) {
+        async search_query(q: Q) {
             this.search_generation += 1;
             let current_generation = this.search_generation;
             let del = 500;
@@ -31,7 +31,7 @@ export function SlowSearch<T, S extends Constructor<{
             // some other (concurrent) call to this method may change current_generation
             if (this.search_generation == current_generation) {
                 this.last_search = Date.now();
-                let r = await super.with_query(q);
+                let r = await super.search_query(q);
 
                 // to make sure that latest searches are not overwritten by searches that started earlier
                 if (this.search_generation == current_generation) {
@@ -40,7 +40,7 @@ export function SlowSearch<T, S extends Constructor<{
             }
             return null;
         }
-    } as S & Constructor<ISlow<T>>
+    } as S & Constructor<ISlow<T,Q>>
 }
 
 
@@ -81,7 +81,6 @@ export interface IUnique<T> {
 }
 export function UniqueSearch<T, S extends Constructor<{
     next_page(): Promise<RObject<T>[]>;
-    get_key(t: RObject<T>): any;
 }>>(s: S) {
     return class extends s implements IUnique<T> {
         uniq: Set<T>;
@@ -93,7 +92,7 @@ export function UniqueSearch<T, S extends Constructor<{
         async next_page() {
             let r = await super.next_page();
             let items = r.filter((item) => {
-                let k = this.get_key(item);
+                let k: any = item.get_key();
                 if (this.uniq.has(k)) {
                     return false;
                 } else {
@@ -134,13 +133,8 @@ export abstract class Paged<T> {
 
 export abstract class Unpaged<T> {
     has_next_page: boolean = true;
-    query: string;
-    constructor(q: string) {
-        this.query = q;
-    }
 
     abstract next_page(): Promise<RObject<T>[]>;
-    abstract get_key(t: RObject<T>): unknown;
 }
 
 

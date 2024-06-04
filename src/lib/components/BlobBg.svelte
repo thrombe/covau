@@ -54,6 +54,81 @@
 
     let final_seed = seed ?? (_seed ?? Date.now().toString());
 
+    // - [catppuccin](https://github.com/catppuccin/catppuccin#-palette)
+    let catpuccin_macchiato = [
+        "#f4dbd6",
+        "#f0c6c6",
+        "#f5bde6",
+        "#c6a0f6",
+        "#ed8796",
+        "#ee99a0",
+        "#f5a97f",
+        "#eed49f",
+        "#a6da95",
+        "#8bd5ca",
+        "#91d7e3",
+        "#7dc4e4",
+        "#8aadf4",
+        "#b7bdf8",
+        "#cad3f5",
+        "#b8c0e0",
+        "#a5adcb",
+        "#939ab7",
+        "#8087a2",
+        "#6e738d",
+        "#5b6078",
+        "#494d64",
+        "#363a4f",
+        "#24273a",
+        "#1e2030",
+        "#181926",
+    ];
+    let gruvbox_dark_fg_dark = [
+        "#282828",
+        "#CC241D",
+        "#98971A",
+        "#D79921",
+        "#458588",
+        "#458588",
+        "#B16286",
+        "#689D6A",
+        "#A89984",
+    ];
+    let gruvbox_dark_fg_bright = [
+        "#928374",
+        "#FB4934",
+        "#B8BB26",
+        "#FABD2F",
+        "#83A598",
+        "#D3869B",
+        "#8EC07C",
+        "#EBDBB2",
+    ];
+    let macos = [
+        "#4F0D1B",
+        "#912E40",
+        "#504591",
+        "#5197B9",
+        "#16183E",
+        "#925FD6",
+    ];
+    let macos_brighter_maybe = [
+        "#65408E",
+        "#E60193",
+        "#F90038",
+        "#FB8C40",
+        "#FDAC14",
+        "#CAE7FB",
+        "#06A4DC",
+        "#0078BD",
+        "#29295B",
+    ];
+
+    // colors = macos;
+    // bg_color = '#51468F';
+    
+    // colors = catpuccin_macchiato.slice(0, -5);
+    // bg_color = catpuccin_macchiato[3];
 
     let canvas: HTMLCanvasElement;
     let width: number;

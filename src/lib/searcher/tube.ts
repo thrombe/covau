@@ -1,3 +1,4 @@
+import type { FetchRequest } from "$types/server";
 import Innertube, { UniversalCache } from "youtubei.js/web";
 
 export async function new_innertube_instance() {
@@ -34,10 +35,10 @@ export async function new_innertube_instance() {
                 url,
                 input instanceof Request ? input : undefined
             );
-            let req = {
+            let req: FetchRequest = {
                 url: url,
                 headers: headers_copy,
-                body: init?.body,
+                body: init?.body?.toString(),
                 method: request.method
             };
             let res = await fetch('/.netlify/functions/fetch', {

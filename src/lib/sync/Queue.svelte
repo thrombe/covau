@@ -1,14 +1,13 @@
 <script lang="ts">
     import type Innertube from 'youtubei.js/web';
     import type { Unique } from '../virtual';
-    import AudioListItem from './AudioListItem.svelte';
-    import InputBar from './InputBar.svelte';
-    import VirtualScrollable from './VirtualScrollable.svelte';
-    import type { VideoInfo } from 'youtubei.js/dist/src/parser/youtube';
+    import AudioListItem from '$lib/components/AudioListItem.svelte';
+    import InputBar from '$lib/components/InputBar.svelte';
+    import VirtualScrollable from '$lib/components/VirtualScrollable.svelte';
+    import type { VideoInfo } from '$lib/searcher/song_tube.ts';
     import { toast } from '$lib/toast/Toasts.svelte';
 
     export let items: Array<Unique<string, string>>;
-    export let gap: number;
     export let item_height: number;
     export let selected_item_index: number;
     export let playing: number | null;
@@ -43,6 +42,7 @@
     let end_is_visible = false;
     const end_reached = async () => {};
     const on_item_click = async (t: Unique<VideoInfo | string, unknown>) => {};
+    let t: VideoInfo | string;
     let selected_item: Unique<VideoInfo | string, unknown>;
     let try_scroll_selected_item_in_view: () => Promise<void>;
 
@@ -53,8 +53,13 @@
             if (searched_item_map.has(id.data)) {
                 return Promise.resolve();
             } else {
-                return tube.getBasicInfo(id.data).then((info) => {
-                    // console.log(info);
+                return tube.getBasicInfo(id.data).then(async (info) => {
+                    // TODO: remove this crazy code once the problem fixes itself
+                    // the library returns results of other queries. for whatever reason.
+                    // maybe netlify's caching is broken
+                    // for (let i = 0; i < 5 && "id" in info.basic_info && id.data != info.basic_info.id; i += 1) {
+                    //     info = await tube.getBasicInfo(id.data);
+                    // }
                     searched_item_map.set(id.data, info);
                 }).catch(e => {
                     searched_item_map.set(id.data, { basic_info: { title: id.data, author: '' }})
@@ -168,7 +173,6 @@
 <div class='w-full h-full'>
     <VirtualScrollable
         bind:items={searched_items}
-        {gap}
         columns={1}
         {item_height}
         {on_item_click}
@@ -182,6 +186,7 @@
         let:selected
         let:index
     >
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
         <item class='w-full h-full block relative py-1 rounded-xl'
             draggable={index != items.length}
             on:dragstart={(event) => dragstart(event, index)}
@@ -216,7 +221,7 @@
                         await delete_item(index, items[index].data);
                     }}
                 >
-                    <img draggable={false} class='h-3 opacity-50' src='/static/remove.svg'>
+                    <img alt="remove" draggable={false} class='h-3 opacity-50' src='/static/remove.svg'>
                 </button>
                 <div class='absolute h-full flex flex-col justify-center left-0 top-0'>
                     <button
@@ -226,7 +231,7 @@
                             await play_item(index);
                         }}
                     >
-                        <img draggable={false} class='scale-[50%]' src='/static/play.svg'>
+                        <img alt="play" draggable={false} class='scale-[50%]' src='/static/play.svg'>
                     </button>
                 </div>
             {/if}

@@ -1,22 +1,18 @@
-
 <script lang="ts">
-    import VirtualScrollable from './VirtualScrollable.svelte';
-    import { tick } from 'svelte';
-    import type { Unique } from '../virtual.ts';
-    import type { Writable } from 'svelte/store';
-    import type { RFactory, RObject, RSearcher } from '../searcher/searcher.ts';
+    import VirtualScrollable from "./VirtualScrollable.svelte";
+    import { tick } from "svelte";
+    import type { Unique } from "../virtual.ts";
+    import type { Writable } from "svelte/store";
+    import type { Keyed, RFactory, RObject, RSearcher } from "../searcher/searcher.ts";
 
     // OOF: extra prop to fix T as svelte does not recognise T properly here
     // just pass a variable with the required T type (undefined is fine too) and ignore it
     export let t: T;
-    export let fac: Writable<RFactory<T> | null>;
     export let searcher: Writable<RSearcher<T>>;
     export let selected_item_index: number;
     export let selected_item: Unique<RObject<T>, unknown>;
     export let columns: number;
     export let item_height: number;
-    export let search_query: string;
-    export let gap: number;
     export let end_is_visible = true;
     export let on_item_click: (t: Unique<RObject<T>, unknown>) => Promise<void>;
     export let try_scroll_selected_item_in_view: () => Promise<void>;
@@ -45,31 +41,29 @@
             }
             await next_page();
             await tick();
-            await new Promise<void>(r => setTimeout(() => r(), 100));
+            await new Promise<void>((r) => setTimeout(() => r(), 100));
             await tick();
         }
     };
     const next_page = async () => {
         let r = await $searcher.next_page();
-        items = r.map((e: RObject<T>) => {
+        items = r.map((e: Keyed) => {
             return { id: e.get_key(), data: e } as Unique<RObject<T>, number>;
         });
     };
     export const search_objects = async () => {
-        if ($fac) {
-            let s = await $fac.with_query(search_query);
-            if (!s) {
-                return;
-            }
-            $searcher = s as RSearcher<T>;
-        }
         await next_page();
         await tick();
         selected_item_index = 0;
         await try_scroll_selected_item_in_view();
         end_reached();
     };
-    search_objects();
+    searcher.subscribe(async (e) => {
+        items = [];
+        if (search_objects) {
+            await search_objects();
+        }
+    });
 
     let info_width = 0;
     let info_margin = 0;
@@ -83,11 +77,13 @@
     }
 </script>
 
-<cl class="main" style="--info-width: {info_width}px; --info-margin: {info_margin}px;">
+<cl
+    class="main"
+    style="--info-width: {info_width}px; --info-margin: {info_margin}px;"
+>
     <scrollable>
         <VirtualScrollable
             bind:items
-            {gap}
             {columns}
             {item_height}
             {on_item_click}

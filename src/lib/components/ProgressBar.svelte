@@ -26,7 +26,7 @@
     // so wait for some hacky amount of time before
     // syncing progress bar to the 'progress' variable
     let wait_for_update = false;
-    let timeout: number;
+    let timeout: ReturnType<typeof setTimeout>;
     $: if (!dragging) {
         wait_for_update = true;
         clearTimeout(timeout);
@@ -105,6 +105,7 @@
 
 <svelte:window on:mousemove={mousemove} on:dragover={dragover} />
 
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <bar
     class='w-full h-full flex flex-row relative bg-gray-200 bg-opacity-10 rounded-md'
     bind:this={bar}

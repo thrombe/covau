@@ -1,67 +1,91 @@
-import type Search from "youtubei.js/dist/src/parser/ytmusic/Search";
-import Innertube, { MusicShelfContinuation, UniversalCache, YTNodes } from "youtubei.js/web";
+import Innertube, { MusicShelfContinuation, UniversalCache, YTMusic, YT, YTNodes, Misc } from "youtubei.js/web";
 import { SavedSearch, SlowSearch, UniqueSearch, Unpaged } from "./mixins";
 import type { Keyed, RObject, RSearcher } from "./searcher";
-import type { SearchContinuation } from "youtubei.js/dist/src/parser/ytmusic/Search";
-import type { Playlist } from "youtubei.js/dist/src/parser/ytmusic";
+
+export { YT, YTNodes, YTMusic };
+export type Search = YTMusic.Search;
+export type SearchContinuation = Awaited<ReturnType<typeof YTMusic.Search.prototype.getContinuation>>;
+export type MusicResponsiveListItem = YTNodes.MusicResponsiveListItem;
+export type VideoInfo = YT.VideoInfo;
 
 // https://github.com/LuanRT/YouTube.js/issues/321
-export type MusicResponsiveListItem = YTNodes.MusicResponsiveListItem;
-export type Typ =  'song' | 'video' | 'album' | 'playlist' | 'artist';
-type SearchTyp =
-    { type: 'search', search: Typ } |
-    { type: 'artist', id: string } |
-    { type: 'album', id: string } |
-    { type: 'playlist', id: string };
+export type Typ = 'song' | 'video' | 'album' | 'playlist' | 'artist';
+export type BrowseQuery =
+    { query_type: 'search', search: Typ, query: string } |
+    { query_type: 'artist', id: string } |
+    { query_type: 'album', id: string } |
+    { query_type: 'playlist', id: string } |
+    { query_type: 'up-next', id: string } |
+    { query_type: 'home-feed' };
 
-export class SongTube extends Unpaged<MusicResponsiveListItem> {
+export type Author = {
+    name: string,
+    channel_id: string | null,
+};
+export type Song = {
+    id: string,
+    title: string | null,
+    thumbnail: string | null,
+    authors: Author[],
+};
+export type Video = Song;
+export type Album = {
+    id: string,
+    title: string | null,
+    thumbnail: string | null,
+    author: Author | null,
+};
+export type Playlist = Album;
+export type Artist = {
+    id: string,
+    name: string | null,
+    subscribers: string | null,
+    thumbnail: string | null,
+};
+export type MusicListItem =
+    { typ: 'song', data: Song } |
+    { typ: 'video', data: Video } |
+    { typ: 'album', data: Album } |
+    { typ: 'playlist', data: Playlist } |
+    { typ: 'artist', data: Artist };
+
+export class SongTube extends Unpaged<MusicListItem> {
     tube: Innertube;
-    type: SearchTyp;
+    query: BrowseQuery;
 
-    constructor(q: string, tube: Innertube, type: SearchTyp) {
-        super(q);
+    constructor(query: BrowseQuery, tube: Innertube) {
+        super();
         this.tube = tube;
-        this.type = type;
+        this.query = query;
     }
 
-    static new(q: string, tube: Innertube, type: SearchTyp) {
-        const US = UniqueSearch<MusicResponsiveListItem, typeof SongTube>(SongTube);
-        const SS = SavedSearch<MusicResponsiveListItem, typeof US>(US);
-        return new SS(q, tube, type);
+    static new(query: BrowseQuery, tube: Innertube) {
+        const US = UniqueSearch<MusicListItem, typeof SongTube>(SongTube);
+        const SS = SavedSearch<MusicListItem, typeof US>(US);
+        return new SS(query, tube);
     }
 
-    static factory(tube: Innertube, type: Typ) {
-        type R = RSearcher<MusicResponsiveListItem>;
+    static fused() {
+        let s = SongTube.new({ type: '' } as unknown as BrowseQuery, null as unknown as Innertube);
+        s.has_next_page = false;
+        return s;
+    }
+
+    static factory(tube: Innertube) {
+        type R = RSearcher<MusicListItem>;
         class Fac {
             tube: Innertube;
             constructor(tube: Innertube) {
                 this.tube = tube;
             }
-            async with_query(q: string) {
-                let t = SongTube.new(q, this.tube, { type: 'search', search: type });
+            async search_query(query: BrowseQuery) {
+                let t = SongTube.new(query, this.tube);
                 return t as R | null;
             }
-            async browse_artist_songs(artist_id: string) {
-                let t = SongTube.new('', this.tube, { type: 'artist', id: artist_id });
-                return t;
-            }
-            async browse_album(album_id: string) {
-                let t = SongTube.new('', this.tube, { type: 'album', id: album_id });
-                return t;
-            }
-            async browse_playlist(playlist_id: string) {
-                let t = SongTube.new('', this.tube, { type: 'playlist', id: playlist_id });
-                return t;
-            }
         }
-        const SS = SlowSearch<R, typeof Fac>(Fac);
+        const SS = SlowSearch<R, BrowseQuery, typeof Fac>(Fac);
         return new SS(tube);
     }
-
-    static obj_type() {
-        return null as unknown as MusicResponsiveListItem & Keyed;
-    }
-
 
     results: Search | null = null;
     cont: SearchContinuation | null = null;
@@ -70,24 +94,62 @@ export class SongTube extends Unpaged<MusicResponsiveListItem> {
         if (!this.has_next_page) {
             return [];
         }
-        console.log(this.type);
-        if (this.type.type == 'search') {
-            return await this.next_page_search(this.type.search);
-        } else if (this.type.type == 'artist') {
-            let r = await this.next_page_artist_songs(this.type.id);
+        console.log(this.query);
+        if (this.query.query_type == 'search') {
+            return await this.next_page_search(this.query.query, this.query.search);
+        } else if (this.query.query_type == 'artist') {
+            let r = await this.next_page_artist_songs(this.query.id);
             console.log(r);
             return r;
-        } else if (this.type.type == 'album') {
-            let r = await this.next_page_album(this.type.id);
+        } else if (this.query.query_type == 'album') {
+            let r = await this.next_page_album(this.query.id);
             return r;
-        } else if (this.type.type == 'playlist') {
-            let r = await this.next_page_playlist(this.type.id);
+        } else if (this.query.query_type == 'playlist') {
+            let r = await this.next_page_playlist(this.query.id);
+            return r;
+        } else if (this.query.query_type == 'up-next') {
+            let r = await this.next_page_up_next(this.query.id);
+            return r;
+        } else if (this.query.query_type == 'home-feed') {
+            let r = await this.next_page_home_feed();
             return r;
         }
 
         throw 'unreachable';
     }
-    playlist: Playlist | null = null;
+    protected async next_page_up_next(video_id: string) {
+        this.has_next_page = false;
+        let r = await this.tube.music.getUpNext(video_id);
+        let k = r.contents.filterType(YTNodes.PlaylistPanelVideo);
+
+        let mli: MusicListItem[] = k.map(s => ({
+            typ: 'song',
+            data: {
+                id: s.video_id,
+                title: s.title.text ?? '',
+                thumbnail: this.get_thumbnail(s.thumbnail),
+                authors: s.artists?.map(a => ({ name: a.name, channel_id: a.channel_id ?? null })) ?? [],
+            }
+        }));
+        return keyed(mli) as RObject<MusicListItem>[];
+    }
+    protected async next_page_home_feed() {
+        this.has_next_page = false;
+        let r = await this.tube.music.getHomeFeed();
+        let k = r.sections?.filterType(YTNodes.MusicCarouselShelf).flatMap(e => e.contents.filterType(YTNodes.MusicResponsiveListItem)) ?? [];
+
+        let mli: MusicListItem[] = k.map(s => ({
+            typ: 'song',
+            data: {
+                id: s.id!,
+                title: s.title ?? null,
+                thumbnail: this.get_thumbnail(s.thumbnail),
+                authors: s.artists?.map(a => ({ name: a.name, channel_id: a.channel_id ?? null })) ?? [],
+            }
+        }));
+        return keyed(mli) as RObject<MusicListItem>[];
+    }
+    playlist: YTMusic.Playlist | null = null;
     protected async next_page_playlist(playlist_id: string) {
         if (!this.playlist) {
             this.playlist = await this.tube.music.getPlaylist(playlist_id);
@@ -101,35 +163,65 @@ export class SongTube extends Unpaged<MusicResponsiveListItem> {
             this.has_next_page = false;
             return [];
         }
-        
-        let k = a.filterType(YTNodes.MusicResponsiveListItem);
-        return keyed(k);
+
+        let arr = a.filterType(YTNodes.MusicResponsiveListItem);
+
+        let mli: MusicListItem[] = arr.map(p => ({
+            typ: 'song',
+            data: {
+                id: p.id!,
+                title: p.title ?? null,
+                thumbnail: this.get_thumbnail(p.thumbnail),
+                authors: p.artists?.map(a => ({ name: a.name, channel_id: a.channel_id ?? null })) ?? [],
+            }
+        }));
+        return keyed(mli) as RObject<MusicListItem>[];
     }
     protected async next_page_album(album_id: string) {
         this.has_next_page = false;
         let a = await this.tube.music.getAlbum(album_id);
-        return keyed(a.contents);
+        let mli: MusicListItem[] = a.contents.map(a => ({
+            typ: 'song',
+            data: {
+                id: a.id!,
+                title: a.title ?? null,
+                thumbnail: this.get_thumbnail(a.thumbnail),
+                authors: a.artists?.map(a => ({ name: a.name, channel_id: a.channel_id ?? null })) ?? [],
+            }
+        }));
+        return keyed(mli) as RObject<MusicListItem>[];
     }
     protected async next_page_artist_songs(artist_id: string) {
         this.has_next_page = false;
         let a = await this.tube.music.getArtist(artist_id);
         let r = await a.getAllSongs();
-        let arr: RObject<MusicResponsiveListItem>[];
+        let arr: MusicResponsiveListItem[];
         if (!r) {
             arr = [];
         } else {
-            arr = keyed(r.contents);
+            arr = r.contents;
         }
-        return arr;
+
+        let mli: MusicListItem[] = arr.map(e => ({
+            typ: 'song',
+            data: {
+                id: e.id!,
+                title: e.title ?? null,
+                thumbnail: this.get_thumbnail(e.thumbnail),
+                authors: e.artists?.map(a => ({ name: a.name, channel_id: a.channel_id ?? null })) ?? [],
+            }
+        }));
+        return keyed(mli) as RObject<MusicListItem>[];
     }
-    protected async next_page_search(type: Typ) {
-        if (this.query.length == 0) {
+    protected async next_page_search(query: string, type: Typ) {
+        if (query.length == 0) {
             this.has_next_page = false;
             return [];
         }
+
         let songs: Array<MusicResponsiveListItem>;
         if (this.results === null) {
-            this.results = await this.tube.music.search(this.query, { type: type });
+            this.results = await this.tube.music.search(query, { type: type });
             console.log(this.results);
 
             if (!this.results.contents) {
@@ -145,12 +237,17 @@ export class SongTube extends Unpaged<MusicResponsiveListItem> {
             if (this.cont === null) {
                 this.cont = await this.results.getContinuation();
             } else {
-                this.cont = await this.cont.getContinuation();
+                if (this.cont.has_continuation) {
+                    this.cont = await this.cont.getContinuation();
+                } else {
+                    this.cont = null;
+                }
             }
             console.log(this.cont)
 
             if (
-                !this.cont.contents
+                !this.cont
+                || !this.cont.contents
                 || !this.cont.contents.contents
                 || !(this.cont.contents.contents.length > 0)
             ) {
@@ -162,30 +259,84 @@ export class SongTube extends Unpaged<MusicResponsiveListItem> {
         }
 
         songs = songs.filter(e => !!e.id);
-        let k = keyed(songs);
+
+
+        let mli: MusicListItem[] = songs.map(e => {
+            if (e.item_type === 'song' || e.item_type === 'video') {
+                return {
+                    typ: 'song',
+                    data: {
+                        id: e.id!,
+                        title: e.title ?? null,
+                        thumbnail: this.get_thumbnail(e.thumbnail),
+                        authors: e.artists?.map(a => ({ name: a.name, channel_id: a.channel_id ?? null })) ?? [],
+                    }
+                }
+            } else if (e.item_type === 'album' || e.item_type === 'playlist') {
+                return {
+                    typ: e.item_type,
+                    data: {
+                        id: e.id!,
+                        title: e.title ?? null,
+                        thumbnail: this.get_thumbnail(e.thumbnail),
+                        author: e.author ? { name: e.author.name, channel_id: e.author?.channel_id ?? null } : null,
+                    }
+                }
+            } else if (e.item_type === 'artist') {
+                return {
+                    typ: 'artist',
+                    data: {
+                        id: e.id!,
+                        name: e.name ?? null,
+                        thumbnail: this.get_thumbnail(e.thumbnail),
+                        subscribers: e.subscribers ?? null,
+                    }
+                }
+            } else {
+                return {
+                    typ: 'video',
+                    data: {
+                        id: e.id!,
+                        title: e.title ?? null,
+                        thumbnail: this.get_thumbnail(e.thumbnail),
+                        authors: [],
+                    }
+                };
+            }
+        });
+        let k = keyed(mli);
 
         this.has_next_page = this.results.has_continuation;
-        console.log(k.map(e => e.id))
-        return k;
+        return k as RObject<MusicListItem>[];
     }
 
-    get_key(t: RObject<MusicResponsiveListItem>) {
-        if (!t.id) {
-            console.warn("item does not have an id :/", t);
+    get_thumbnail(node: Misc.Thumbnail[] | YTNodes.MusicThumbnail | null | undefined): MusicListItem['data']['thumbnail'] | null {
+        if (node === null || !node) {
+            return null;
         }
-        return t.id;
+
+        let t;
+        if (node instanceof YTNodes.MusicThumbnail) {
+            t = node.contents.map(t => t.url);
+        } else {
+            t = node.map(t => t.url);
+        }
+
+        return [...t, null][0];
     }
 }
 
-const keyed = <T>(items: T[]): (T & Keyed)[] => {
-    return items.filter((e: unknown) => !!e.id).map((e: unknown) => {
-        let p = e as RObject<MusicResponsiveListItem>;
+const keyed = <T extends { data: { id?: any } }>(items: T[]): (T & Keyed)[] => {
+    let res = items.filter((e) => !!e.data.id).map((e) => {
+        let p = e as T & Keyed;
         p.get_key = function() {
-            if (!p.id) {
+            if (!p.data.id) {
                 console.warn("item does not have an id :/", p);
             }
-            return p.id;
+            return p.data.id;
         };
         return p;
     });
+
+    return res;
 }

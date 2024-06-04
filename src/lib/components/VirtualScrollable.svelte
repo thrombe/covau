@@ -17,8 +17,8 @@
     export let on_item_click = async (_: Unique<T, unknown>) => {};
     export let end_is_visible = true;
     export let keyboard_control = true;
-    export let width: number;
-    export let height: number;
+    export let width: number = undefined as unknown as number;
+    export let height: number = undefined as unknown as number;
 
     type T = $$Generic;
     interface $$Slots {
@@ -202,6 +202,7 @@
         "
     >
         {#each visible as item, i (item.id)}
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
             <sel
                 id={is_selected(i, selected) ? 'selected' : ''}
                 on:click={() => {

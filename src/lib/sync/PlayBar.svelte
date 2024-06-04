@@ -1,10 +1,10 @@
 <script lang="ts">
     import { onDestroy } from 'svelte';
-    import { Player } from '$lib/player.ts';
+    import { SyncPlayer } from './player.ts';
     import AudioListItem from '$lib/components/AudioListItem.svelte';
     import ProgressBar from '$lib/components/ProgressBar.svelte';
 
-    export let player: Player;
+    export let player: SyncPlayer;
     export let audio_info: { title: string; title_sub: string; img_src: string } | null;
     export let mobile = false;
     export let keyboard_control = true;
@@ -115,7 +115,7 @@
         target='_blank'
         class='h-full flex justify-center items-center aspect-square bg-gray-200 bg-opacity-10 rounded-md p-1 scale-[90%]'
     >
-        <img src='/static/github.svg' class='h-9 aspect-square' >
+        <img alt="github" src='/static/github.svg' class='h-9 aspect-square' >
     </a>
     <audio-controls>
         <div class='flex flex-row items-center h-1/3 w-full py-1'>
@@ -139,7 +139,7 @@
                     await player.play_prev();
                 }}
             >
-                <img class='h-3' src='/static/prev.svg'>
+                <img alt="prev" class='h-3' src='/static/prev.svg'>
             </button>
             <button
                 on:click={async () => {
@@ -147,21 +147,21 @@
                     is_playing = player.is_playing();
                 }}
             >
-                <img class='h-3' src='/static/{is_playing ? 'pause' : 'play'}.svg'>
+                <img alt="play pause" class='h-3' src='/static/{is_playing ? 'pause' : 'play'}.svg'>
             </button>
             <button
                 on:click={async () => {
                     await player.play_next();
                 }}
             >
-                <img class='h-3' src='/static/next.svg'>
+                <img alt="next" class='h-3' src='/static/next.svg'>
             </button>
         </div>
     </audio-controls>
 
     <volume-control class='relative flex flex-row justify-center items-center pb-1'>
         <button class='volume-button p-2'>
-            <img class='h-6 {is_muted ? 'brightness-50 opacity-50' : ''}' src='/static/volume-{volume_icon}.svg'>
+            <img alt="volume" class='h-6 {is_muted ? 'brightness-50 opacity-50' : ''}' src='/static/volume-{volume_icon}.svg'>
             <div 
                 class='volume-box absolute flex flex-row gap-4 right-0 bottom-10 h-16 px-6 py-4 mr-2 bg-gray-200 bg-opacity-10 rounded-xl backdrop-blur-md {dragging_volume ? 'z-10' : '-z-40 opacity-0'}'
             >
@@ -183,7 +183,7 @@
                         await player.toggle_mute();
                     }}
                 >
-                    <img class='h-full w-6 aspect-square {is_muted ? 'brightness-50 opacity-50' : ''}' src='/static/volume-{volume_icon}.svg'>
+                    <img alt="volume" class='h-full w-6 aspect-square {is_muted ? 'brightness-50 opacity-50' : ''}' src='/static/volume-{volume_icon}.svg'>
                 </button>
             </div>
         </button>
