@@ -147,7 +147,7 @@
     $: if (queue_selected_item_index != null) {
         let id: string | null | undefined;
         if (queue_selected_item_index > -1) {
-            id = queue_items[queue_selected_item_index].id;
+            id = queue_items.at(queue_selected_item_index)?.id ?? null;
         } else if (queue_playing_vid_info) {
             id = queue_playing_vid_info.basic_info.id ?? null;
         } else {
