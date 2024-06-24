@@ -3,6 +3,9 @@ Welcome to Covau, your ultimate webapp for sharing music and videos with friends
 
 [Try it out now!](https://covau.netlify.app/#/)
 
+### Demo Video
+Check out our [demo video](https://www.youtube.com/watch?v=l5NW_tI0uNs) to see Covau in action:
+
 # Features
 ### Seamless Sharing
 No need for accounts or complicated setups. Covau makes sharing easy and hassle-free.
