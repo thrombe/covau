@@ -208,13 +208,21 @@
                     focus_on_create={selected}
                 />
             {:else}
-                <AudioListItem
-                    title={item.basic_info.title ? item.basic_info.title : ''}
-                    title_sub={item.basic_info.author ? item.basic_info.author : ''}
-                    img_src={item.basic_info.thumbnail
-                        ? item.basic_info.thumbnail[item.basic_info.thumbnail.length - 1].url
-                        : ''}
-                />
+                {#if item.playability_status?.status == "LOGIN_REQUIRED"}
+                    <AudioListItem
+                        title={"LOGIN REQUIRED"}
+                        title_sub={""}
+                        img_src={""}
+                    />
+                {:else}
+                    <AudioListItem
+                        title={item.basic_info.title ? item.basic_info.title : ''}
+                        title_sub={item.basic_info.author ? item.basic_info.author : ''}
+                        img_src={item.basic_info.thumbnail
+                            ? item.basic_info.thumbnail[item.basic_info.thumbnail.length - 1].url
+                            : ''}
+                    />
+                {/if}
                 <button
                     class='pop-button'
                     on:click={async () => {
